@@ -18,5 +18,34 @@
     <ClCompile Include="src\main.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="src\Application.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Shape.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\ShaderProgram.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="src\Application.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Shape.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\ShaderProgram.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="src\shaders\base.frag" />
+    <None Include="src\shaders\base.vert" />
+    <None Include="src\shaders\full.frag" />
+    <None Include="src\shaders\full.geom" />
+    <None Include="src\shaders\full.tcs" />
+    <None Include="src\shaders\full.tes" />
+    <None Include="src\shaders\full.vert" />
   </ItemGroup>
 </Project>

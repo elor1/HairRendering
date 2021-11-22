@@ -179,7 +179,24 @@ xcopy /y /d "$(SolutionDir)lib\assimp\assimp-vc140-mt.dll" "$(OutDir)"</Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="src\Application.cpp" />
     <ClCompile Include="src\main.cpp" />
+    <ClCompile Include="src\ShaderProgram.cpp" />
+    <ClCompile Include="src\Shape.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="src\Application.h" />
+    <ClInclude Include="src\ShaderProgram.h" />
+    <ClInclude Include="src\Shape.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="src\shaders\base.frag" />
+    <None Include="src\shaders\base.vert" />
+    <None Include="src\shaders\full.frag" />
+    <None Include="src\shaders\full.geom" />
+    <None Include="src\shaders\full.tcs" />
+    <None Include="src\shaders\full.tes" />
+    <None Include="src\shaders\full.vert" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

@@ -1,0 +1,20 @@
+#version 440
+
+layout(vertices = 3) out;
+
+in vec3 position_v[];
+
+out vec3 position_tc[];
+
+void main()
+{
+	position_tc[gl_InvocationID] = position_v[gl_InvocationID];
+
+	if (gl_InvocationID == 0)
+	{
+		gl_TessLevelInner[0] = 5;
+		gl_TessLevelOuter[0] = 5;
+		gl_TessLevelOuter[1] = 5;
+		gl_TessLevelOuter[2] = 5;
+	}
+}
