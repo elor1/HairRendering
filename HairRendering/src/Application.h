@@ -6,12 +6,13 @@
 
 class Hair;
 class Simulation;
+class Mesh;
 
 class Application
 {
 public:
 	Application(int width, int height);
-	~Application();
+	Application();
 
 	void Run();
 
@@ -20,9 +21,11 @@ private:
 	void Draw();
 	void Update();
 
+	Mesh* mMesh;
 	Hair* mHair;
 	Simulation* mSimulation;
-	ShaderProgram* mProgram;
+	ShaderProgram* mMeshProgram;
+	ShaderProgram* mHairProgram;
 
 	GLFWwindow* mWindow;
 	int mWidth;

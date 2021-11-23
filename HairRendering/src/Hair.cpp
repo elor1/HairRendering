@@ -12,6 +12,21 @@ Hair::Hair(int numGuides, Simulation* simulation)
 	mSimulation = simulation;
 }
 
+Hair::Hair(Mesh* mesh, Simulation* simulation)
+{
+	std::vector<Triangle>& triangles = mesh->triangles;
+	for (auto triangle : triangles)
+	{
+		glm::vec3 position = (triangle.vertex1.position + triangle.vertex2.position + triangle.vertex3.position) / 3.0f;
+		glm::vec3 normal = (triangle.vertex1.normal + triangle.vertex2.normal + triangle.vertex3.normal) / 3.0f;
+		normal.z = 0.0f;
+		normal = glm::normalize(normal);
+
+		mGuideHairs.push_back(new Strand(2, 2.0f, position, normal));
+	}
+	mSimulation = simulation;
+}
+
 void Hair::Update(float time)
 {
 	if (!mSimulation)

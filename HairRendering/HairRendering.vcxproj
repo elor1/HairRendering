@@ -182,6 +182,7 @@ xcopy /y /d "$(SolutionDir)lib\assimp\assimp-vc140-mt.dll" "$(OutDir)"</Command>
     <ClCompile Include="src\Application.cpp" />
     <ClCompile Include="src\Hair.cpp" />
     <ClCompile Include="src\Integrator.cpp" />
+    <ClCompile Include="src\Mesh.cpp" />
     <ClCompile Include="src\Strand.cpp" />
     <ClCompile Include="src\HairPatch.cpp" />
     <ClCompile Include="src\main.cpp" />
@@ -193,6 +194,7 @@ xcopy /y /d "$(SolutionDir)lib\assimp\assimp-vc140-mt.dll" "$(OutDir)"</Command>
     <ClInclude Include="src\Application.h" />
     <ClInclude Include="src\Hair.h" />
     <ClInclude Include="src\Integrator.h" />
+    <ClInclude Include="src\Mesh.h" />
     <ClInclude Include="src\Strand.h" />
     <ClInclude Include="src\HairPatch.h" />
     <ClInclude Include="src\ShaderProgram.h" />

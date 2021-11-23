@@ -1,6 +1,6 @@
 #version 440
 
-uniform vec3 colour;
+in vec3 colour;
 
 out vec3 fragColour;
 
