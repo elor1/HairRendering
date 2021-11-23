@@ -55,13 +55,7 @@ void Strand::Draw(ShaderProgram &program)
 	{
 		program.uniforms.vertexData[i] = mVertices[i]->position;
 	}
-	program.uniforms.colour = glm::vec3(0.6f, 0.4f, 0.3f);
-	program.uniforms.numGroupHairs = 10;
-	program.uniforms.groupWidth = 0.2f;
-	program.uniforms.hairRadius = 0.005f;
-	program.uniforms.numSplineVertices = 20;//program.uniforms.numHairVertices;
-
-	program.SetUniforms();
+	program.SetGuideHairUniforms();
 
 	glPatchParameteri(GL_PATCH_VERTICES, 4);
 	mPatch.Draw(GL_PATCHES);

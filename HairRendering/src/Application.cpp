@@ -81,6 +81,8 @@ void Application::Draw()
 	mProgram->Bind();
 	mProgram->uniforms.projection = glm::perspective(0.8f, (float)mWidth / mHeight, 0.1f, 100.0f);
 	mProgram->uniforms.view = glm::lookAt(glm::vec3(0.0f, 0.0f, 4.0f), glm::vec3(0.0f), glm::vec3(0.0f, 1.0f, 0.0f));
+	mProgram->SetGlobalUniforms();
+
 	mProgram->uniforms.model = glm::mat4(1.0f);
 	mHair->Draw(*mProgram);
 
@@ -107,7 +109,7 @@ void Application::Update()
 
 		mPrevTime = mCurrentTime;
 	}
-
+	
 	//Poll events
 	glfwPollEvents();
 }

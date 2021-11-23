@@ -18,18 +18,21 @@ ShaderProgram::ShaderProgram(const char* vertex, const char* fragment, const cha
 	mID = Load();
 
 	//Setup uniforms
-	std::vector<GLchar const*> uniformNames;
-	uniformNames.push_back("model");
-	uniformNames.push_back("view");
-	uniformNames.push_back("projection");
-	uniformNames.push_back("numHairPatch");
-	uniformNames.push_back("numHairSegments");
-	uniformNames.push_back("numSplineVertices");
-	uniformNames.push_back("vertexData");
-	uniformNames.push_back("groupWidth");
-	uniformNames.push_back("hairRadius");
-	uniformNames.push_back("tapering");
-	uniformNames.push_back("colour");
+	std::vector<GLchar const*> uniformNames
+	{
+		"model",
+		"view",
+		"projection",
+		"numHairPatch",
+		"numHairSegments",
+		"numSplineVertices",
+		"vertexData",
+		"groupWidth",
+		"hairRadius",
+		"tapering",
+		"noiseAmplitude",
+		"colour"
+	};
 
 	for (auto name : uniformNames)
 	{
@@ -48,19 +51,28 @@ GLuint ShaderProgram::GetID()
 	return mID;
 }
 
-void ShaderProgram::SetUniforms()
+void ShaderProgram::SetGlobalUniforms()
 {
-	glUniformMatrix4fv(mUniformLocations["model"], 1, GL_FALSE, glm::value_ptr(uniforms.model));
 	glUniformMatrix4fv(mUniformLocations["view"], 1, GL_FALSE, glm::value_ptr(uniforms.view));
 	glUniformMatrix4fv(mUniformLocations["projection"], 1, GL_FALSE, glm::value_ptr(uniforms.projection));
+}
+
+void ShaderProgram::SetHairUniforms()
+{
+	glUniformMatrix4fv(mUniformLocations["model"], 1, GL_FALSE, glm::value_ptr(uniforms.model));
 	glUniform1i(mUniformLocations["numHairPatch"], uniforms.numGroupHairs);
-	glUniform1i(mUniformLocations["numHairSegments"], uniforms.numHairVertices - 1);
 	glUniform1i(mUniformLocations["numSplineVertices"], uniforms.numSplineVertices);
-	glUniform3fv(mUniformLocations["vertexData"], uniforms.numHairVertices, &uniforms.vertexData[0][0]);
 	glUniform1f(mUniformLocations["groupWidth"], uniforms.groupWidth);
 	glUniform1f(mUniformLocations["hairRadius"], uniforms.hairRadius);
 	glUniform1f(mUniformLocations["tapering"], uniforms.tapering);
+	glUniform1f(mUniformLocations["noiseAmplitude"], uniforms.noiseAmplitude);
 	glUniform3fv(mUniformLocations["colour"], 1, glm::value_ptr(uniforms.colour));
+}
+
+void ShaderProgram::SetGuideHairUniforms()
+{
+	glUniform1i(mUniformLocations["numHairSegments"], uniforms.numHairVertices - 1);
+	glUniform3fv(mUniformLocations["vertexData"], uniforms.numHairVertices, &uniforms.vertexData[0][0]);
 }
 
 void ShaderProgram::Bind()

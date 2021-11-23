@@ -17,6 +17,7 @@ struct Uniforms
 	float groupWidth;
 	float hairRadius;
 	float tapering;
+	float noiseAmplitude;
 	glm::vec3 colour;
 };
 
@@ -26,7 +27,9 @@ public:
 	ShaderProgram(const char* vertex, const char* fragment, const char* geometry = "", const char* tessControl = "", const char* tessEval = "");
 
 	GLuint GetID();
-	void SetUniforms();
+	void SetGlobalUniforms();
+	void SetHairUniforms();
+	void SetGuideHairUniforms();
 	void Bind();
 	void Unbind();
 
