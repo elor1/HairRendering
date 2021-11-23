@@ -5,6 +5,7 @@
 #include <glm.hpp>
 #include <gtx/transform.hpp>
 #include <gtc/type_ptr.hpp>
+#include "Simulation.h"
 
 Application::Application(int width, int height)
 {
@@ -75,23 +76,23 @@ void Application::Draw()
 {
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-	float fov = 0.8f;
-	float aspectRatio = (float)mWidth / mHeight;
-	float nearClip = 0.1f;
-	float farClip = 100.0f;
-	glm::vec3 cameraPos = glm::vec3(0.0f, 0.0f, 4.0f);
-	glm::vec3 center = glm::vec3(0.0f, 0.0f, 0.0f);
-	glm::vec3 up = glm::vec3(0.0f, 1.0f, 0.0f);
-
-	glm::mat4 projection = glm::perspective(fov, aspectRatio, nearClip, farClip);
-	glm::mat4 view = glm::lookAt(cameraPos, center, up);
+	glm::mat4 projection = glm::perspective(0.8f, (float)mWidth / mHeight, 0.1f, 100.0f);
+	glm::mat4 view = glm::lookAt(glm::vec3(0.0f, 0.0f, 4.0f), glm::vec3(0.0f), glm::vec3(0.0f, 1.0f, 0.0f));
 	glm::mat4 model(1.0f);
 
+	//Generate hair vertex positions
+	int numVertices = 50;
+	GLfloat hairData[3 * 50];
+	HairPatch::TestData(hairData, numVertices, mDeltaTime);
+
 	glUseProgram(mFullShader);
-	glUniformMatrix4fv(glGetUniformLocation(mBaseShader, "projection"), 1, GL_FALSE, glm::value_ptr(projection));
-	glUniformMatrix4fv(glGetUniformLocation(mBaseShader, "view"), 1, GL_FALSE, glm::value_ptr(view));
-	glUniformMatrix4fv(glGetUniformLocation(mBaseShader, "model"), 1, GL_FALSE, glm::value_ptr(model));
-	glUniform3f(glGetUniformLocation(mBaseShader, "colour"), 0.0f, 1.0f, 1.0f);
+	glUniformMatrix4fv(glGetUniformLocation(mFullShader, "projection"), 1, GL_FALSE, glm::value_ptr(projection));
+	glUniformMatrix4fv(glGetUniformLocation(mFullShader, "view"), 1, GL_FALSE, glm::value_ptr(view));
+	glUniformMatrix4fv(glGetUniformLocation(mFullShader, "model"), 1, GL_FALSE, glm::value_ptr(model));
+	glUniform3f(glGetUniformLocation(mFullShader, "colour"), 0.6f, 0.4f, 0.3f);
+	glUniform3fv(glGetUniformLocation(mFullShader, "vertexData"), numVertices, hairData);
+	glUniform1i(glGetUniformLocation(mFullShader, "numHairSegments"), numVertices + 1);
+	glUniform1i(glGetUniformLocation(mFullShader, "numHairPatch"), 20);
 
 	mHairPatch.Draw();
 

@@ -1,50 +1,34 @@
 #include "Hair.h"
-#include <iostream>
+#include "Strand.h"
+#include "Simulation.h"
 
-Hair::Hair(int numSegments, double length, glm::vec3 position)
+Hair::Hair(int numGuides, Simulation* simulation)
 {
-	if (numSegments < 2)
+	for (int i = 0; i < numGuides; i++)
 	{
-		std::cout << "ERROR: Must have at least 2 hair segments" << std::endl;
+		mGuideHairs.push_back(new Strand(20, 1.0, glm::vec3(i, 0, 0)));
 	}
 
-	if (length <= 0)
+	mSimulation = simulation;
+}
+
+void Hair::Update(float time)
+{
+	/*if (!mSimulation)
 	{
-		std::cout << "ERROR: HAir length must be higher than 0" << std::endl;
+		mSimulation->Simulate(this);
 	}
 
-	mNumSegments = numSegments;
-	mLength = length;
-	mVertices = new HairVertex[numSegments + 1];
-
-	double step = (double)numSegments / length;
-	for (int i = 0; i < numSegments; i++)
+	for (auto guide : mGuideHairs)
 	{
-		mVertices[i] = HairVertex(glm::vec3(position.x, position.y * i, position.z));
-	}
+		guide->Update(time);
+	}*/
 }
 
-Hair::~Hair()
+void Hair::Draw(GLuint program)
 {
-	delete mVertices;
-}
-
-int Hair::GetNumSegments()
-{
-	return mNumSegments;
-}
-
-double Hair::GetLength()
-{
-	return mLength;
-}
-
-HairVertex Hair::GetVertex(int index)
-{
-	return mVertices[index];
-}
-
-HairVertex* Hair::GetVertices()
-{
-	return mVertices;
+	/*for (auto guide : mGuideHairs)
+	{
+		guide->Draw(program);
+	}*/
 }

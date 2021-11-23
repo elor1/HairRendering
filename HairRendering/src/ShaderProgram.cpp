@@ -66,7 +66,21 @@ GLuint ShaderProgram::CreateShader(GLenum type, const char* path)
 	glShaderSource(shaderID, 1, &code, NULL);
 	glCompileShader(shaderID);
 
-	GLint result = GL_FALSE;
+	GLint success;
+	glGetShaderiv(shaderID, GL_COMPILE_STATUS, &success);
+
+	if (success == GL_FALSE)
+	{
+		GLint length;
+		glGetShaderiv(shaderID, GL_INFO_LOG_LENGTH, &length);
+		std::string log(length, ' ');
+		glGetShaderInfoLog(shaderID, length, &length, &log[0]);
+		std::cout << "ERROR Failed to compile " << path << std::endl << log << std::endl;
+		glDeleteShader(shaderID);
+		glfwTerminate();
+	}
+
+	/*GLint result = GL_FALSE;
 	int logLength;
 	glGetShaderiv(shaderID, GL_COMPILE_STATUS, &result);
 	glGetShaderiv(shaderID, GL_INFO_LOG_LENGTH, &logLength);
@@ -75,7 +89,7 @@ GLuint ShaderProgram::CreateShader(GLenum type, const char* path)
 		std::vector<char> infoLog(logLength);
 		glGetShaderInfoLog(shaderID, logLength, NULL, &infoLog[0]);
 		std::cout << "ERROR: Failed to compile shader " << path << std::endl << &infoLog << std::endl;
-	}
+	}*/
 
 	return shaderID;
 }

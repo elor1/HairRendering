@@ -4,14 +4,47 @@ layout(isolines) in;
 
 in vec3 position_tc[];
 
-uniform mat4 model;
-uniform mat4 view;
-uniform mat4 projection;
+const int MAX_VERTICES = 64; //Max number of hair vertices
+const int NOISE_LAYERS = 3;
+const float NOISE_AMPLITUDE = 0.04f;
+
+uniform mat4 model, view, projection;
+uniform vec3 vertexData[MAX_VERTICES];
+uniform int numHairSegments;
+
+float Random(vec2 x)
+{
+    float rand = dot(x, vec2(127.1f, 311.7f));
+    return -1.0f - 2.0f * fract(sin(rand) * (43758.5453123));
+}
+
+float Noise(in vec2 x)
+{
+    vec2 floor = floor(x);
+    vec2 fract = fract(x);
+    vec2 u = fract * fract * (3.0f - 2.0f * fract);
+    return mix(mix(Random(floor + vec2(0.0,0.0)),
+                   Random(floor + vec2(1.0,0.0)), u.x),
+               mix(Random(floor + vec2(0.0,1.0)),
+                   Random(floor + vec2(1.0,1.0)), u.x), u.y);
+}
+
+float NoiseLayers(in vec2 x)
+{
+    float result = 0.0f;
+    for (int i = 0; i < NOISE_LAYERS; i++)
+    {
+        float scale = pow(2.0f, float(i));
+        result += Noise(5.0f * scale * gl_TessCoord.xy) / (2.0f * scale);
+    }
+
+    return result;
+}
 
 void main()
 {
-	vec3 point1 = mix(position_tc[0], position_tc[1], gl_TessCoord.x);
-    vec3 point2 = mix(position_tc[2], position_tc[3], gl_TessCoord.x);
-
-    gl_Position = projection * view * model * vec4(mix(point1, point2, gl_TessCoord.y), 1);
+	vec3 position = vertexData[int(clamp(gl_TessCoord.x, 0.0f, 1.0f - 1.0f / 10000.0f) * (numHairSegments - 1))];
+    position.x += gl_TessCoord.y - 0.5f;
+    position.x += NOISE_AMPLITUDE * NoiseLayers(gl_TessCoord.xy);
+    gl_Position = projection * view * model * vec4(position, 1);
 }
