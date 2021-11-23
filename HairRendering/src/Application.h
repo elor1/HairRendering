@@ -2,6 +2,10 @@
 #include <glew.h>
 #include <glfw3.h>
 #include "HairPatch.h"
+#include "ShaderProgram.h"
+
+class Hair;
+class Simulation;
 
 class Application
 {
@@ -16,9 +20,9 @@ private:
 	void Draw();
 	void Update();
 
-	HairPatch mHairPatch;
-	GLuint mBaseShader;
-	GLuint mFullShader;
+	Hair* mHair;
+	Simulation* mSimulation;
+	ShaderProgram* mProgram;
 
 	GLFWwindow* mWindow;
 	int mWidth;

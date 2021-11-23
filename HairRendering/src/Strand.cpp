@@ -10,41 +10,61 @@ Strand::Strand(int numSegments, double length, glm::vec3 position)
 
 	if (length <= 0)
 	{
-		std::cout << "ERROR: HAir length must be higher than 0" << std::endl;
+		std::cout << "ERROR: Hair length must be higher than 0" << std::endl;
 	}
 
 	mNumSegments = numSegments;
 	mLength = length;
-	mVertices = new HairVertex[numSegments + 1];
 
-	double step = (double)numSegments / length;
+	double step = (double)length / numSegments;
 	for (int i = 0; i < numSegments; i++)
 	{
-		mVertices[i] = HairVertex(glm::vec3(position.x, position.y * i, position.z));
+		mVertices.push_back(new HairVertex(glm::vec3(position.x, position.y - step * i, position.z)));
+
+		if (i != 0)
+		{
+			glm::vec3 joint = (mVertices[i]->position + mVertices[i - 1]->position) / 2.0f;
+			mJoints.push_back(new Joint(joint));
+		}
 	}
+
+	GLfloat data[] = { -0.5f, 0.5f, 0.0f,
+					  0.5f, 0.5f, 0.0f,
+					  -0.5f, -0.5f, 0.0f,
+					  0.5f, -0.5f, 0.0f };
+	mPatch.Create();
+	mPatch.SetVertexData(data, sizeof(data), 4);
+	mPatch.SetAttribute(0, 3, GL_FLOAT, GL_FALSE, 0, 0);
 }
 
 Strand::~Strand()
 {
-	delete mVertices;
+	mPatch.Destroy();
 }
 
-int Strand::GetNumSegments()
+void Strand::Update(float time)
 {
-	return mNumSegments;
 }
 
-double Strand::GetLength()
+void Strand::Draw(ShaderProgram &program)
 {
-	return mLength;
+	
+	program.uniforms.colour = glm::vec3(0.6f, 0.4f, 0.3f);
+	program.uniforms.numGroupHairs = 20;
+	program.uniforms.numHairVertices = glm::min((int)mVertices.size(), 64);
+
+	for (int i = 0; i < program.uniforms.numHairVertices; i++)
+	{
+		program.uniforms.vertexData[3 * i] = mVertices[i]->position.x;
+		program.uniforms.vertexData[3 * i + 1] = mVertices[i]->position.y;
+		program.uniforms.vertexData[3 * i + 2] = mVertices[i]->position.z;
+	}
+
+	program.SetUniforms();
+
+	glPatchParameteri(GL_PATCH_VERTICES, 4);
+	mPatch.Draw(GL_PATCHES);
 }
 
-HairVertex Strand::GetVertex(int index)
-{
-	return mVertices[index];
-}
 
-HairVertex* Strand::GetVertices()
-{
-	return mVertices;
-}
+

@@ -9,9 +9,8 @@ public:
 
 	void Initialise();
 	void Draw();
-	static void TestData(GLfloat* data, int numVertices, float time);
+	void TestData(GLfloat* data, int numVertices, float time);
 
 private:
 	Shape mPatch;
-	GLuint mFullShader;
 };

@@ -6,7 +6,7 @@ Hair::Hair(int numGuides, Simulation* simulation)
 {
 	for (int i = 0; i < numGuides; i++)
 	{
-		mGuideHairs.push_back(new Strand(20, 1.0, glm::vec3(i, 0, 0)));
+		mGuideHairs.push_back(new Strand(20, 1.0, glm::vec3(i, 0.0f, 0.0f)));
 	}
 
 	mSimulation = simulation;
@@ -14,7 +14,7 @@ Hair::Hair(int numGuides, Simulation* simulation)
 
 void Hair::Update(float time)
 {
-	/*if (!mSimulation)
+	if (!mSimulation)
 	{
 		mSimulation->Simulate(this);
 	}
@@ -22,13 +22,13 @@ void Hair::Update(float time)
 	for (auto guide : mGuideHairs)
 	{
 		guide->Update(time);
-	}*/
+	}
 }
 
-void Hair::Draw(GLuint program)
+void Hair::Draw(ShaderProgram &program)
 {
-	/*for (auto guide : mGuideHairs)
+	for (auto guide : mGuideHairs)
 	{
 		guide->Draw(program);
-	}*/
+	}
 }

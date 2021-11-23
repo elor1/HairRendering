@@ -8,9 +8,6 @@ HairPatch::~HairPatch()
 
 void HairPatch::Initialise()
 {
-    /*ShaderProgram* fullShader = new ShaderProgram("../HairRendering/src/shaders/full.vert", "../HairRendering/src/shaders/full.frag", "", "../HairRendering/src/shaders/full.tcs", "../HairRendering/src/shaders/full.tes");
-    mFullShader = fullShader->Load();*/
-
     GLfloat data[] = { -0.5f, 0.5f, 0.0f,
                         0.5f, 0.5f, 0.0f,
                        -0.5f, -0.5f, 0.0f,

@@ -3,6 +3,7 @@
 #include <iostream>
 #include <glfw3.h>
 #include <string>
+#include <gtc/type_ptr.hpp>
 
 ShaderProgram::ShaderProgram(const char* vertex, const char* fragment, const char* geometry, const char* tessControl, const char* tessEval)
 {
@@ -13,6 +14,49 @@ ShaderProgram::ShaderProgram(const char* vertex, const char* fragment, const cha
 	mGeometry = geometry;
 	mTessControl = tessControl;
 	mTessEval = tessEval;
+
+	mID = Load();
+
+	//Setup uniforms
+	std::vector<GLchar const*> uniformNames;
+	uniformNames.push_back("model");
+	uniformNames.push_back("view");
+	uniformNames.push_back("projection");
+	uniformNames.push_back("numHairPatch");
+	uniformNames.push_back("numHairSegments");
+	uniformNames.push_back("vertexData");
+	uniformNames.push_back("colour");
+
+	for (auto name : uniformNames)
+	{
+		mUniformLocations[name] = glGetUniformLocation(mID, name);
+	}
+}
+
+GLuint ShaderProgram::GetID()
+{
+	return mID;
+}
+
+void ShaderProgram::SetUniforms()
+{
+	glUniformMatrix4fv(mUniformLocations["model"], 1, GL_FALSE, glm::value_ptr(uniforms.model));
+	glUniformMatrix4fv(mUniformLocations["view"], 1, GL_FALSE, glm::value_ptr(uniforms.view));
+	glUniformMatrix4fv(mUniformLocations["projection"], 1, GL_FALSE, glm::value_ptr(uniforms.projection));
+	glUniform1i(mUniformLocations["numHairPatch"], uniforms.numGroupHairs);
+	glUniform1i(mUniformLocations["numHairSegments"], uniforms.numHairVertices - 1);
+	glUniform3fv(mUniformLocations["vertexData"], uniforms.numHairVertices, &uniforms.vertexData[0]);
+	glUniform3fv(mUniformLocations["colour"], 1, glm::value_ptr(uniforms.colour));
+}
+
+void ShaderProgram::Bind()
+{
+	glUseProgram(mID);
+}
+
+void ShaderProgram::Unbind()
+{
+	glUseProgram(mID);
 }
 
 GLuint ShaderProgram::Load()
@@ -44,6 +88,7 @@ GLuint ShaderProgram::CreateShader(GLenum type, const char* path)
 {
 	GLuint shaderID = glCreateShader(type);
 
+	//Read from file
 	std::ifstream file(path);
 	std::string out;
 
@@ -62,6 +107,7 @@ GLuint ShaderProgram::CreateShader(GLenum type, const char* path)
 
 	file.close();
 
+	//Compile shader
 	const char* code = out.c_str();
 	glShaderSource(shaderID, 1, &code, NULL);
 	glCompileShader(shaderID);
@@ -79,17 +125,6 @@ GLuint ShaderProgram::CreateShader(GLenum type, const char* path)
 		glDeleteShader(shaderID);
 		glfwTerminate();
 	}
-
-	/*GLint result = GL_FALSE;
-	int logLength;
-	glGetShaderiv(shaderID, GL_COMPILE_STATUS, &result);
-	glGetShaderiv(shaderID, GL_INFO_LOG_LENGTH, &logLength);
-	if (logLength > 0)
-	{
-		std::vector<char> infoLog(logLength);
-		glGetShaderInfoLog(shaderID, logLength, NULL, &infoLog[0]);
-		std::cout << "ERROR: Failed to compile shader " << path << std::endl << &infoLog << std::endl;
-	}*/
 
 	return shaderID;
 }
