@@ -8,7 +8,6 @@
 
 Application::Application(int width, int height)
 {
-	mFPS = 60.0f;
 	mPrevTime = glfwGetTime();
 	mCurrentTime = glfwGetTime();
 	mWidth = width;
@@ -19,7 +18,6 @@ Application::Application(int width, int height)
 
 Application::~Application()
 {
-	mTriangle.Destroy();
 }
 
 void Application::Run()
@@ -66,22 +64,11 @@ void Application::Initialise()
 	ShaderProgram* baseShader = new ShaderProgram("../HairRendering/src/shaders/base.vert", "../HairRendering/src/shaders/base.frag");
 	mBaseShader = baseShader->Load();
 
-	ShaderProgram* fullShader = new ShaderProgram("../HairRendering/src/shaders/full.vert", "../HairRendering/src/shaders/full.frag", "../HairRendering/src/shaders/full.geom", "../HairRendering/src/shaders/full.tcs", "../HairRendering/src/shaders/full.tes");
+	ShaderProgram* fullShader = new ShaderProgram("../HairRendering/src/shaders/full.vert", "../HairRendering/src/shaders/full.frag", "", "../HairRendering/src/shaders/full.tcs", "../HairRendering/src/shaders/full.tes");
 	mFullShader = fullShader->Load();
 
-	glPatchParameteri(GL_PATCH_VERTICES, 3);
-
-	GLfloat triangleData[] = { -0.5f, -0.5f, 0.0f, 
-							   0.0f,  0.0f, 1.0f,  
-							  +0.5f, -0.5f, 0.0f,  
-							   0.0f,  0.0f, 1.0f,  
-							   0.0f,  0.5f, 0.0f,  
-							   0.0f,  0.0f, 1.0f };
-
-	mTriangle.Create();
-	mTriangle.SetVertexData(triangleData, sizeof(triangleData), 3);
-	mTriangle.SetAttribute(0, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), 0);
-	mTriangle.SetAttribute(1, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), 3 * sizeof(float));
+	mHairPatch.Initialise();
+	glPatchParameteri(GL_PATCH_VERTICES, 4);
 }
 
 void Application::Draw()
@@ -100,43 +87,37 @@ void Application::Draw()
 	glm::mat4 view = glm::lookAt(cameraPos, center, up);
 	glm::mat4 model(1.0f);
 
-	glUseProgram(mBaseShader);
+	glUseProgram(mFullShader);
 	glUniformMatrix4fv(glGetUniformLocation(mBaseShader, "projection"), 1, GL_FALSE, glm::value_ptr(projection));
 	glUniformMatrix4fv(glGetUniformLocation(mBaseShader, "view"), 1, GL_FALSE, glm::value_ptr(view));
 	glUniformMatrix4fv(glGetUniformLocation(mBaseShader, "model"), 1, GL_FALSE, glm::value_ptr(model));
 	glUniform3f(glGetUniformLocation(mBaseShader, "colour"), 0.0f, 1.0f, 1.0f);
 
-	mTriangle.Draw(GL_TRIANGLES);
+	mHairPatch.Draw();
 
 	glUseProgram(0);
 }
 
 void Application::Update()
 {
-	//mCurrentTime = glfwGetTime();
+	mCurrentTime = glfwGetTime();
+	mDeltaTime = mCurrentTime - mPrevTime;
 
 	if (glfwGetKey(mWindow, GLFW_KEY_ESCAPE) == GLFW_PRESS)
 	{
 		glfwSetWindowShouldClose(mWindow, true);
 	}
 
-	//if (mCurrentTime - mPrevTime >= 1000.0f / mFPS)
-	//{
-	//	//Render
-	//	Draw();
+	//Draw 60 times per second
+	if (mDeltaTime >= 1.0f / 60.0f)
+	{
+		Draw();
 
-	//	//Swap front and back buffers
-	//	glfwSwapBuffers(mWindow);
+		//Swap front and back buffers
+		glfwSwapBuffers(mWindow);
 
-	//	//Poll events
-	//	glfwPollEvents();
-
-	//	mPrevTime = mCurrentTime;
-	//}
-
-	Draw();
-	//Swap front and back buffers
-	glfwSwapBuffers(mWindow);
+		mPrevTime = mCurrentTime;
+	}
 
 	//Poll events
 	glfwPollEvents();

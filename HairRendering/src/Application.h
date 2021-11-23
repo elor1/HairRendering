@@ -1,7 +1,7 @@
 #pragma once
 #include <glew.h>
 #include <glfw3.h>
-#include "Shape.h"
+#include "HairPatch.h"
 
 class Application
 {
@@ -16,7 +16,7 @@ private:
 	void Draw();
 	void Update();
 
-	Shape mTriangle;
+	HairPatch mHairPatch;
 	GLuint mBaseShader;
 	GLuint mFullShader;
 
@@ -26,5 +26,5 @@ private:
 
 	double mPrevTime;
 	double mCurrentTime;
-	float mFPS;
+	double mDeltaTime;
 };

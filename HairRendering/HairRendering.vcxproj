@@ -180,12 +180,16 @@ xcopy /y /d "$(SolutionDir)lib\assimp\assimp-vc140-mt.dll" "$(OutDir)"</Command>
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="src\Application.cpp" />
+    <ClCompile Include="src\Hair.cpp" />
+    <ClCompile Include="src\HairPatch.cpp" />
     <ClCompile Include="src\main.cpp" />
     <ClCompile Include="src\ShaderProgram.cpp" />
     <ClCompile Include="src\Shape.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\Application.h" />
+    <ClInclude Include="src\Hair.h" />
+    <ClInclude Include="src\HairPatch.h" />
     <ClInclude Include="src\ShaderProgram.h" />
     <ClInclude Include="src\Shape.h" />
   </ItemGroup>
