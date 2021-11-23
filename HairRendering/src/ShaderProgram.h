@@ -12,8 +12,11 @@ struct Uniforms
 	glm::mat4 projection;
 	int numGroupHairs;
 	int numHairVertices;
-	GLfloat vertexData[64];
+	int numSplineVertices;
+	glm::vec3 vertexData[64];
 	float groupWidth;
+	float hairRadius;
+	float tapering;
 	glm::vec3 colour;
 };
 

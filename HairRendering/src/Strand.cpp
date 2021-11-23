@@ -1,11 +1,11 @@
 #include "Strand.h"
 #include <iostream>
 
-Strand::Strand(int numSegments, double length, glm::vec3 position)
+Strand::Strand(int numSegments, double length, glm::vec3 position, glm::vec3 direction)
 {
-	if (numSegments < 2)
+	if (numSegments < 1)
 	{
-		std::cout << "ERROR: Must have at least 2 hair segments" << std::endl;
+		std::cout << "ERROR: Must have at least 1 hair segment" << std::endl;
 	}
 
 	if (length <= 0)
@@ -13,19 +13,21 @@ Strand::Strand(int numSegments, double length, glm::vec3 position)
 		std::cout << "ERROR: Hair length must be higher than 0" << std::endl;
 	}
 
+	direction = glm::normalize(direction);
 	mNumSegments = numSegments;
 	mLength = length;
 
 	double step = (double)length / numSegments;
 	for (int i = 0; i < numSegments; i++)
 	{
-		mVertices.push_back(new HairVertex(glm::vec3(position.x, position.y - step * i, position.z)));
-
-		if (i != 0)
+		HairVertex* newVertex = new HairVertex(position + direction * (float)(step * i));
+		if (i > 0)
 		{
-			glm::vec3 joint = (mVertices[i]->position + mVertices[i - 1]->position) / 2.0f;
-			mJoints.push_back(new Joint(joint));
+			HairVertex* oldVertex = mVertices[i - 1];
+			newVertex->theta = acos(glm::clamp(glm::dot(oldVertex->position - newVertex->position, glm::vec3(0.0f, -1.0f, 0.0f)), -1.0f, 1.0f));
 		}
+		newVertex->segmentLength = step;
+		mVertices.push_back(newVertex);
 	}
 
 	GLfloat data[] = { -0.5f, 0.5f, 0.0f,
@@ -48,17 +50,16 @@ void Strand::Update(float time)
 
 void Strand::Draw(ShaderProgram &program)
 {
-	
-	program.uniforms.colour = glm::vec3(0.6f, 0.4f, 0.3f);
-	program.uniforms.numGroupHairs = 20;
 	program.uniforms.numHairVertices = glm::min((int)mVertices.size(), 64);
-
 	for (int i = 0; i < program.uniforms.numHairVertices; i++)
 	{
-		program.uniforms.vertexData[3 * i] = mVertices[i]->position.x;
-		program.uniforms.vertexData[3 * i + 1] = mVertices[i]->position.y;
-		program.uniforms.vertexData[3 * i + 2] = mVertices[i]->position.z;
+		program.uniforms.vertexData[i] = mVertices[i]->position;
 	}
+	program.uniforms.colour = glm::vec3(0.6f, 0.4f, 0.3f);
+	program.uniforms.numGroupHairs = 10;
+	program.uniforms.groupWidth = 0.2f;
+	program.uniforms.hairRadius = 0.005f;
+	program.uniforms.numSplineVertices = 20;//program.uniforms.numHairVertices;
 
 	program.SetUniforms();
 

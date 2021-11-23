@@ -3,19 +3,13 @@
 layout(vertices = 4) out;
 
 uniform int numHairPatch;
-uniform int numHairSegments;
-
-in vec3 position_v[];
-
-out vec3 position_tc[];
+uniform int numSplineVertices;
 
 void main()
 {
-	position_tc[gl_InvocationID] = position_v[gl_InvocationID];
-
 	if (gl_InvocationID == 0)
 	{
 		gl_TessLevelOuter[0] = numHairPatch;
-		gl_TessLevelOuter[1] = numHairSegments;
+		gl_TessLevelOuter[1] = numSplineVertices - 1;
 	}
 }

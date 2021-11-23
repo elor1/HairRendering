@@ -2,15 +2,18 @@
 
 layout(isolines) in;
 
-in vec3 position_tc[];
+out vec3 tangent_te;
+out float tessx_te;
 
 const int MAX_VERTICES = 64; //Max number of hair vertices
 const int NOISE_LAYERS = 3;
-const float NOISE_AMPLITUDE = 0.04f;
+const float NOISE_AMPLITUDE = 0.03f;
 
 uniform mat4 model, view, projection;
 uniform vec3 vertexData[MAX_VERTICES];
 uniform int numHairSegments;
+uniform int numSplineVertices;
+uniform float groupWidth;
 
 float Random(vec2 x)
 {
@@ -41,10 +44,50 @@ float NoiseLayers(in vec2 x)
     return result;
 }
 
+vec3 Spline(float tessCoordX)
+{
+    float length = clamp(tessCoordX, 0.0f, 1.0f) * numHairSegments;
+    float fract = fract(length);
+
+    int index1 = int(length);
+    int index0 = max(index1 - 1, 0);
+    int index2 = min(index1 + 1, numHairSegments);
+    int index3 = min(index2 + 1, numHairSegments);
+
+    vec3 point0 = vertexData[index0];
+    vec3 point1 = vertexData[index1];
+    vec3 point2 = vertexData[index2];
+    vec3 point3 = vertexData[index3];
+
+    vec3 m1 = (point2 - point0) / 2.0f;
+    vec3 m2 = (point1 - point3) / 2.0f;
+
+    return mix(point1 + m1 * fract, point2 + m2 * (1 - fract), smoothstep(0.0f, 1.0f, fract));
+}
+
+vec3 SplineOffset(in vec2 tessCoord)
+{
+    vec3 position = Spline(tessCoord.x);
+    position.x += groupWidth * (tessCoord.y - 0.5f);
+
+    //Add noise
+    position.x += NOISE_AMPLITUDE * NoiseLayers(tessCoord.xy);
+    position.y += NOISE_AMPLITUDE * NoiseLayers(tessCoord.xy + 1);
+    position.z += NOISE_AMPLITUDE * NoiseLayers(tessCoord.xy + 2);
+
+    return position;
+}
+
 void main()
 {
-	vec3 position = vertexData[int(clamp(gl_TessCoord.x, 0.0f, 1.0f - 1.0f / 10000.0f) * (numHairSegments - 1))];
-    position.x += gl_TessCoord.y - 0.5f;
-    position.x += NOISE_AMPLITUDE * NoiseLayers(gl_TessCoord.xy);
-    gl_Position = projection * view * model * vec4(position, 1);
+	vec3 position = SplineOffset(gl_TessCoord.xy);
+    position.x += groupWidth * (gl_TessCoord.y - 0.5f);
+
+    //Calculate tangent
+    vec3 previousPosition = SplineOffset(vec2(gl_TessCoord.x - 1.0f / (numSplineVertices - 1), gl_TessCoord.y));
+    vec3 nextPosition = SplineOffset(vec2(gl_TessCoord.x + 1.0f / (numSplineVertices - 1), gl_TessCoord.y));
+    tangent_te = (view * model * vec4(nextPosition - previousPosition, 0.0f)).xyz;
+    tessx_te = gl_TessCoord.x;
+
+    gl_Position = view * model * vec4(position, 1.0f);
 }

@@ -1,6 +1,7 @@
 #pragma once
 #include <vector>
 #include <glm.hpp>
+#include "Integrator.h"
 
 class Hair;
 
@@ -21,4 +22,6 @@ private:
 	void CalculateExternalForces(Hair* hair);
 	void CalculateConstraints(Hair* hair);
 	void Integrate(Hair* hair);
+	void Integrate2(Hair* hair);
+	double OmegaDot(double theta, double omega, float rodLength, float inertia);
 };

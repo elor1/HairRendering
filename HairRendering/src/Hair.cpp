@@ -6,7 +6,7 @@ Hair::Hair(int numGuides, Simulation* simulation)
 {
 	for (int i = 0; i < numGuides; i++)
 	{
-		mGuideHairs.push_back(new Strand(20, 1.0, glm::vec3(i, 0.0f, 0.0f)));
+		mGuideHairs.push_back(new Strand(2, 2.0, glm::vec3(i + 0.25f, 0.0f, 0.0f), glm::vec3(0.0f, 1.0f, 0.0f)));
 	}
 
 	mSimulation = simulation;

@@ -24,13 +24,23 @@ ShaderProgram::ShaderProgram(const char* vertex, const char* fragment, const cha
 	uniformNames.push_back("projection");
 	uniformNames.push_back("numHairPatch");
 	uniformNames.push_back("numHairSegments");
+	uniformNames.push_back("numSplineVertices");
 	uniformNames.push_back("vertexData");
+	uniformNames.push_back("groupWidth");
+	uniformNames.push_back("hairRadius");
+	uniformNames.push_back("tapering");
 	uniformNames.push_back("colour");
 
 	for (auto name : uniformNames)
 	{
 		mUniformLocations[name] = glGetUniformLocation(mID, name);
 	}
+
+	uniforms.numGroupHairs = 1;
+	uniforms.groupWidth = 0.1f;
+	uniforms.hairRadius = 0.004f;
+	uniforms.tapering = 5.0f;
+	uniforms.colour = glm::vec3(0.6f, 0.4f, 0.3f);
 }
 
 GLuint ShaderProgram::GetID()
@@ -45,7 +55,11 @@ void ShaderProgram::SetUniforms()
 	glUniformMatrix4fv(mUniformLocations["projection"], 1, GL_FALSE, glm::value_ptr(uniforms.projection));
 	glUniform1i(mUniformLocations["numHairPatch"], uniforms.numGroupHairs);
 	glUniform1i(mUniformLocations["numHairSegments"], uniforms.numHairVertices - 1);
-	glUniform3fv(mUniformLocations["vertexData"], uniforms.numHairVertices, &uniforms.vertexData[0]);
+	glUniform1i(mUniformLocations["numSplineVertices"], uniforms.numSplineVertices);
+	glUniform3fv(mUniformLocations["vertexData"], uniforms.numHairVertices, &uniforms.vertexData[0][0]);
+	glUniform1f(mUniformLocations["groupWidth"], uniforms.groupWidth);
+	glUniform1f(mUniformLocations["hairRadius"], uniforms.hairRadius);
+	glUniform1f(mUniformLocations["tapering"], uniforms.tapering);
 	glUniform3fv(mUniformLocations["colour"], 1, glm::value_ptr(uniforms.colour));
 }
 

@@ -63,7 +63,7 @@ void Application::Initialise()
 	glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
 
 	//Shaders
-	mProgram = new ShaderProgram("../HairRendering/src/shaders/full.vert", "../HairRendering/src/shaders/full.frag", "", "../HairRendering/src/shaders/full.tcs", "../HairRendering/src/shaders/full.tes");
+	mProgram = new ShaderProgram("../HairRendering/src/shaders/full.vert", "../HairRendering/src/shaders/full.frag", "../HairRendering/src/shaders/full.geom", "../HairRendering/src/shaders/full.tcs", "../HairRendering/src/shaders/full.tes");
 
 	mSimulation = new Simulation();
 	mHair = new Hair(1, mSimulation);

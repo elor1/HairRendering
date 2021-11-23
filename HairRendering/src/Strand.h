@@ -9,12 +9,18 @@ struct HairVertex
 	glm::vec3 position;
 	glm::vec3 velocity;
 	glm::vec3 acceleration;
+	double theta;
+	double omega;
+	double segmentLength;
 
 	HairVertex()
 	{
 		position = glm::vec3(0.0f);
 		velocity = glm::vec3(0.0f);
 		acceleration = glm::vec3(0.0f);
+		theta = 0.0;
+		omega = 0.0;
+		segmentLength = 0.0;
 	}
 
 	HairVertex(glm::vec3 pos)
@@ -22,6 +28,9 @@ struct HairVertex
 		position = pos;
 		velocity = glm::vec3(0.0f);
 		acceleration = glm::vec3(0.0f);
+		theta = 0.0;
+		omega = 0.0;
+		segmentLength = 0.0;
 	}
 
 	HairVertex(glm::vec3 p, glm::vec3 v, glm::vec3 a)
@@ -29,6 +38,9 @@ struct HairVertex
 		position = p;
 		velocity = v;
 		acceleration = a;
+		theta = 0.0;
+		omega = 0.0;
+		segmentLength = 0.0;
 	}
 };
 
@@ -59,14 +71,13 @@ struct Joint
 class Strand
 {
 public:
-	Strand(int numSegments, double length, glm::vec3 position);
+	Strand(int numSegments, double length, glm::vec3 position, glm::vec3 direction);
 	virtual ~Strand();
 
 	void Update(float time);
 	void Draw(ShaderProgram &program);
 
 	std::vector<HairVertex*> mVertices;
-	std::vector<Joint*> mJoints;
 	Shape mPatch;
 	int mNumSegments;
 	double mLength;
