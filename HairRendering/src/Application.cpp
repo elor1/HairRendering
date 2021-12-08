@@ -7,9 +7,9 @@
 #include <gtc/type_ptr.hpp>
 #include "Simulation.h"
 #include "Hair.h"
-#include "Mesh.h"
+#include "Model.h"
 
-#define USE_MESH false
+#define USE_MESH true
 
 Application::Application(int width, int height)
 {
@@ -17,13 +17,27 @@ Application::Application(int width, int height)
 	mCurrentTime = glfwGetTime();
 	mWidth = width;
 	mHeight = height;
+	mHairDensity = 40;
 
 	Initialise();
 }
 
 Application::Application()
 {
-	delete mMesh;
+	if (USE_MESH)
+	{
+		delete mMesh;
+	}
+	delete mSimulation;
+	delete mHair;
+}
+
+Application::~Application()
+{
+	if (USE_MESH)
+	{
+		delete mMesh;
+	}
 	delete mSimulation;
 	delete mHair;
 }
@@ -72,19 +86,35 @@ void Application::Initialise()
 	mMeshProgram = new ShaderProgram("../HairRendering/src/shaders/base.vert", "../HairRendering/src/shaders/base.frag");
 	mHairProgram = new ShaderProgram("../HairRendering/src/shaders/full.vert", "../HairRendering/src/shaders/full.frag", "../HairRendering/src/shaders/full.geom", "../HairRendering/src/shaders/full.tcs", "../HairRendering/src/shaders/full.tes");
 
-	mSimulation = new Simulation();
+	InitSimulation();
+}
 
+void Application::InitSimulation()
+{
+	delete mMesh;
+	delete mSimulation;
+	Hair* oldHair = mHair;
+
+	mSimulation = new Simulation();
 	if (USE_MESH)
 	{
-		mMesh = new Mesh("../models/Head.obj");
-		mHair = new Hair(mMesh, mSimulation);
+		Model* model = new Model("../models/Head2.obj");
+		mMesh = model->GetFirstMesh();
+		mHair = new Hair(mMesh, mHairDensity, "../images/hairFlipped.jpg", mSimulation, mHair);
 	}
 	else
 	{
-		mHair = new Hair(1, mSimulation);
+		if (oldHair)
+		{
+			mHair = new Hair(oldHair, mSimulation);
+		}
+		else
+		{
+			mHair = new Hair(1, mSimulation);
+		}
 	}
-	
-	glPatchParameteri(GL_PATCH_VERTICES, 4);
+
+	delete oldHair;
 }
 
 void Application::Draw()
@@ -102,7 +132,7 @@ void Application::Draw()
 	mHairProgram->uniforms.model = glm::mat4(1.0f);
 	mHair->Draw(*mHairProgram);
 	mHairProgram->Unbind();
-
+	
 	if (USE_MESH)
 	{
 		mMeshProgram->Bind();
@@ -137,4 +167,19 @@ void Application::Update()
 	
 	//Poll events
 	glfwPollEvents();
+}
+
+void Application::SetPatchHair(int numHairs)
+{
+	mHair->mNumGroupHairs = numHairs;
+}
+
+void Application::SetNumSplineVertices(int numVertices)
+{
+	mHair->mNumSplineVertices = numVertices;
+}
+
+void Application::SetHairColour(glm::vec3 colour)
+{
+	mHair->mColour = colour / 2550.0f;
 }

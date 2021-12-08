@@ -24,7 +24,9 @@ Strand::Strand(int numSegments, double length, glm::vec3 position, glm::vec3 dir
 		if (i > 0)
 		{
 			HairVertex* oldVertex = mVertices[i - 1];
-			newVertex->theta = acos(glm::clamp(glm::dot(oldVertex->position - newVertex->position, glm::vec3(0.0f, -1.0f, 0.0f)), -1.0f, 1.0f));
+			double dot = glm::clamp(glm::dot(oldVertex->position - newVertex->position, glm::vec3(0.0f, -1.0f, 0.0f)), -1.0f, 1.0f);
+			double det = glm::clamp(glm::dot(oldVertex->position - newVertex->position, glm::vec3(1.0f, 0.0f, 0.0f)), -1.0f, 1.0f);
+			newVertex->theta = -atan2(det, dot);
 		}
 		newVertex->segmentLength = step;
 		mVertices.push_back(newVertex);

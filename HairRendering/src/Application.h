@@ -13,19 +13,25 @@ class Application
 public:
 	Application(int width, int height);
 	Application();
+	~Application();
 
 	void Run();
 
 private:
 	void Initialise();
+	void InitSimulation();
 	void Draw();
 	void Update();
+	void SetPatchHair(int numHairs);
+	void SetNumSplineVertices(int numVertices);
+	void SetHairColour(glm::vec3 colour);
 
 	Mesh* mMesh;
 	Hair* mHair;
 	Simulation* mSimulation;
 	ShaderProgram* mMeshProgram;
 	ShaderProgram* mHairProgram;
+	float mHairDensity;
 
 	GLFWwindow* mWindow;
 	int mWidth;

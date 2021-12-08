@@ -8,9 +8,12 @@ uniform mat4 model;
 uniform mat4 view;
 uniform mat4 projection;
 
-out vec3 colour;
+out vec4 position_v;
+out vec4 normal_v;
 
-void main() {
-    colour = vec3(texCoords, 0);
-    gl_Position = projection * view * model * vec4(position, 1);
+void main()
+{
+    position_v = view * model * vec4(position, 1.0f);
+    normal_v = view * model * vec4(normal, 0.0f);
+    gl_Position = projection * position_v;
 }

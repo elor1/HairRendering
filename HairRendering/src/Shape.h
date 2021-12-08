@@ -1,5 +1,8 @@
 #pragma once
 #include <glew.h>
+#include <vector>
+
+struct Vertex;
 
 class Shape
 {
@@ -17,5 +20,6 @@ private:
 	bool mIsCreated;
 	GLuint mVBO;
 	GLuint mVAO;
+	GLuint mEBO;
 	int mNumVertices;
 };

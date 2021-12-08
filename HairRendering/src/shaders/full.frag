@@ -12,7 +12,6 @@ const vec4 lightPosition = vec4(2.0f, 1.0f, 2.0f, 1.0f);
 
 void main()
 {
-	fragColour = colour;
 	vec4 lightDirection = normalize((view * lightPosition) - position_g);
 	vec3 tangent = normalize(tangent_g);
 

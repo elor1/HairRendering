@@ -11,11 +11,23 @@ class Hair
 {
 public:
 	Hair(int numGuides, Simulation* simulation);
-	Hair(Mesh* mesh, Simulation* simulation);
+	Hair(Hair* oldHair, Simulation* simulation);
+	Hair(Mesh* mesh, float hairDensity, const char* hairTexture, Simulation* simulation, Hair* oldHair = nullptr/*, int width = 960, int height = 720*/);
 
 	void Update(float time);
 	void Draw(ShaderProgram &program);
+	void SetAttributes(Hair* oldHair);
+	void SetAttributes(glm::vec3 colour = glm::vec3(0.6f, 0.4f, 0.3f), int numGroupHairs = 15, float groupWidth = 0.2f, float hairRadius = 0.005f, float noiseAmplitude = 0.03f, int numSplineVertices = 20);
 
 	std::vector<Strand*> mGuideHairs;
 	Simulation* mSimulation;
+	int mNumGuideHairs;
+	int mNumHairVertices;
+	int mNumPatchHair;
+	glm::vec3 mColour;
+	int mNumGroupHairs;
+	float mGroupWidth;
+	float mHairRadius;
+	float mNoiseAmplitude;
+	int mNumSplineVertices;
 };

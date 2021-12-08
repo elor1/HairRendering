@@ -43,6 +43,7 @@ ShaderProgram::ShaderProgram(const char* vertex, const char* fragment, const cha
 	uniforms.groupWidth = 0.1f;
 	uniforms.hairRadius = 0.004f;
 	uniforms.tapering = 5.0f;
+	uniforms.noiseAmplitude = 0;
 	uniforms.colour = glm::vec3(0.6f, 0.4f, 0.3f);
 }
 
