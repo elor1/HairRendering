@@ -7,40 +7,42 @@
 struct HairVertex
 {
 	glm::vec3 position;
+	glm::vec3 tempPosition;
 	glm::vec3 velocity;
-	glm::vec3 acceleration;
+	glm::vec3 forces;
+	glm::vec3 d;
 	double theta;
 	double omega;
-	double segmentLength;
+	float segmentLength;
+	float mass;
+	float invMass;
 
 	HairVertex()
 	{
 		position = glm::vec3(0.0f);
+		tempPosition = glm::vec3(0.0f);
 		velocity = glm::vec3(0.0f);
-		acceleration = glm::vec3(0.0f);
+		forces = glm::vec3(0.0f);
 		theta = 0.0;
 		omega = 0.0;
-		segmentLength = 0.0;
+		segmentLength = 0.0f;
+		d = glm::vec3(0.0f);
+		mass = 0.0f;
+		invMass = 0.0f;
 	}
 
 	HairVertex(glm::vec3 pos)
 	{
 		position = pos;
+		tempPosition = pos;
 		velocity = glm::vec3(0.0f);
-		acceleration = glm::vec3(0.0f);
+		forces = glm::vec3(0.0f);
 		theta = 0.0;
 		omega = 0.0;
 		segmentLength = 0.0;
-	}
-
-	HairVertex(glm::vec3 p, glm::vec3 v, glm::vec3 a)
-	{
-		position = p;
-		velocity = v;
-		acceleration = a;
-		theta = 0.0;
-		omega = 0.0;
-		segmentLength = 0.0;
+		d = glm::vec3(0.0f);
+		mass = 0.0f;
+		invMass = 0.0f;
 	}
 };
 

@@ -25,5 +25,8 @@ private:
 	void Integrate2(Hair* hair);
 	void Integrate3(Hair* hair);
 	void Integrate4(Hair* hair);
+
+	void ParticleSimulation(Hair* hair);
+
 	double OmegaDot(double theta, double omega, float rodLength, float inertia);
 };

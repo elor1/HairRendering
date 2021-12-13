@@ -5,7 +5,7 @@
 #define GRAVITY -29.8f
 #define MASS 1.0f
 #define DAMPENING 0.35f
-#define TIMESTEP 0.01
+#define TIMESTEP 0.01f
 
 Simulation::Simulation()
 {
@@ -25,7 +25,7 @@ void Simulation::Simulate(Hair* hair)
 {
 	CalculateExternalForces(hair);
 	CalculateConstraints(hair);
-	Integrate3(hair);
+	ParticleSimulation(hair);
 }
 
 void Simulation::CalculateExternalForces(Hair* hair)
@@ -462,6 +462,48 @@ void Simulation::Integrate4(Hair* hair)
 			vertex4->position.x = vertex3->position.x + length4 * sin(vertex4->theta);
 			vertex4->position.y = vertex3->position.y + length4 * cos(vertex4->theta);
 		}
+	}
+}
+
+void Simulation::ParticleSimulation(Hair* hair)
+{
+	for (auto guide : hair->mGuideHairs)
+	{
+		float numVertices = guide->mVertices.size();
+		guide->mVertices[0]->tempPosition = guide->mVertices[0]->position;
+
+		for (int i = 1; i < numVertices; i++)
+		{
+			HairVertex* vertex = guide->mVertices[i];
+
+			vertex->velocity = vertex->velocity + TIMESTEP * (vertex->forces * (1.0f / vertex->mass));
+			vertex->tempPosition += (vertex->velocity * TIMESTEP);
+			vertex->forces = glm::vec3(0.0f);
+			vertex->velocity *= 0.99f;
+		}
+
+		glm::vec3 direction;
+		glm::vec3 currentPos;
+		for (int i = 1; i < numVertices; i++)
+		{
+			HairVertex* previous = guide->mVertices[i - 1];
+			HairVertex* current = guide->mVertices[i];
+			currentPos = current->tempPosition;
+			direction = glm::normalize(current->tempPosition - previous->tempPosition);
+			current->tempPosition = previous->tempPosition + direction * previous->segmentLength;
+			current->d = currentPos - current->tempPosition;
+		}
+
+		for (int i = 1; i < numVertices; i++)
+		{
+			HairVertex* previous = guide->mVertices[i - 1];
+			HairVertex* current = guide->mVertices[i];
+			previous->velocity = ((previous->tempPosition - previous->position) / TIMESTEP) + 0.9f * (current->d / TIMESTEP);
+			previous->position = previous->tempPosition;
+		}
+
+		HairVertex* last = guide->mVertices.back();
+		last->position = last->tempPosition;
 	}
 }
 

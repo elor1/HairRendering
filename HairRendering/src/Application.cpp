@@ -10,6 +10,7 @@
 #include "Model.h"
 
 #define USE_MESH true
+#define USE_TEXTURE false
 
 Application::Application(int width, int height)
 {
@@ -18,6 +19,9 @@ Application::Application(int width, int height)
 	mWidth = width;
 	mHeight = height;
 	mHairDensity = 40;
+	mFirstMouse = true;
+	mLastX = width / 2.0;
+	mLastY = width / 2.f;
 
 	Initialise();
 }
@@ -70,6 +74,19 @@ void Application::Initialise()
 	}
 
 	glfwMakeContextCurrent(mWindow);
+	glfwSetInputMode(mWindow, GLFW_CURSOR, GLFW_CURSOR_HIDDEN);
+
+	//Callback functions
+	glfwSetFramebufferSizeCallback(mWindow, FrameBufferCallback);
+
+	glfwSetWindowUserPointer(mWindow, this);
+	auto CursorCallback = [](GLFWwindow* window, double xPos, double yPos)
+	{
+		Application* app = (Application*)glfwGetWindowUserPointer(window);
+		app->MouseCallback(window, xPos, yPos);
+	};
+
+	glfwSetCursorPosCallback(mWindow, CursorCallback);
 
 	//Initialise GLEW
 	glewExperimental = GL_TRUE;
@@ -81,6 +98,8 @@ void Application::Initialise()
 	glEnable(GL_DEPTH_TEST);
 	glEnable(GL_CULL_FACE);
 	glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
+
+	mCamera = new Camera(glm::vec3(10.0f, 0.0f, 0.0f), glm::vec3(0.0f, 1.0f, 0.0f), 180.0f, 0.0f);
 
 	//Shaders
 	mMeshProgram = new ShaderProgram("../HairRendering/src/shaders/base.vert", "../HairRendering/src/shaders/base.frag");
@@ -98,9 +117,19 @@ void Application::InitSimulation()
 	mSimulation = new Simulation();
 	if (USE_MESH)
 	{
-		Model* model = new Model("../models/Head2.obj");
-		mMesh = model->GetFirstMesh();
-		mHair = new Hair(mMesh, mHairDensity, "../images/hairFlipped.jpg", mSimulation, mHair);
+		if (USE_TEXTURE)
+		{
+			Model* model = new Model("../models/Head2.obj");
+			mMesh = model->GetFirstMesh();
+			mHair = new Hair(mMesh, mHairDensity, "../images/hair.jpg", mSimulation, mHair);
+		}
+		else
+		{
+			Model* model = new Model("../models/Head2.obj");
+			mMesh = model->GetFirstMesh();
+			Model* scalp = new Model("../models/Scalp4.obj");
+			mHair = new Hair(scalp->GetFirstMesh(), mHairDensity, mSimulation, mHair);
+		}
 	}
 	else
 	{
@@ -126,7 +155,8 @@ void Application::Draw()
 	
 	mHairProgram->Bind();
 	mHairProgram->uniforms.projection = glm::perspective(0.8f, (float)mWidth / mHeight, 0.1f, 100.0f);
-	mHairProgram->uniforms.view = glm::lookAt(glm::vec3(0.0f, 0.0f, 6.0f), glm::vec3(0.0f), glm::vec3(0.0f, 1.0f, 0.0f));
+	//mHairProgram->uniforms.view = glm::lookAt(glm::vec3(0.0f, 0.0f, 6.0f), glm::vec3(0.0f), glm::vec3(0.0f, 1.0f, 0.0f));
+	mHairProgram->uniforms.view = mCamera->GetViewMatrix();
 	mHairProgram->SetGlobalUniforms();
 
 	mHairProgram->uniforms.model = glm::mat4(1.0f);
@@ -149,14 +179,12 @@ void Application::Update()
 	mCurrentTime = glfwGetTime();
 	mDeltaTime = mCurrentTime - mPrevTime;
 
-	if (glfwGetKey(mWindow, GLFW_KEY_ESCAPE) == GLFW_PRESS)
-	{
-		glfwSetWindowShouldClose(mWindow, true);
-	}
+	ProcessInput();
 
 	//Draw 60 times per second
 	if (mDeltaTime >= 1.0f / 60.0f)
 	{
+		std::cout << 1 / mDeltaTime << " FPS" << std::endl;
 		Draw();
 
 		//Swap front and back buffers
@@ -182,4 +210,76 @@ void Application::SetNumSplineVertices(int numVertices)
 void Application::SetHairColour(glm::vec3 colour)
 {
 	mHair->mColour = colour / 2550.0f;
+}
+
+void Application::ProcessInput()
+{
+	if (glfwGetKey(mWindow, GLFW_KEY_ESCAPE) == GLFW_PRESS)
+	{
+		glfwSetWindowShouldClose(mWindow, true);
+	}
+
+	if (glfwGetKey(mWindow, GLFW_KEY_W) == GLFW_PRESS)
+	{
+		mCamera->Move(EMovementDirection::Forward, mDeltaTime);
+	}
+
+	if (glfwGetKey(mWindow, GLFW_KEY_S) == GLFW_PRESS)
+	{
+		mCamera->Move(EMovementDirection::Backward, mDeltaTime);
+	}
+
+	if (glfwGetKey(mWindow, GLFW_KEY_A) == GLFW_PRESS)
+	{
+		mCamera->Move(EMovementDirection::Left, mDeltaTime);
+	}
+
+	if (glfwGetKey(mWindow, GLFW_KEY_D) == GLFW_PRESS)
+	{
+		mCamera->Move(EMovementDirection::Right, mDeltaTime);
+	}
+
+	if (glfwGetKey(mWindow, GLFW_KEY_UP) == GLFW_PRESS)
+	{
+		mCamera->Rotate(0.0f, mDeltaTime);
+	}
+
+	if (glfwGetKey(mWindow, GLFW_KEY_DOWN) == GLFW_PRESS)
+	{
+		mCamera->Rotate(0.0f, -mDeltaTime);
+	}
+
+	if (glfwGetKey(mWindow, GLFW_KEY_LEFT) == GLFW_PRESS)
+	{
+		mCamera->Rotate(-mDeltaTime, 0.0f);
+	}
+
+	if (glfwGetKey(mWindow, GLFW_KEY_RIGHT) == GLFW_PRESS)
+	{
+		mCamera->Rotate(mDeltaTime, 0.0f);
+	}
+}
+
+void Application::FrameBufferCallback(GLFWwindow* window, int width, int height)
+{
+	glfwGetWindowSize(window, &width, &height);
+	glViewport(0, 0, width, height);
+}
+
+void Application::MouseCallback(GLFWwindow* window, double xPos, double yPos)
+{
+	if (mFirstMouse)
+	{
+		mLastX = xPos;
+		mLastY = yPos;
+		mFirstMouse = false;
+	}
+
+	float xoffset = xPos - mLastX;
+	float yoffset = mLastY - yPos;
+
+	mLastX = xPos;
+	mLastY = yPos;
+
+	mCamera->Rotate(xoffset, yoffset);
 }

@@ -93,7 +93,7 @@ struct Triangle
 
 	float Area()
 	{
-		return glm::length(glm::cross(vertex3.position - vertex1.position, vertex2.position - vertex1.position)) /*/ 2.0f*/ * 1000.0f;
+		return glm::length(glm::cross(vertex3.position - vertex1.position, vertex2.position - vertex1.position)) / 2.0f /** 1000.0f*/;
 		/*float a = glm::distance(vertex1.position, vertex2.position);
 		float b = glm::distance(vertex2.position, vertex3.position);
 		float c = glm::distance(vertex3.position, vertex1.position);
@@ -146,6 +146,19 @@ struct Triangle
 		//position = ((vertex1.position + vertex2.position + vertex3.position) / 3.0f)/* + glm::vec3(r1, r2, r3)*/;
 		//texCoords = ((vertex1.texCoords + vertex2.texCoords + vertex3.texCoords) / 3.0f)/* + glm::vec2(r1, r2)*/;
 		//normal = ((vertex1.normal + vertex2.normal + vertex3.normal) / 3.0f)/* + glm::vec3(r1, r2, r3)*/;
+		texCoords = glm::mat3x2(vertex1.texCoords, vertex2.texCoords, vertex3.texCoords) * point;
+		position = glm::mat3(vertex1.position, vertex2.position, vertex3.position) * point;
+		normal = glm::mat3(vertex1.normal, vertex2.normal, vertex3.normal) * point;
+	}
+
+	void RandPoint(glm::vec3& position, glm::vec2& texCoords, glm::vec3& normal)
+	{
+		float random = sqrt((float)rand() / RAND_MAX);
+
+		glm::vec3 point;
+		point.x = 1 - random;
+		point.y = (float)rand() / RAND_MAX;
+		point.z = 1 - point.x - point.y;
 		texCoords = glm::mat3x2(vertex1.texCoords, vertex2.texCoords, vertex3.texCoords) * point;
 		position = glm::mat3(vertex1.position, vertex2.position, vertex3.position) * point;
 		normal = glm::mat3(vertex1.normal, vertex2.normal, vertex3.normal) * point;
