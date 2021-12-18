@@ -7,7 +7,7 @@ Model::Model(std::string filename)
 
 void Model::Draw()
 {
-	for (auto mesh : mMeshes)
+	for (auto& mesh : mMeshes)
 	{
 		mesh.Draw();
 	}
@@ -16,7 +16,7 @@ void Model::Draw()
 std::vector<Mesh*> Model::GetMeshes()
 {
 	std::vector<Mesh*> meshes;
-	for (auto mesh : mMeshes)
+	for (auto& mesh : mMeshes)
 	{
 		meshes.push_back(&mesh);
 	}

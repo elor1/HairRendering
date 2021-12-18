@@ -17,6 +17,9 @@ Strand::Strand(int numSegments, double length, glm::vec3 position, glm::vec3 dir
 	mNumSegments = numSegments;
 	mLength = length;
 
+	mTriangleFace[0] = glm::normalize(glm::vec3(-direction.y, direction.x, 0.0f));
+	mTriangleFace[1] = glm::cross(direction, mTriangleFace[0]);
+
 	double step = (double)length / numSegments;
 	for (int i = 0; i < numSegments; i++)
 	{
@@ -52,6 +55,8 @@ void Strand::Update(float time)
 
 void Strand::Draw(ShaderProgram &program)
 {
+	program.uniforms.triangleFace[0] = mTriangleFace[0];
+	program.uniforms.triangleFace[1] = mTriangleFace[1];
 	program.uniforms.numHairVertices = glm::min((int)mVertices.size(), 64);
 	for (int i = 0; i < program.uniforms.numHairVertices; i++)
 	{

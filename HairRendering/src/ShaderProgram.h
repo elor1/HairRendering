@@ -14,10 +14,11 @@ struct Uniforms
 	int numHairVertices;
 	int numSplineVertices;
 	glm::vec3 vertexData[64];
-	float groupWidth;
+	float groupSpread;
 	float hairRadius;
 	float tapering;
 	float noiseAmplitude;
+	glm::vec3 triangleFace[2];
 	glm::vec3 colour;
 };
 

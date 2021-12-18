@@ -27,20 +27,21 @@ ShaderProgram::ShaderProgram(const char* vertex, const char* fragment, const cha
 		"numHairSegments",
 		"numSplineVertices",
 		"vertexData",
-		"groupWidth",
+		"groupSpread",
 		"hairRadius",
 		"tapering",
 		"noiseAmplitude",
+		"triangleFace",
 		"colour"
 	};
 
-	for (auto name : uniformNames)
+	for (auto& name : uniformNames)
 	{
 		mUniformLocations[name] = glGetUniformLocation(mID, name);
 	}
 
 	uniforms.numGroupHairs = 1;
-	uniforms.groupWidth = 0.1f;
+	uniforms.groupSpread = 0.15f;
 	uniforms.hairRadius = 0.004f;
 	uniforms.tapering = 5.0f;
 	uniforms.noiseAmplitude = 0;
@@ -63,7 +64,7 @@ void ShaderProgram::SetHairUniforms()
 	glUniformMatrix4fv(mUniformLocations["model"], 1, GL_FALSE, glm::value_ptr(uniforms.model));
 	glUniform1i(mUniformLocations["numHairPatch"], uniforms.numGroupHairs);
 	glUniform1i(mUniformLocations["numSplineVertices"], uniforms.numSplineVertices);
-	glUniform1f(mUniformLocations["groupWidth"], uniforms.groupWidth);
+	glUniform1f(mUniformLocations["groupSpread"], uniforms.groupSpread);
 	glUniform1f(mUniformLocations["hairRadius"], uniforms.hairRadius);
 	glUniform1f(mUniformLocations["tapering"], uniforms.tapering);
 	glUniform1f(mUniformLocations["noiseAmplitude"], uniforms.noiseAmplitude);
@@ -74,6 +75,7 @@ void ShaderProgram::SetGuideHairUniforms()
 {
 	glUniform1i(mUniformLocations["numHairSegments"], uniforms.numHairVertices - 1);
 	glUniform3fv(mUniformLocations["vertexData"], uniforms.numHairVertices, &uniforms.vertexData[0][0]);
+	glUniform3fv(mUniformLocations["triangleFace"], 2, &uniforms.triangleFace[0][0]);
 }
 
 void ShaderProgram::Bind()
@@ -103,7 +105,7 @@ GLuint ShaderProgram::Load()
 
 	GLuint programID = CreateProgram(shaders);
 
-	for (auto shader : shaders)
+	for (auto& shader : shaders)
 	{
 		glDeleteShader(shader);
 	}
@@ -160,7 +162,7 @@ GLuint ShaderProgram::CreateProgram(std::vector<GLuint>& shaders)
 {
 	GLuint programID = glCreateProgram();
 
-	for (auto shader : shaders)
+	for (auto& shader : shaders)
 	{
 		glAttachShader(programID, shader);
 	}

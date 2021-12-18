@@ -127,7 +127,7 @@ void Application::InitSimulation()
 		{
 			Model* model = new Model("../models/Head2.obj");
 			mMesh = model->GetFirstMesh();
-			Model* scalp = new Model("../models/Scalp4.obj");
+			Model* scalp = new Model("../models/ScalpLow.obj");
 			mHair = new Hair(scalp->GetFirstMesh(), mHairDensity, mSimulation, mHair);
 		}
 	}

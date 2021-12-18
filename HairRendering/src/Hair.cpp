@@ -8,7 +8,7 @@ Hair::Hair(int numGuides, Simulation* simulation)
 {
 	for (int i = 0; i < numGuides; i++)
 	{
-		mGuideHairs.push_back(new Strand(3, 1.0, glm::vec3(i + 0.25f, 1.0f, 0.0f), glm::vec3(0.0f, -1.0f, 0.0f)));
+		mGuideHairs.push_back(new Strand(10, 1.0, glm::vec3(i + 0.25f, 1.0f, 0.0f), glm::vec3(0.0f, -1.0f, 0.0f)));
 	}
 
 	SetAttributes();
@@ -22,7 +22,7 @@ Hair::Hair(Hair* oldHair, Simulation* simulation)
 
 	for (int i = 0; i < mNumGuideHairs; i++)
 	{
-		mGuideHairs.push_back(new Strand(3, 1.0, glm::vec3(i + 0.25f, 1.0f, 0.0f), glm::vec3(1.0f, 0.0f, 0.0f)));
+		mGuideHairs.push_back(new Strand(10, 1.0, glm::vec3(i + 0.25f, 1.0f, 0.0f), glm::vec3(1.0f, 0.0f, 0.0f)));
 	}
 
 	SetAttributes(oldHair);
@@ -35,7 +35,7 @@ Hair::Hair(Mesh* mesh, float hairDensity, const char* hairTexture, Simulation* s
 	int width, height;
 	unsigned char* image = SOIL_load_image(hairTexture, &width, &height, NULL, SOIL_LOAD_RGB);
 
-	for (auto triangle : mesh->triangles)
+	for (auto& triangle : mesh->triangles)
 	{
 		std::default_random_engine generator;
 		std::uniform_real_distribution<float> distribution(-1.0f, 1.0f);
@@ -60,9 +60,7 @@ Hair::Hair(Mesh* mesh, float hairDensity, const char* hairTexture, Simulation* s
 				continue;
 			}
 
-			normal.z = 0.0f;
-			normal = glm::normalize(normal);
-			mGuideHairs.push_back(new Strand(3, 1, position, normal));
+			mGuideHairs.push_back(new Strand(10, 1, position, normal));
 		}
 	}
 
@@ -74,7 +72,7 @@ Hair::Hair(Mesh* mesh, float hairDensity, const char* hairTexture, Simulation* s
 
 Hair::Hair(Mesh* mesh, float hairDensity, Simulation* simulation, Hair* oldHair)
 {
-	/*for (auto triangle : mesh->triangles)
+	/*for (auto& triangle : mesh->triangles)
 	{
 		std::default_random_engine generator;
 		std::uniform_real_distribution<float> distribution(-1.0f, 1.0f);
@@ -94,7 +92,7 @@ Hair::Hair(Mesh* mesh, float hairDensity, Simulation* simulation, Hair* oldHair)
 
 	std::default_random_engine generator;
 	std::uniform_real_distribution<float> distribution(-0.03f, 0.03f);
-	for (auto vertex : mesh->GetVertices())
+	for (auto& vertex : mesh->GetVertices())
 	{
 		/*int numHairs = (int)(hairDensity / 8);
 		for (int i = 0; i < 1; i++)
@@ -102,11 +100,11 @@ Hair::Hair(Mesh* mesh, float hairDensity, Simulation* simulation, Hair* oldHair)
 			glm::vec3 random = glm::vec3(distribution(generator), distribution(generator), distribution(generator));
 			glm::vec3 position = vertex.position + random;
 			glm::vec3 normal = vertex.normal + random;
-			mGuideHairs.push_back(new Strand(3, 1, position + glm::vec3(0.0f, 0.0f,  0.0f), normal));
+			mGuideHairs.push_back(new Strand(10, 1, position + glm::vec3(0.0f, 0.0f,  0.0f), normal));
 		//}
 	}
 
-	/*for (auto triangle : mesh->triangles)
+	/*for (auto& triangle : mesh->triangles)
 	{
 		std::default_random_engine generator;
 		std::uniform_real_distribution<float> distribution(-1.0f, 1.0f);
@@ -130,7 +128,7 @@ void Hair::Update(float time)
 		mSimulation->Simulate(this);
 	}
 
-	for (auto guide : mGuideHairs)
+	for (auto& guide : mGuideHairs)
 	{
 		guide->Update(time);
 	}
@@ -140,13 +138,13 @@ void Hair::Draw(ShaderProgram &program)
 {
 	program.uniforms.colour = mColour;
 	program.uniforms.numGroupHairs = mNumGroupHairs;
-	program.uniforms.groupWidth = mGroupWidth;
+	program.uniforms.groupSpread = mGroupSpread;
 	program.uniforms.hairRadius = mHairRadius;
 	program.uniforms.noiseAmplitude = mNoiseAmplitude;
 	program.uniforms.numSplineVertices = mNumSplineVertices;
 	program.SetHairUniforms();
 
-	for (auto guide : mGuideHairs)
+	for (auto& guide : mGuideHairs)
 	{
 		guide->Draw(program);
 	}
@@ -160,15 +158,15 @@ void Hair::SetAttributes(Hair* oldHair)
 	}
 	else
 	{
-		SetAttributes(oldHair->mColour, oldHair->mNumGroupHairs, oldHair->mGroupWidth, oldHair->mHairRadius, oldHair->mNoiseAmplitude, oldHair->mNumSplineVertices);
+		SetAttributes(oldHair->mColour, oldHair->mNumGroupHairs, oldHair->mGroupSpread, oldHair->mHairRadius, oldHair->mNoiseAmplitude, oldHair->mNumSplineVertices);
 	}
 }
 
-void Hair::SetAttributes(glm::vec3 colour, int numGroupHairs, float groupWidth, float hairRadius, float noiseAmplitude, int numSplineVertices)
+void Hair::SetAttributes(glm::vec3 colour, int numGroupHairs, float groupSpread, float hairRadius, float noiseAmplitude, int numSplineVertices)
 {
 	mColour = colour;
 	mNumGroupHairs = numGroupHairs;
-	mGroupWidth = groupWidth;
+	mGroupSpread = groupSpread;
 	mHairRadius = hairRadius;
 	mNoiseAmplitude = noiseAmplitude;
 	mNumSplineVertices = numSplineVertices;

@@ -10,7 +10,7 @@ struct HairVertex
 	glm::vec3 tempPosition;
 	glm::vec3 velocity;
 	glm::vec3 forces;
-	glm::vec3 d;
+	glm::vec3 correction;
 	double theta;
 	double omega;
 	float segmentLength;
@@ -26,7 +26,7 @@ struct HairVertex
 		theta = 0.0;
 		omega = 0.0;
 		segmentLength = 0.0f;
-		d = glm::vec3(0.0f);
+		correction = glm::vec3(0.0f);
 		mass = 0.0f;
 		invMass = 0.0f;
 	}
@@ -40,7 +40,7 @@ struct HairVertex
 		theta = 0.0;
 		omega = 0.0;
 		segmentLength = 0.0;
-		d = glm::vec3(0.0f);
+		correction = glm::vec3(0.0f);
 		mass = 0.0f;
 		invMass = 0.0f;
 	}
@@ -83,5 +83,5 @@ public:
 	Shape mPatch;
 	int mNumSegments;
 	double mLength;
-
+	glm::vec3 mTriangleFace[2];
 };

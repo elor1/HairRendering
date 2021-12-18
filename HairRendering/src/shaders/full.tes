@@ -12,13 +12,13 @@ uniform mat4 model, view, projection;
 uniform vec3 vertexData[MAX_VERTICES];
 uniform int numHairSegments;
 uniform int numSplineVertices;
-uniform float groupWidth;
+uniform float groupSpread;
 uniform float noiseAmplitude;
+uniform vec3 triangleFace[2];
 
 float Random(vec2 x)
 {
-    float rand = dot(x, vec2(127.1f, 311.7f));
-    return -1.0f - 2.0f * fract(sin(rand) * (43758.5453123));
+    return fract(sin(dot(x, vec2(12.9898, 78.233))) * 43758.5453);
 }
 
 float Noise(in vec2 x)
@@ -41,7 +41,7 @@ float NoiseLayers(in vec2 x)
         result += Noise(5.0f * scale * gl_TessCoord.xy) / (2.0f * scale);
     }
 
-    return result;
+    return 2.0f * result - 1.0f;
 }
 
 vec3 Spline(float tessCoordX)
@@ -68,12 +68,19 @@ vec3 Spline(float tessCoordX)
 vec3 SplineOffset(in vec2 tessCoord)
 {
     vec3 position = Spline(tessCoord.x);
-    position.x += groupWidth * (tessCoord.y - 0.5f);
+    
+
+    //Offset each hair in circle around guide hair
+    float r = sqrt(Random(vec2(tessCoord.y)));
+    float theta = 6.283 * Random(vec2(0.9f * tessCoord.y));
+    position += groupSpread * r * cos(theta) * triangleFace[0];
+    position += groupSpread * r * sin(theta) * triangleFace[1];
 
     //Add noise
-    position.x += noiseAmplitude * NoiseLayers(tessCoord.xy);
-    position.y += noiseAmplitude * NoiseLayers(tessCoord.xy + 1);
-    position.z += noiseAmplitude * NoiseLayers(tessCoord.xy + 2);
+    float noise = noiseAmplitude * tessCoord.x;
+    position.x += noise * NoiseLayers(tessCoord.xy);
+    position.y += noise * NoiseLayers(tessCoord.xy + 1);
+    position.z += noise * NoiseLayers(tessCoord.xy + 2);
 
     return position;
 }
@@ -81,7 +88,7 @@ vec3 SplineOffset(in vec2 tessCoord)
 void main()
 {
 	vec3 position = SplineOffset(gl_TessCoord.xy);
-    position.x += groupWidth * (gl_TessCoord.y - 0.5f);
+    //position.x += groupWidth * (gl_TessCoord.y - 0.5f);
 
     //Calculate tangent
     vec3 previousPosition = SplineOffset(vec2(gl_TessCoord.x - 1.0f / (numSplineVertices - 1), gl_TessCoord.y));

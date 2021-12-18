@@ -4,7 +4,7 @@
 
 #define GRAVITY -29.8f
 #define MASS 1.0f
-#define DAMPENING 0.35f
+#define DAMPENING 0.95f
 #define TIMESTEP 0.01f
 
 Simulation::Simulation()
@@ -30,9 +30,9 @@ void Simulation::Simulate(Hair* hair)
 
 void Simulation::CalculateExternalForces(Hair* hair)
 {
-	for (auto guide : hair->mGuideHairs)
+	for (auto& guide : hair->mGuideHairs)
 	{
-		for (auto vertex : guide->mVertices)
+		for (auto& vertex : guide->mVertices)
 		{
 			glm::vec3 force = glm::vec3(0.0f);
 
@@ -40,8 +40,12 @@ void Simulation::CalculateExternalForces(Hair* hair)
 			force += glm::vec3(0.0f, -9.8f, 0.0f);
 
 			//Wind
-			force += glm::vec3(6.0f + 20.0f * ((rand() % 100) / 100.0f) - 10.0f, 0.0f, 0.0f);
-			//vertex->forces = force;
+			if (mTime > 2.0f)
+			{
+				force += glm::vec3(6.0f + 20.0f * ((rand() % 100) / 100.0f) - 10.0f, 0.0f, 0.0f);
+			}
+			
+			vertex->forces = force;
 		}
 	}
 }
@@ -53,7 +57,7 @@ void Simulation::CalculateConstraints(Hair* hair)
 
 void Simulation::Integrate(Hair* hair)
 {
-	for (auto guide : hair->mGuideHairs)
+	for (auto& guide : hair->mGuideHairs)
 	{
 		float numVertices = guide->mVertices.size();
 		for (int i = 1; i < numVertices; i++)
@@ -106,7 +110,7 @@ void Simulation::Integrate(Hair* hair)
 
 void Simulation::Integrate2(Hair* hair)
 {
-	for (auto guide : hair->mGuideHairs)
+	for (auto& guide : hair->mGuideHairs)
 	{
 		float numVertices = guide->mVertices.size();
 		for (int i = 2; i < numVertices; i++)
@@ -182,7 +186,7 @@ void Simulation::Integrate2(Hair* hair)
 
 void Simulation::Integrate3(Hair* hair)
 {
-	for (auto guide : hair->mGuideHairs)
+	for (auto& guide : hair->mGuideHairs)
 	{
 		float numVertices = guide->mVertices.size();
 		for (int i = 3; i < numVertices; i++)
@@ -285,7 +289,7 @@ void Simulation::Integrate3(Hair* hair)
 
 void Simulation::Integrate4(Hair* hair)
 {
-	for (auto guide : hair->mGuideHairs)
+	for (auto& guide : hair->mGuideHairs)
 	{
 		float numVertices = guide->mVertices.size();
 		for (int i = 4; i < numVertices; i++)
@@ -467,7 +471,7 @@ void Simulation::Integrate4(Hair* hair)
 
 void Simulation::ParticleSimulation(Hair* hair)
 {
-	for (auto guide : hair->mGuideHairs)
+	for (auto& guide : hair->mGuideHairs)
 	{
 		float numVertices = guide->mVertices.size();
 		guide->mVertices[0]->tempPosition = guide->mVertices[0]->position;
@@ -491,14 +495,14 @@ void Simulation::ParticleSimulation(Hair* hair)
 			currentPos = current->tempPosition;
 			direction = glm::normalize(current->tempPosition - previous->tempPosition);
 			current->tempPosition = previous->tempPosition + direction * previous->segmentLength;
-			current->d = currentPos - current->tempPosition;
+			current->correction = currentPos - current->tempPosition;
 		}
 
 		for (int i = 1; i < numVertices; i++)
 		{
 			HairVertex* previous = guide->mVertices[i - 1];
 			HairVertex* current = guide->mVertices[i];
-			previous->velocity = ((previous->tempPosition - previous->position) / TIMESTEP) + 0.9f * (current->d / TIMESTEP);
+			previous->velocity = ((previous->tempPosition - previous->position) / TIMESTEP) + DAMPENING * (current->correction / TIMESTEP);
 			previous->position = previous->tempPosition;
 		}
 

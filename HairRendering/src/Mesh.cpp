@@ -82,7 +82,7 @@
 //	}
 //
 //	std::vector<GLfloat> VBOdata;
-//	for (auto vertex : mVertices)
+//	for (auto& vertex : mVertices)
 //	{
 //		VBOdata.push_back(vertex.position.x);
 //		VBOdata.push_back(vertex.position.y);
@@ -121,7 +121,7 @@ void Mesh::SetupMesh()
 	}
 
 	//std::vector<GLfloat> VBOdata;
-	//for (auto vertex : mVertices)
+	//for (auto& vertex : mVertices)
 	//{
 	//	VBOdata.push_back(vertex.position.x);
 	//	VBOdata.push_back(vertex.position.y);
