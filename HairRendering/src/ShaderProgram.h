@@ -20,6 +20,7 @@ struct Uniforms
 	float noiseAmplitude;
 	glm::vec3 triangleFace[2];
 	glm::vec3 colour;
+	glm::vec3 lightPosition;
 };
 
 class ShaderProgram
@@ -29,8 +30,8 @@ public:
 
 	GLuint GetID();
 	void SetGlobalUniforms();
-	void SetHairUniforms();
-	void SetGuideHairUniforms();
+	void SetObjectUniforms();
+	void SetDrawUniforms();
 	void Bind();
 	void Unbind();
 

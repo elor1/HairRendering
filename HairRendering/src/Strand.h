@@ -77,7 +77,7 @@ public:
 	virtual ~Strand();
 
 	void Update(float time);
-	void Draw(ShaderProgram &program);
+	void Draw(ShaderProgram* program);
 
 	std::vector<HairVertex*> mVertices;
 	Shape mPatch;

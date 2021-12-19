@@ -32,7 +32,8 @@ ShaderProgram::ShaderProgram(const char* vertex, const char* fragment, const cha
 		"tapering",
 		"noiseAmplitude",
 		"triangleFace",
-		"colour"
+		"colour",
+		"lightPosition"
 	};
 
 	for (auto& name : uniformNames)
@@ -57,9 +58,10 @@ void ShaderProgram::SetGlobalUniforms()
 {
 	glUniformMatrix4fv(mUniformLocations["view"], 1, GL_FALSE, glm::value_ptr(uniforms.view));
 	glUniformMatrix4fv(mUniformLocations["projection"], 1, GL_FALSE, glm::value_ptr(uniforms.projection));
+	glUniform3fv(mUniformLocations["lightPosition"], 1, glm::value_ptr(uniforms.lightPosition));
 }
 
-void ShaderProgram::SetHairUniforms()
+void ShaderProgram::SetObjectUniforms()
 {
 	glUniformMatrix4fv(mUniformLocations["model"], 1, GL_FALSE, glm::value_ptr(uniforms.model));
 	glUniform1i(mUniformLocations["numHairPatch"], uniforms.numGroupHairs);
@@ -71,7 +73,7 @@ void ShaderProgram::SetHairUniforms()
 	glUniform3fv(mUniformLocations["colour"], 1, glm::value_ptr(uniforms.colour));
 }
 
-void ShaderProgram::SetGuideHairUniforms()
+void ShaderProgram::SetDrawUniforms()
 {
 	glUniform1i(mUniformLocations["numHairSegments"], uniforms.numHairVertices - 1);
 	glUniform3fv(mUniformLocations["vertexData"], uniforms.numHairVertices, &uniforms.vertexData[0][0]);

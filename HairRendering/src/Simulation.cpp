@@ -26,6 +26,7 @@ void Simulation::Simulate(Hair* hair)
 	CalculateExternalForces(hair);
 	CalculateConstraints(hair);
 	ParticleSimulation(hair);
+	//Integrate(hair);
 }
 
 void Simulation::CalculateExternalForces(Hair* hair)
@@ -48,6 +49,25 @@ void Simulation::CalculateExternalForces(Hair* hair)
 			vertex->forces = force;
 		}
 	}
+	//for (int i = 0; i < hair->mGuideHairs.size(); i++)
+	//{
+	//	float numVertices = hair->mGuideHairs[i]->mVertices.size();
+	//	for (int j = 1; j < numVertices; j++)
+	//	{
+	//		glm::vec3 force = glm::vec3(0.0f);
+
+	//		//Gravity
+	//		force += glm::vec3(0.0f, -9.8f, 0.0f);
+
+	//		//Wind
+	//		if (mTime > 2.0f)
+	//		{
+	//			force += glm::vec3(6.0f + 20.0f * ((rand() % 100) / 100.0f) - 10.0f, 0.0f, 0.0f);
+	//		}
+	//		
+	//		hair->mGuideHairs[i]->mVertices[j]->forces = force;
+	//	}
+	//}
 }
 
 void Simulation::CalculateConstraints(Hair* hair)

@@ -27,9 +27,6 @@
     <ClCompile Include="src\ShaderProgram.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\HairPatch.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="src\Strand.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -62,9 +59,6 @@
     <ClInclude Include="src\ShaderProgram.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\HairPatch.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="src\Strand.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -88,12 +82,12 @@
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <None Include="src\shaders\base.frag" />
-    <None Include="src\shaders\base.vert" />
-    <None Include="src\shaders\full.frag" />
-    <None Include="src\shaders\full.geom" />
-    <None Include="src\shaders\full.tcs" />
-    <None Include="src\shaders\full.tes" />
-    <None Include="src\shaders\full.vert" />
+    <None Include="src\shaders\mesh.frag" />
+    <None Include="src\shaders\mesh.vert" />
+    <None Include="src\shaders\hair.frag" />
+    <None Include="src\shaders\hair.geom" />
+    <None Include="src\shaders\hair.tcs" />
+    <None Include="src\shaders\hair.tes" />
+    <None Include="src\shaders\hair.vert" />
   </ItemGroup>
 </Project>

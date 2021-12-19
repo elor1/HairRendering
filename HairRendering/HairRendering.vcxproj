@@ -186,7 +186,6 @@ xcopy /y /d "$(SolutionDir)lib\assimp\assimp-vc140-mt.dll" "$(OutDir)"</Command>
     <ClCompile Include="src\Mesh.cpp" />
     <ClCompile Include="src\Model.cpp" />
     <ClCompile Include="src\Strand.cpp" />
-    <ClCompile Include="src\HairPatch.cpp" />
     <ClCompile Include="src\main.cpp" />
     <ClCompile Include="src\ShaderProgram.cpp" />
     <ClCompile Include="src\Shape.cpp" />
@@ -200,19 +199,18 @@ xcopy /y /d "$(SolutionDir)lib\assimp\assimp-vc140-mt.dll" "$(OutDir)"</Command>
     <ClInclude Include="src\Mesh.h" />
     <ClInclude Include="src\Model.h" />
     <ClInclude Include="src\Strand.h" />
-    <ClInclude Include="src\HairPatch.h" />
     <ClInclude Include="src\ShaderProgram.h" />
     <ClInclude Include="src\Shape.h" />
     <ClInclude Include="src\Simulation.h" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="src\shaders\base.frag" />
-    <None Include="src\shaders\base.vert" />
-    <None Include="src\shaders\full.frag" />
-    <None Include="src\shaders\full.geom" />
-    <None Include="src\shaders\full.tcs" />
-    <None Include="src\shaders\full.tes" />
-    <None Include="src\shaders\full.vert" />
+    <None Include="src\shaders\mesh.frag" />
+    <None Include="src\shaders\mesh.vert" />
+    <None Include="src\shaders\hair.frag" />
+    <None Include="src\shaders\hair.geom" />
+    <None Include="src\shaders\hair.tcs" />
+    <None Include="src\shaders\hair.tes" />
+    <None Include="src\shaders\hair.vert" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

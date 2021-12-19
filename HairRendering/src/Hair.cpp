@@ -134,15 +134,15 @@ void Hair::Update(float time)
 	}
 }
 
-void Hair::Draw(ShaderProgram &program)
+void Hair::Draw(ShaderProgram* program)
 {
-	program.uniforms.colour = mColour;
-	program.uniforms.numGroupHairs = mNumGroupHairs;
-	program.uniforms.groupSpread = mGroupSpread;
-	program.uniforms.hairRadius = mHairRadius;
-	program.uniforms.noiseAmplitude = mNoiseAmplitude;
-	program.uniforms.numSplineVertices = mNumSplineVertices;
-	program.SetHairUniforms();
+	program->uniforms.colour = mColour;
+	program->uniforms.numGroupHairs = mNumGroupHairs;
+	program->uniforms.groupSpread = mGroupSpread;
+	program->uniforms.hairRadius = mHairRadius;
+	program->uniforms.noiseAmplitude = mNoiseAmplitude;
+	program->uniforms.numSplineVertices = mNumSplineVertices;
+	program->SetObjectUniforms();
 
 	for (auto& guide : mGuideHairs)
 	{

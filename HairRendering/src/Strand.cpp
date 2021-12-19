@@ -53,16 +53,16 @@ void Strand::Update(float time)
 {
 }
 
-void Strand::Draw(ShaderProgram &program)
+void Strand::Draw(ShaderProgram* program)
 {
-	program.uniforms.triangleFace[0] = mTriangleFace[0];
-	program.uniforms.triangleFace[1] = mTriangleFace[1];
-	program.uniforms.numHairVertices = glm::min((int)mVertices.size(), 64);
-	for (int i = 0; i < program.uniforms.numHairVertices; i++)
+	program->uniforms.triangleFace[0] = mTriangleFace[0];
+	program->uniforms.triangleFace[1] = mTriangleFace[1];
+	program->uniforms.numHairVertices = glm::min((int)mVertices.size(), 64);
+	for (int i = 0; i < program->uniforms.numHairVertices; i++)
 	{
-		program.uniforms.vertexData[i] = mVertices[i]->position;
+		program->uniforms.vertexData[i] = mVertices[i]->position;
 	}
-	program.SetGuideHairUniforms();
+	program->SetDrawUniforms();
 
 	glPatchParameteri(GL_PATCH_VERTICES, 4);
 	mPatch.Draw(GL_PATCHES);

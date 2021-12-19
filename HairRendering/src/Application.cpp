@@ -38,12 +38,11 @@ Application::Application()
 
 Application::~Application()
 {
-	if (USE_MESH)
-	{
-		delete mMesh;
-	}
+	delete mMesh;
 	delete mSimulation;
 	delete mHair;
+	delete mHairProgram;
+	delete mMeshProgram;
 }
 
 void Application::Run()
@@ -102,8 +101,8 @@ void Application::Initialise()
 	mCamera = new Camera(glm::vec3(10.0f, 0.0f, 0.0f), glm::vec3(0.0f, 1.0f, 0.0f), 180.0f, 0.0f);
 
 	//Shaders
-	mMeshProgram = new ShaderProgram("../HairRendering/src/shaders/base.vert", "../HairRendering/src/shaders/base.frag");
-	mHairProgram = new ShaderProgram("../HairRendering/src/shaders/full.vert", "../HairRendering/src/shaders/full.frag", "../HairRendering/src/shaders/full.geom", "../HairRendering/src/shaders/full.tcs", "../HairRendering/src/shaders/full.tes");
+	mMeshProgram = new ShaderProgram("../HairRendering/src/shaders/mesh.vert", "../HairRendering/src/shaders/mesh.frag");
+	mHairProgram = new ShaderProgram("../HairRendering/src/shaders/hair.vert", "../HairRendering/src/shaders/hair.frag", "../HairRendering/src/shaders/hair.geom", "../HairRendering/src/shaders/hair.tcs", "../HairRendering/src/shaders/hair.tes");
 
 	InitSimulation();
 }
@@ -157,18 +156,24 @@ void Application::Draw()
 	mHairProgram->uniforms.projection = glm::perspective(0.8f, (float)mWidth / mHeight, 0.1f, 100.0f);
 	//mHairProgram->uniforms.view = glm::lookAt(glm::vec3(0.0f, 0.0f, 6.0f), glm::vec3(0.0f), glm::vec3(0.0f, 1.0f, 0.0f));
 	mHairProgram->uniforms.view = mCamera->GetViewMatrix();
-	mHairProgram->SetGlobalUniforms();
-
 	mHairProgram->uniforms.model = glm::mat4(1.0f);
-	mHair->Draw(*mHairProgram);
+	mHairProgram->uniforms.lightPosition = glm::vec3(2.0f, 1.0f, 2.0f);
+	mHairProgram->SetGlobalUniforms();
+	
+	mHair->Draw(mHairProgram);
 	mHairProgram->Unbind();
 	
 	if (USE_MESH)
 	{
 		mMeshProgram->Bind();
-		glUniformMatrix4fv(glGetUniformLocation(mMeshProgram->GetID(), "projection"), 1, GL_FALSE, glm::value_ptr(mHairProgram->uniforms.projection));
-		glUniformMatrix4fv(glGetUniformLocation(mMeshProgram->GetID(), "view"), 1, GL_FALSE, glm::value_ptr(mHairProgram->uniforms.view));
-		glUniformMatrix4fv(glGetUniformLocation(mMeshProgram->GetID(), "model"), 1, GL_FALSE, glm::value_ptr(mHairProgram->uniforms.model));
+
+		mMeshProgram->uniforms.projection = mHairProgram->uniforms.projection;
+		mMeshProgram->uniforms.view = mHairProgram->uniforms.view;
+		mMeshProgram->uniforms.model = mHairProgram->uniforms.model;
+		mMeshProgram->uniforms.lightPosition = mHairProgram->uniforms.lightPosition;
+		mMeshProgram->SetGlobalUniforms();
+		mMeshProgram->SetObjectUniforms();
+
 		mMesh->Draw();
 		mMeshProgram->Unbind();
 	}

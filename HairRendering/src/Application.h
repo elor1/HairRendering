@@ -1,7 +1,6 @@
 #pragma once
 #include <glew.h>
 #include <glfw3.h>
-#include "HairPatch.h"
 #include "ShaderProgram.h"
 #include "Camera.h"
 
