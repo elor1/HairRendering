@@ -48,4 +48,5 @@ private:
 	double mPrevTime;
 	double mCurrentTime;
 	double mDeltaTime;
+	int mFrame;
 };

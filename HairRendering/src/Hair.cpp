@@ -123,7 +123,7 @@ Hair::Hair(Mesh* mesh, float hairDensity, Simulation* simulation, Hair* oldHair)
 
 void Hair::Update(float time)
 {
-	if (!mSimulation)
+	if (mSimulation)
 	{
 		mSimulation->Simulate(this);
 	}

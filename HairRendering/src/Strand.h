@@ -27,7 +27,7 @@ struct HairVertex
 		omega = 0.0;
 		segmentLength = 0.0f;
 		correction = glm::vec3(0.0f);
-		mass = 0.0f;
+		mass = 0.01f;
 		invMass = 0.0f;
 	}
 
@@ -41,7 +41,7 @@ struct HairVertex
 		omega = 0.0;
 		segmentLength = 0.0;
 		correction = glm::vec3(0.0f);
-		mass = 0.0f;
+		mass = 0.01f;
 		invMass = 0.0f;
 	}
 };

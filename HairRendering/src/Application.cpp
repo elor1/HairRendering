@@ -22,6 +22,7 @@ Application::Application(int width, int height)
 	mFirstMouse = true;
 	mLastX = width / 2.0;
 	mLastY = width / 2.f;
+	mFrame = 0;
 
 	Initialise();
 }
@@ -148,9 +149,11 @@ void Application::InitSimulation()
 void Application::Draw()
 {
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+	float time = mFrame++ / 60.0f;
 	
-	mSimulation->Update(mDeltaTime);
-	mHair->Update(mDeltaTime);
+	mSimulation->Update(time);
+	mHair->Update(time);
 	
 	mHairProgram->Bind();
 	mHairProgram->uniforms.projection = glm::perspective(0.8f, (float)mWidth / mHeight, 0.1f, 100.0f);

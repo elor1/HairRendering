@@ -41,14 +41,33 @@ void Simulation::CalculateExternalForces(Hair* hair)
 			force += glm::vec3(0.0f, -9.8f, 0.0f);
 
 			//Wind
-			if (mTime > 2.0f)
+			/*if (mTime > 2.0f)
 			{
 				force += glm::vec3(6.0f + 20.0f * ((rand() % 100) / 100.0f) - 10.0f, 0.0f, 0.0f);
-			}
+			}*/
 			
 			vertex->forces = force;
 		}
 	}
+	
+	//for (auto& guide : hair->mGuideHairs)
+	//{
+	//	float  numVerts = guide->mVertices.size();
+	//	for (int i = 1; i < numVerts; i++)
+	//	{
+	//		glm::vec3 force = glm::vec3(0.0f);
+
+	//		force += glm::vec3(0.0f, -9.8f, 0.0f);
+
+	//		/*if (mTime > 2)
+	//		{
+	//			force += glm::vec3(6.0f + 20.0f * ((rand() % 100) / 100.0f) - 10.0f, 0.0f, 0.0f);
+	//		}*/
+	//		
+	//		guide->mVertices[i]->forces = force;
+	//	}
+	//}
+
 	//for (int i = 0; i < hair->mGuideHairs.size(); i++)
 	//{
 	//	float numVertices = hair->mGuideHairs[i]->mVertices.size();
