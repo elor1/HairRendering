@@ -7,6 +7,8 @@
 class Hair;
 class Simulation;
 class Mesh;
+class Texture;
+class Framebuffer;
 
 class Application
 {
@@ -35,6 +37,9 @@ private:
 	ShaderProgram* mMeshProgram;
 	ShaderProgram* mHairProgram;
 	float mHairDensity;
+	Texture* mNoiseTexture;
+	Texture* mShadowDepthTexture;
+	Framebuffer* mShadowFramebuffer;
 
 	Camera* mCamera;
 	bool mFirstMouse;

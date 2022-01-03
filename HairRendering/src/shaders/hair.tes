@@ -15,6 +15,7 @@ uniform int numSplineVertices;
 uniform float groupSpread;
 uniform float noiseAmplitude;
 uniform vec3 triangleFace[2];
+uniform sampler2D noiseTexture;
 
 float Random(vec2 x)
 {
@@ -78,9 +79,10 @@ vec3 SplineOffset(in vec2 tessCoord)
 
     //Add noise
     float noise = noiseAmplitude * tessCoord.x;
-    position.x += noise * NoiseLayers(tessCoord.xy);
-    position.y += noise * NoiseLayers(tessCoord.xy + 1);
-    position.z += noise * NoiseLayers(tessCoord.xy + 2);
+    tessCoord *= 0.4f;
+    position.x += noise * (1.0f - 2.0f * texture(noiseTexture, tessCoord.xy).r);
+    position.y += noise * (1.0f - 2.0f * texture(noiseTexture, tessCoord.xy + 0.01f).r);
+    position.z += noise * (1.0f - 2.0f * texture(noiseTexture, tessCoord.xy + 0.02).r);
 
     return position;
 }

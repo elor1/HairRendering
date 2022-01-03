@@ -13,7 +13,7 @@ out vec4 normal_v;
 
 void main()
 {
-    position_v = view * model * vec4(position, 1.0f);
-    normal_v = view * model * vec4(normal, 0.0f);
-    gl_Position = projection * position_v;
+    position_v = model * vec4(position, 1.0f);
+    normal_v = model * vec4(normal, 0.0f);
+    gl_Position = projection * view * position_v;
 }

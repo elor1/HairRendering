@@ -3,6 +3,8 @@
 uniform vec3 colour;
 uniform mat4 view;
 uniform vec3 lightPosition;
+uniform sampler2D shadowMap;
+uniform mat4 dirToLight;
 
 in vec4 position_g;
 in vec3 tangent_g;
@@ -18,4 +20,6 @@ void main()
 	float specular = pow(sqrt(1.0f - abs(dot(tangent, normalize(normalize(-position_g.xyz) + lightDirection.xyz)))), 40.);
 
 	fragColour = colour * vec3(0.5f * diffuse + specular);
+
+	vec4 shadowCoord = dirToLight * position_g;
 }

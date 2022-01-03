@@ -33,7 +33,10 @@ ShaderProgram::ShaderProgram(const char* vertex, const char* fragment, const cha
 		"noiseAmplitude",
 		"triangleFace",
 		"colour",
-		"lightPosition"
+		"lightPosition",
+		"dirToLight",
+		"noiseTexture",
+		"shadowMap"
 	};
 
 	for (auto& name : uniformNames)
@@ -58,7 +61,10 @@ void ShaderProgram::SetGlobalUniforms()
 {
 	glUniformMatrix4fv(mUniformLocations["view"], 1, GL_FALSE, glm::value_ptr(uniforms.view));
 	glUniformMatrix4fv(mUniformLocations["projection"], 1, GL_FALSE, glm::value_ptr(uniforms.projection));
+	glUniformMatrix4fv(mUniformLocations["dirToLight"], 1, GL_FALSE, glm::value_ptr(uniforms.dirToLight));
 	glUniform3fv(mUniformLocations["lightPosition"], 1, glm::value_ptr(uniforms.lightPosition));
+	glUniform1i(mUniformLocations["noiseTexture"], uniforms.noiseTexture);
+	glUniform1i(mUniformLocations["shadowMap"], uniforms.shadowMap);
 }
 
 void ShaderProgram::SetObjectUniforms()

@@ -8,6 +8,8 @@
 #include "Simulation.h"
 #include "Hair.h"
 #include "Model.h"
+#include "Texture.h"
+#include "Framebuffer.h"
 
 #define USE_MESH true
 #define USE_TEXTURE false
@@ -44,6 +46,7 @@ Application::~Application()
 	delete mHair;
 	delete mHairProgram;
 	delete mMeshProgram;
+	delete mNoiseTexture;
 }
 
 void Application::Run()
@@ -105,6 +108,17 @@ void Application::Initialise()
 	mMeshProgram = new ShaderProgram("../HairRendering/src/shaders/mesh.vert", "../HairRendering/src/shaders/mesh.frag");
 	mHairProgram = new ShaderProgram("../HairRendering/src/shaders/hair.vert", "../HairRendering/src/shaders/hair.frag", "../HairRendering/src/shaders/hair.geom", "../HairRendering/src/shaders/hair.tcs", "../HairRendering/src/shaders/hair.tes");
 
+	//Textures
+	mNoiseTexture = new Texture();
+	mNoiseTexture->Create("../images/Noise.jpg", GL_LINEAR, GL_LINEAR);
+	mShadowDepthTexture = new Texture();
+	mShadowDepthTexture->CreateDepthTexture(1024, 1024);
+
+	//Framebuffers
+	mShadowFramebuffer = new Framebuffer();
+	mShadowFramebuffer->Create();
+	mShadowFramebuffer->AttachDepthTexture(mShadowDepthTexture->GetID());
+
 	InitSimulation();
 }
 
@@ -155,17 +169,63 @@ void Application::Draw()
 	mSimulation->Update(time);
 	mHair->Update(time);
 	
+	glm::vec3 lightPosition = glm::vec3(2.0f, 1.0f, 2.0f);
+	glm::mat4 lightProjection = glm::perspective(1.5f, 1.0f, 1.0f, 100.0f);
+	glm::mat4 lightView = glm::lookAt(lightPosition, glm::vec3(0.0f), glm::vec3(0.0f, 1.0f, 0.0f));
+	glm::mat4 eyeToLight = lightProjection * lightView * glm::inverse(mCamera->GetViewMatrix());
+
+	//Shadow map
+	glViewport(0, 0, mShadowDepthTexture->GetWidth(), mShadowDepthTexture->GetHeight());
+	mShadowFramebuffer->Bind();
+	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+	mMeshProgram->Bind();
+	mMeshProgram->uniforms.projection = lightProjection;
+	mMeshProgram->uniforms.view = lightView;
+	mMeshProgram->uniforms.model = glm::mat4(1.0f);
+	mMeshProgram->SetGlobalUniforms();
+	mMeshProgram->SetObjectUniforms();
+	mMesh->Draw();
+	mMeshProgram->Unbind();
+
 	mHairProgram->Bind();
+	mNoiseTexture->Bind(GL_TEXTURE0);
+	mShadowDepthTexture->Bind(GL_TEXTURE1);
+	mHairProgram->uniforms.projection = lightProjection;
+	mHairProgram->uniforms.view = lightView;
+	mHairProgram->uniforms.model = glm::mat4(1.0f);
+	mHairProgram->uniforms.dirToLight = eyeToLight;
+	mHairProgram->uniforms.lightPosition = lightPosition;
+	mHairProgram->uniforms.noiseTexture = 0;
+	mHairProgram->uniforms.shadowMap = 1;
+	mHairProgram->SetGlobalUniforms();
+	mHair->Draw(mHairProgram);
+	mShadowDepthTexture->Unbind(GL_TEXTURE1);
+	mNoiseTexture->Unbind(GL_TEXTURE0);
+	mHairProgram->Unbind();
+
+	mShadowFramebuffer->Unbind();
+
+	//Render hair
+	glViewport(0, 0, mWidth, mHeight);
+	mHairProgram->Bind();
+	mNoiseTexture->Bind(GL_TEXTURE0);
+	mShadowDepthTexture->Bind(GL_TEXTURE1);
 	mHairProgram->uniforms.projection = glm::perspective(0.8f, (float)mWidth / mHeight, 0.1f, 100.0f);
 	//mHairProgram->uniforms.view = glm::lookAt(glm::vec3(0.0f, 0.0f, 6.0f), glm::vec3(0.0f), glm::vec3(0.0f, 1.0f, 0.0f));
 	mHairProgram->uniforms.view = mCamera->GetViewMatrix();
 	mHairProgram->uniforms.model = glm::mat4(1.0f);
-	mHairProgram->uniforms.lightPosition = glm::vec3(2.0f, 1.0f, 2.0f);
+	mHairProgram->uniforms.dirToLight = eyeToLight;
+	mHairProgram->uniforms.lightPosition = lightPosition;
+	mHairProgram->uniforms.noiseTexture = 0;
+	mHairProgram->uniforms.shadowMap = 1;
 	mHairProgram->SetGlobalUniforms();
-	
 	mHair->Draw(mHairProgram);
+
+	mShadowDepthTexture->Unbind(GL_TEXTURE1);
+	mNoiseTexture->Unbind(GL_TEXTURE0);
 	mHairProgram->Unbind();
 	
+	//Render mesh
 	if (USE_MESH)
 	{
 		mMeshProgram->Bind();

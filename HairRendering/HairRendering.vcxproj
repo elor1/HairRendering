@@ -181,27 +181,33 @@ xcopy /y /d "$(SolutionDir)lib\assimp\assimp-vc140-mt.dll" "$(OutDir)"</Command>
   <ItemGroup>
     <ClCompile Include="src\Application.cpp" />
     <ClCompile Include="src\Camera.cpp" />
+    <ClCompile Include="src\Framebuffer.cpp" />
     <ClCompile Include="src\Hair.cpp" />
     <ClCompile Include="src\Integrator.cpp" />
     <ClCompile Include="src\Mesh.cpp" />
     <ClCompile Include="src\Model.cpp" />
+    <ClCompile Include="src\Quad.cpp" />
     <ClCompile Include="src\Strand.cpp" />
     <ClCompile Include="src\main.cpp" />
     <ClCompile Include="src\ShaderProgram.cpp" />
     <ClCompile Include="src\Shape.cpp" />
     <ClCompile Include="src\Simulation.cpp" />
+    <ClCompile Include="src\Texture.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\Application.h" />
     <ClInclude Include="src\Camera.h" />
+    <ClInclude Include="src\Framebuffer.h" />
     <ClInclude Include="src\Hair.h" />
     <ClInclude Include="src\Integrator.h" />
     <ClInclude Include="src\Mesh.h" />
     <ClInclude Include="src\Model.h" />
+    <ClInclude Include="src\Quad.h" />
     <ClInclude Include="src\Strand.h" />
     <ClInclude Include="src\ShaderProgram.h" />
     <ClInclude Include="src\Shape.h" />
     <ClInclude Include="src\Simulation.h" />
+    <ClInclude Include="src\Texture.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="src\shaders\mesh.frag" />
@@ -211,6 +217,8 @@ xcopy /y /d "$(SolutionDir)lib\assimp\assimp-vc140-mt.dll" "$(OutDir)"</Command>
     <None Include="src\shaders\hair.tcs" />
     <None Include="src\shaders\hair.tes" />
     <None Include="src\shaders\hair.vert" />
+    <None Include="src\shaders\quad.frag" />
+    <None Include="src\shaders\quad.vert" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
