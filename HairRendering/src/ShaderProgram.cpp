@@ -7,8 +7,6 @@
 
 ShaderProgram::ShaderProgram(const char* vertex, const char* fragment, const char* geometry, const char* tessControl, const char* tessEval)
 {
-	//Load(vertex, fragment, geometry, tessControl, tessEval);
-
 	mVertex = vertex;
 	mFragment = fragment;
 	mGeometry = geometry;

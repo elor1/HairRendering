@@ -11,9 +11,6 @@
 #include "Texture.h"
 #include "Framebuffer.h"
 
-#define USE_MESH true
-#define USE_TEXTURE false
-
 Application::Application(int width, int height)
 {
 	mPrevTime = glfwGetTime();
@@ -27,16 +24,6 @@ Application::Application(int width, int height)
 	mFrame = 0;
 
 	Initialise();
-}
-
-Application::Application()
-{
-	if (USE_MESH)
-	{
-		delete mMesh;
-	}
-	delete mSimulation;
-	delete mHair;
 }
 
 Application::~Application()
@@ -128,34 +115,14 @@ void Application::InitSimulation()
 	delete mSimulation;
 	Hair* oldHair = mHair;
 
-	mSimulation = new Simulation();
-	if (USE_MESH)
-	{
-		if (USE_TEXTURE)
-		{
-			Model* model = new Model("../models/Head2.obj");
-			mMesh = model->GetFirstMesh();
-			mHair = new Hair(mMesh, mHairDensity, "../images/hair.jpg", mSimulation, mHair);
-		}
-		else
-		{
-			Model* model = new Model("../models/Head2.obj");
-			mMesh = model->GetFirstMesh();
-			Model* scalp = new Model("../models/ScalpLow.obj");
-			mHair = new Hair(scalp->GetFirstMesh(), mHairDensity, mSimulation, mHair);
-		}
-	}
-	else
-	{
-		if (oldHair)
-		{
-			mHair = new Hair(oldHair, mSimulation);
-		}
-		else
-		{
-			mHair = new Hair(1, mSimulation);
-		}
-	}
+	Model* model = new Model("../models/Head2.obj");
+	mMesh = model->GetFirstMesh();
+
+	Model* modelLow = new Model("../models/HeadLow.obj");
+	Mesh* meshLow = modelLow->GetFirstMesh();
+	mSimulation = new Simulation(meshLow);
+	Model* scalp = new Model("../models/ScalpLow.obj");
+	mHair = new Hair(scalp->GetFirstMesh(), mHairDensity, mSimulation, mHair);
 
 	delete oldHair;
 }
@@ -226,20 +193,17 @@ void Application::Draw()
 	mHairProgram->Unbind();
 	
 	//Render mesh
-	if (USE_MESH)
-	{
-		mMeshProgram->Bind();
+	mMeshProgram->Bind();
 
-		mMeshProgram->uniforms.projection = mHairProgram->uniforms.projection;
-		mMeshProgram->uniforms.view = mHairProgram->uniforms.view;
-		mMeshProgram->uniforms.model = mHairProgram->uniforms.model;
-		mMeshProgram->uniforms.lightPosition = mHairProgram->uniforms.lightPosition;
-		mMeshProgram->SetGlobalUniforms();
-		mMeshProgram->SetObjectUniforms();
+	mMeshProgram->uniforms.projection = mHairProgram->uniforms.projection;
+	mMeshProgram->uniforms.view = mHairProgram->uniforms.view;
+	mMeshProgram->uniforms.model = mHairProgram->uniforms.model;
+	mMeshProgram->uniforms.lightPosition = mHairProgram->uniforms.lightPosition;
+	mMeshProgram->SetGlobalUniforms();
+	mMeshProgram->SetObjectUniforms();
 
-		mMesh->Draw();
-		mMeshProgram->Unbind();
-	}
+	mMesh->Draw();
+	mMeshProgram->Unbind();
 }
 
 void Application::Update()

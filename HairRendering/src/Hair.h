@@ -11,8 +11,6 @@ class Hair
 {
 public:
 	Hair(int numGuides, Simulation* simulation);
-	Hair(Hair* oldHair, Simulation* simulation);
-	Hair(Mesh* mesh, float hairDensity, const char* hairTexture, Simulation* simulation, Hair* oldHair = nullptr/*, int width = 960, int height = 720*/);
 	Hair(Mesh* mesh, float hairDensity, Simulation* simulation, Hair* oldHair = nullptr);
 
 	void Update(float time);

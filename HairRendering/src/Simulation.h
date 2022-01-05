@@ -2,13 +2,14 @@
 #include <vector>
 #include <glm.hpp>
 #include "Integrator.h"
+#include "Mesh.h"
 
 class Hair;
 
 class Simulation
 {
 public:
-	Simulation();
+	Simulation(Mesh* mesh);
 	virtual ~Simulation();
 
 	void Update(float time);
@@ -18,15 +19,10 @@ public:
 
 private:
 	float mTime;
+	Mesh* mMesh;
 
 	void CalculateExternalForces(Hair* hair);
 	void CalculateConstraints(Hair* hair);
-	void Integrate(Hair* hair);
-	void Integrate2(Hair* hair);
-	void Integrate3(Hair* hair);
-	void Integrate4(Hair* hair);
 
 	void ParticleSimulation(Hair* hair);
-
-	double OmegaDot(double theta, double omega, float rodLength, float inertia);
 };

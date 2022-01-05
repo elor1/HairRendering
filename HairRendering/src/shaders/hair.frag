@@ -17,7 +17,7 @@ void main()
 	vec3 tangent = normalize(tangent_g);
 
 	float diffuse = sqrt(1.0f - abs(dot(tangent, lightDirection.xyz)));
-	float specular = pow(sqrt(1.0f - abs(dot(tangent, normalize(normalize(-position_g.xyz) + lightDirection.xyz)))), 40.);
+	float specular = pow(sqrt(1.0f - abs(dot(tangent, normalize(normalize(-position_g.xyz) + lightDirection.xyz)))), 40.0f);
 
 	fragColour = colour * vec3(0.5f * diffuse + specular);
 

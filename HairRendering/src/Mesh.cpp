@@ -1,147 +1,43 @@
-//#include "Mesh.h"
-//#include <iostream>
-//#include <glew.h>
-//
-//Mesh::Mesh(std::string filename)
-//{
-//	Load(filename);
-//	Initialise();
-//}
-//
-//void Mesh::Draw()
-//{
-//	mShape.Draw(GL_TRIANGLES);
-//}
-//
-//void Mesh::Load(std::string filename)
-//{
-//	Assimp::Importer importer;
-//	const aiScene* scene = importer.ReadFile(filename, aiProcess_Triangulate | aiProcess_FlipUVs);
-//
-//	if (!scene || scene->mFlags & AI_SCENE_FLAGS_INCOMPLETE || !scene->mRootNode)
-//	{
-//		std::cout << "ERROR: " << importer.GetErrorString() << std::endl;
-//		return;
-//	}
-//	mDirectory = filename.substr(0, filename.find_last_of('/'));
-//
-//	Process(scene->mMeshes[scene->mRootNode->mMeshes[0]], scene);
-//}
-//
-//void Mesh::Process(aiMesh* mesh, const aiScene* scene)
-//{
-//	for (unsigned int i = 0; i < mesh->mNumVertices; i++)
-//	{
-//		Vertex vertex;
-//		glm::vec3 vector;
-//		vector.x = mesh->mVertices[i].x;
-//		vector.y = mesh->mVertices[i].y;
-//		vector.z = mesh->mVertices[i].z;
-//		vertex.position = vector;
-//
-//		if (mesh->HasNormals())
-//		{
-//			vector.x = mesh->mNormals[i].x;
-//			vector.y = mesh->mNormals[i].y;
-//			vector.z = mesh->mNormals[i].z;
-//			vertex.normal = vector;
-//		}
-//
-//		if (mesh->mTextureCoords[0])
-//		{
-//			glm::vec2 vec;
-//			vec.x = mesh->mTextureCoords[0][i].x;
-//			vec.y = mesh->mTextureCoords[0][i].y;
-//			vertex.texCoords = vec;
-//		}
-//		else
-//		{
-//			vertex.texCoords = glm::vec2(0.0f);
-//		}
-//
-//		mVertices.push_back(vertex);
-//	}
-//
-//	for (unsigned int i = 0; i < mesh->mNumFaces; i++)
-//	{
-//		aiFace face = mesh->mFaces[i];
-//		for (unsigned int j = 0; j < face.mNumIndices; j++)
-//		{
-//			mIndices.push_back(face.mIndices[j]);
-//		}
-//	}
-//}
-//
-//void Mesh::Initialise()
-//{
-//	for (unsigned int i = 0; i < mVertices.size() / 3; i++)
-//	{
-//		unsigned int index = i * 3;
-//		Triangle triangle(mVertices[index], mVertices[index + 1], mVertices[index + 2]);
-//		triangles.push_back(triangle);
-//	}
-//
-//	std::vector<GLfloat> VBOdata;
-//	for (auto& vertex : mVertices)
-//	{
-//		VBOdata.push_back(vertex.position.x);
-//		VBOdata.push_back(vertex.position.y);
-//		VBOdata.push_back(vertex.position.z);
-//		VBOdata.push_back(vertex.texCoords.x);
-//		VBOdata.push_back(vertex.texCoords.y);
-//		VBOdata.push_back(vertex.normal.x);
-//		VBOdata.push_back(vertex.normal.y);
-//		VBOdata.push_back(vertex.normal.z);
-//	}
-//	mShape.Create();
-//	mShape.SetVertexData(&VBOdata[0], sizeof(GLfloat) * VBOdata.size(), mVertices.size());
-//	mShape.SetAttribute(0, 3, GL_FLOAT, GL_FALSE, sizeof(GLfloat) * 8, 0);
-//	mShape.SetAttribute(1, 2, GL_FLOAT, GL_FALSE, sizeof(GLfloat) * 8, 3 * sizeof(GLfloat));
-//	mShape.SetAttribute(2, 3, GL_FLOAT, GL_FALSE, sizeof(GLfloat) * 8, 5 * sizeof(GLfloat));
-//}
-
 #include "Mesh.h"
 #include <glew.h>
+#include <glm.hpp>
+#include <gtc/random.hpp>
 
 Mesh::Mesh(std::vector<Vertex> vertices, std::vector<unsigned int> indices)
 {
 	mVertices = vertices;
 	mIndices = indices;
 
+	mMin = glm::vec3(std::numeric_limits<float>::max());
+	mMax = glm::vec3(std::numeric_limits<float>::min());
+
+	for (auto& vertex : vertices)
+	{
+		mMin = glm::min(mMin, vertex.position);
+		mMax = glm::max(mMax, vertex.position);
+	}
+
 	SetupMesh();
 }
 
 void Mesh::SetupMesh()
 {
-	for (unsigned int i = 0; i < mVertices.size() / 3; i++)
+	/*for (unsigned int i = 0; i < mVertices.size() / 3; i++)
 	{
 		unsigned int index = i * 3;
 		Triangle triangle(mVertices[index], mVertices[index + 1], mVertices[index + 2]);
 		triangles.push_back(triangle);
-	}
+	}*/
 
-	//std::vector<GLfloat> VBOdata;
-	//for (auto& vertex : mVertices)
-	//{
-	//	VBOdata.push_back(vertex.position.x);
-	//	VBOdata.push_back(vertex.position.y);
-	//	VBOdata.push_back(vertex.position.z);
-	//	VBOdata.push_back(vertex.texCoords.x);
-	//	VBOdata.push_back(vertex.texCoords.y);
-	//	VBOdata.push_back(vertex.normal.x);
-	//	VBOdata.push_back(vertex.normal.y);
-	//	VBOdata.push_back(vertex.normal.z);
-	//}
-	//mShape.Create();
-	////mShape.SetVertexData(&VBOdata[0], sizeof(GLfloat) * VBOdata.size(), mVertices.size());
-	///*mShape.SetVertexData(mVertices);
-	//mShape.SetAttribute(0, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), 0);
-	//mShape.SetAttribute(1, 2, GL_FLOAT, GL_FALSE, sizeof(Vertex), offsetof(Vertex, Vertex::texCoords));
-	//mShape.SetAttribute(2, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), offsetof(Vertex, Vertex::normal));*/
-	//mShape.SetupMesh(mVertices, mIndices);
-	///*mShape.SetAttribute(0, 3, GL_FLOAT, GL_FALSE, sizeof(GLfloat) * 8, 0);
-	//mShape.SetAttribute(1, 2, GL_FLOAT, GL_FALSE, sizeof(GLfloat) * 8, 3 * sizeof(GLfloat));
-	//mShape.SetAttribute(2, 3, GL_FLOAT, GL_FALSE, sizeof(GLfloat) * 8, 5 * sizeof(GLfloat));*/
+	//Create triangles
+	for (int i = 0; i * 3 < mIndices.size(); i++)
+	{
+		Vertex v1 = mVertices[mIndices[3 * i]];
+		Vertex v2 = mVertices[mIndices[3 * i + 1]];
+		Vertex v3 = mVertices[mIndices[3 * i + 2]];
+
+		triangles.push_back(Triangle(v1, v2, v3));
+	}
 
 	glGenVertexArrays(1, &mVAO);
 	glGenBuffers(1, &mVBO);
@@ -170,7 +66,6 @@ void Mesh::SetupMesh()
 
 void Mesh::Draw()
 {
-	//mShape.Draw(GL_TRIANGLES);
 	glBindVertexArray(mVAO);
 	glDrawElements(GL_TRIANGLES, mIndices.size(), GL_UNSIGNED_INT, 0);
 	glBindVertexArray(0);
@@ -179,4 +74,39 @@ void Mesh::Draw()
 std::vector<Vertex> Mesh::GetVertices()
 {
 	return mVertices;
+}
+
+bool Mesh::Contains(glm::vec3 &normal, glm::vec3 position)
+{
+	if (glm::any(glm::lessThan(position, mMin)) || glm::any(glm::greaterThan(position, mMax)))
+	{
+		return false;
+	}
+
+	int numIntersections = 0;
+	/*double rand1 = rand() % 1000;
+	double rand2 = rand() % 1000;
+	double rand3 = rand() % 1000;
+	glm::vec3 randomDir = glm::normalize(glm::vec3(rand1, rand2, rand3));*/
+	glm::vec3 randomDir = glm::normalize(position);
+
+	for (auto& triangle : triangles)
+	{
+		glm::vec3 intersection = glm::vec3(0.0f);
+
+		if (triangle.IsIntersecting(intersection, position, randomDir))
+		{
+			normal = (triangle.vertex1.normal + triangle.vertex2.normal + triangle.vertex3.normal) / 3.0f;
+			numIntersections++;
+		}
+	}
+
+	if (numIntersections % 2 == 0)
+	{
+		return false;
+	}
+	else
+	{
+		return true;
+	}
 }
