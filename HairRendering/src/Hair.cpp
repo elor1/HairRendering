@@ -48,7 +48,7 @@ Hair::Hair(Mesh* mesh, float hairDensity, Simulation* simulation, Hair* oldHair)
 			glm::vec3 random = glm::vec3(distribution(generator), distribution(generator), distribution(generator));
 			glm::vec3 position = vertex.position + random;
 			glm::vec3 normal = vertex.normal + random;
-			mGuideHairs.push_back(new Strand(20, 1, position + glm::vec3(0.0f, 0.0f,  0.0f), normal));
+			mGuideHairs.push_back(new Strand(20, 0.8, position, normal));
 		//}
 	}
 

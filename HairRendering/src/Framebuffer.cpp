@@ -22,6 +22,7 @@ void Framebuffer::AttachTextures(std::vector<GLuint> textureIDs, GLenum target)
 
 	int numTextures = textureIDs.size();
 	std::vector<GLenum> drawBuffers;
+	drawBuffers.resize(numTextures);
 	for (int i = 0; i < numTextures; i++)
 	{
 		drawBuffers[i] = GL_COLOR_ATTACHMENT0 + i;

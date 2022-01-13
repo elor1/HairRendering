@@ -29,17 +29,25 @@ private:
 	void ProcessInput();
 	static void FrameBufferCallback(GLFWwindow* window, int width, int height);
 	void MouseCallback(GLFWwindow* window, double xPos, double yPos);
-
+	
 	Mesh* mMesh;
-	Hair* mHair;
 	Mesh* mCollider;
+
+	Hair* mHair;
 	Simulation* mSimulation;
+
 	ShaderProgram* mMeshProgram;
 	ShaderProgram* mHairProgram;
+	ShaderProgram* mOpacityMapProgram;
+
 	float mHairDensity;
+
 	Texture* mNoiseTexture;
 	Texture* mShadowDepthTexture;
+	Texture* mOpacityMapTexture;
+
 	Framebuffer* mShadowFramebuffer;
+	Framebuffer* mOpacityMapFramebuffer;
 
 	Camera* mCamera;
 	bool mFirstMouse;
@@ -54,4 +62,7 @@ private:
 	double mCurrentTime;
 	double mDeltaTime;
 	int mFrame;
+
+	bool mIsPaused;
+	bool mSpaceDown;
 };

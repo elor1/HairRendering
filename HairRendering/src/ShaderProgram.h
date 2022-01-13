@@ -24,6 +24,8 @@ struct Uniforms
 	glm::mat4 dirToLight;
 	int noiseTexture;
 	int shadowMap;
+	int opacityMap;
+	float shadowIntensity;
 };
 
 class ShaderProgram
