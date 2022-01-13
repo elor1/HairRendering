@@ -16,6 +16,7 @@ struct HairVertex
 	float segmentLength;
 	float mass;
 	float invMass;
+	bool simulate;
 
 	HairVertex()
 	{
@@ -29,6 +30,7 @@ struct HairVertex
 		correction = glm::vec3(0.0f);
 		mass = 0.01f;
 		invMass = 0.0f;
+		simulate = true;
 	}
 
 	HairVertex(glm::vec3 pos)
@@ -43,30 +45,7 @@ struct HairVertex
 		correction = glm::vec3(0.0f);
 		mass = 0.01f;
 		invMass = 0.0f;
-	}
-};
-
-struct Joint
-{
-	glm::vec3 position;
-	glm::vec3 linear;
-	glm::vec3 angular;
-	glm::vec3 constraint;
-
-	Joint()
-	{
-		position = glm::vec3(0.0f);
-		linear = glm::vec3(0.0f);
-		angular = glm::vec3(0.0f);
-		constraint = glm::vec3(0.0f);
-	}
-
-	Joint(glm::vec3 pos)
-	{
-		position = pos;
-		linear = glm::vec3(0.0f);
-		angular = glm::vec3(0.0f);
-		constraint = glm::vec3(0.0f);
+		simulate = true;
 	}
 };
 

@@ -32,6 +32,7 @@ private:
 
 	Mesh* mMesh;
 	Hair* mHair;
+	Mesh* mCollider;
 	Simulation* mSimulation;
 	ShaderProgram* mMeshProgram;
 	ShaderProgram* mHairProgram;

@@ -10,7 +10,7 @@
 class Model
 {
 public:
-	Model(std::string filename);
+	Model(std::string filename, float scale = 1.0f);
 
 	void Draw();
 	std::vector<Mesh*> GetMeshes();
@@ -23,4 +23,6 @@ private:
 	void LoadModel(std::string filename);
 	void ProcessNode(aiNode* node, const aiScene* scene);
 	Mesh ProcessMesh(aiMesh* mesh, const aiScene* scene);
+
+	float mScale;
 };

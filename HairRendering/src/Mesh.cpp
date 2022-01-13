@@ -3,13 +3,15 @@
 #include <glm.hpp>
 #include <gtc/random.hpp>
 
-Mesh::Mesh(std::vector<Vertex> vertices, std::vector<unsigned int> indices)
+Mesh::Mesh(std::vector<Vertex> vertices, std::vector<unsigned int> indices, float scale)
 {
 	mVertices = vertices;
 	mIndices = indices;
 
 	mMin = glm::vec3(std::numeric_limits<float>::max());
 	mMax = glm::vec3(std::numeric_limits<float>::min());
+
+	mScale = scale;
 
 	for (auto& vertex : vertices)
 	{
@@ -35,6 +37,10 @@ void Mesh::SetupMesh()
 		Vertex v1 = mVertices[mIndices[3 * i]];
 		Vertex v2 = mVertices[mIndices[3 * i + 1]];
 		Vertex v3 = mVertices[mIndices[3 * i + 2]];
+
+		v1.position *= mScale;
+		v2.position *= mScale;
+		v3.position *= mScale;
 
 		triangles.push_back(Triangle(v1, v2, v3));
 	}
@@ -78,35 +84,63 @@ std::vector<Vertex> Mesh::GetVertices()
 
 bool Mesh::Contains(glm::vec3 &normal, glm::vec3 position)
 {
+	//Check if position is outside bounding box
+	/*if (glm::any(glm::lessThan(position, mMin)) || glm::any(glm::greaterThan(position, mMax)))
+	{
+		return false;
+	}*/
+
+	//int numIntersections = 0;
+	///*double rand1 = rand() % 1000;
+	//double rand2 = rand() % 1000;
+	//double rand3 = rand() % 1000;
+	//glm::vec3 randomDir = glm::normalize(glm::vec3(rand1, rand2, rand3));*/
+	//glm::vec3 randomDir = glm::normalize(glm::vec3(1.0f, 1.0f, 1.0f));
+
+	//for (auto& triangle : triangles)
+	//{
+	//	glm::vec3 intersection = glm::vec3(0.0f);
+
+	//	if (triangle.IsIntersecting(intersection, position, randomDir))
+	//	{
+	//		normal = (triangle.vertex1.normal + triangle.vertex2.normal + triangle.vertex3.normal) / 3.0f;
+	//		numIntersections++;
+	//	}
+	//}
+
+	//if (numIntersections % 2 == 0)
+	//{
+	//	return false;
+	//}
+	//else
+	//{
+	//	return true;
+	//}
+
 	if (glm::any(glm::lessThan(position, mMin)) || glm::any(glm::greaterThan(position, mMax)))
 	{
 		return false;
 	}
 
+	Vector3 direction = Vector3(0.0f, 1.0f, 0.0f);
+	Vector3 pos = Vector3(position.x, position.y, position.z);
 	int numIntersections = 0;
-	/*double rand1 = rand() % 1000;
-	double rand2 = rand() % 1000;
-	double rand3 = rand() % 1000;
-	glm::vec3 randomDir = glm::normalize(glm::vec3(rand1, rand2, rand3));*/
-	glm::vec3 randomDir = glm::normalize(position);
 
 	for (auto& triangle : triangles)
 	{
-		glm::vec3 intersection = glm::vec3(0.0f);
-
-		if (triangle.IsIntersecting(intersection, position, randomDir))
+		if (triangle.Intersects(direction, pos))
 		{
 			normal = (triangle.vertex1.normal + triangle.vertex2.normal + triangle.vertex3.normal) / 3.0f;
 			numIntersections++;
 		}
 	}
 
-	if (numIntersections % 2 == 0)
+	if (numIntersections % 2 == 1)
 	{
-		return false;
+		return true;
 	}
 	else
 	{
-		return true;
+		return false;
 	}
 }

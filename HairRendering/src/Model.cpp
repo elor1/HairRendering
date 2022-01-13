@@ -1,7 +1,8 @@
 #include "Model.h"
 
-Model::Model(std::string filename)
+Model::Model(std::string filename, float scale)
 {
+	mScale = scale;
 	LoadModel(filename);
 }
 
@@ -104,7 +105,7 @@ Mesh Model::ProcessMesh(aiMesh* mesh, const aiScene* scene)
 		}
 	}
 
-	return Mesh(vertices, indices);
+	return Mesh(vertices, indices, mScale);
 }
 
 

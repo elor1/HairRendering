@@ -2,7 +2,7 @@
 #include "Strand.h"
 #include "Hair.h"
 
-#define GRAVITY -29.8f
+#define GRAVITY -9.8f
 #define MASS 1.0f
 #define DAMPENING 0.95f
 #define TIMESTEP 0.01f
@@ -37,12 +37,12 @@ void Simulation::CalculateExternalForces(Hair* hair)
 {
 	for (auto& guide : hair->mGuideHairs)
 	{
-		for (auto& vertex : guide->mVertices)
+		float numVerts = guide->mVertices.size();
+		for (int i = 1; i < numVerts; i++)
 		{
-			glm::vec3 force = glm::vec3(0.0f);
+			HairVertex* vertex = guide->mVertices[i];
 
-			//Gravity
-			force += glm::vec3(0.0f, -9.8f, 0.0f);
+			glm::vec3 force = glm::vec3(0.0f, GRAVITY, 0.0f);
 
 			//Wind
 			if (WIND)
@@ -59,7 +59,9 @@ void Simulation::CalculateExternalForces(Hair* hair)
 				glm::vec3 normal;
 				if (mMesh->Contains(normal, vertex->position))
 				{
-					force = 2.0f * normal;
+					force = 20.0f * normal;
+					/*force = glm::vec3(0.0f, 0.0f, 0.0f);
+					vertex->simulate = false;*/
 				}
 			}
 
@@ -79,10 +81,17 @@ void Simulation::ParticleSimulation(Hair* hair)
 	{
 		float numVertices = guide->mVertices.size();
 		guide->mVertices[0]->tempPosition = guide->mVertices[0]->position;
+		HairVertex* last = guide->mVertices.back();
 
+		//Update velocities
 		for (int i = 1; i < numVertices; i++)
 		{
 			HairVertex* vertex = guide->mVertices[i];
+
+			if (!vertex->simulate)
+			{
+				goto skip;
+			}
 
 			vertex->velocity = vertex->velocity + TIMESTEP * (vertex->forces * (1.0f / vertex->mass));
 			vertex->tempPosition += (vertex->velocity * TIMESTEP);
@@ -102,6 +111,7 @@ void Simulation::ParticleSimulation(Hair* hair)
 			current->correction = currentPos - current->tempPosition;
 		}
 
+		//Velocity correction
 		for (int i = 1; i < numVertices; i++)
 		{
 			HairVertex* previous = guide->mVertices[i - 1];
@@ -110,7 +120,9 @@ void Simulation::ParticleSimulation(Hair* hair)
 			previous->position = previous->tempPosition;
 		}
 
-		HairVertex* last = guide->mVertices.back();
+		
 		last->position = last->tempPosition;
+		
+	skip:;
 	}
 }
