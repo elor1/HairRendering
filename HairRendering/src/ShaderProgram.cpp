@@ -34,7 +34,12 @@ ShaderProgram::ShaderProgram(const char* vertex, const char* fragment, const cha
 		"lightPosition",
 		"dirToLight",
 		"noiseTexture",
-		"shadowMap"
+		"hairShadowMap",
+		"meshShadowMap",
+		"opacityMap",
+		"useShadows",
+		"shadowIntensity",
+		"layerSize"
 	};
 
 	for (auto& name : uniformNames)
@@ -47,7 +52,7 @@ ShaderProgram::ShaderProgram(const char* vertex, const char* fragment, const cha
 	uniforms.hairRadius = 0.004f;
 	uniforms.tapering = 5.0f;
 	uniforms.noiseAmplitude = 0;
-	uniforms.colour = glm::vec3(0.3f, 0.2f, 0.15f);
+	uniforms.colour = glm::vec3(0.6f, 0.4f, 0.3f);
 }
 
 GLuint ShaderProgram::GetID()
@@ -62,9 +67,12 @@ void ShaderProgram::SetGlobalUniforms()
 	glUniformMatrix4fv(mUniformLocations["dirToLight"], 1, GL_FALSE, glm::value_ptr(uniforms.dirToLight));
 	glUniform3fv(mUniformLocations["lightPosition"], 1, glm::value_ptr(uniforms.lightPosition));
 	glUniform1i(mUniformLocations["noiseTexture"], uniforms.noiseTexture);
-	glUniform1i(mUniformLocations["shadowMap"], uniforms.shadowMap);
+	glUniform1i(mUniformLocations["hairShadowMap"], uniforms.hairShadowMap);
+	glUniform1i(mUniformLocations["meshShadowMap"], uniforms.meshShadowMap);
 	glUniform1i(mUniformLocations["opacityMap"], uniforms.opacityMap);
+	glUniform1i(mUniformLocations["useShadows"], uniforms.useShadows);
 	glUniform1f(mUniformLocations["shadowIntensity"], uniforms.shadowIntensity);
+	glUniform1f(mUniformLocations["layerSize"], uniforms.occlusionLayerSize);
 }
 
 void ShaderProgram::SetObjectUniforms()

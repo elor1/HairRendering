@@ -36,17 +36,22 @@ private:
 	Hair* mHair;
 	Simulation* mSimulation;
 
+	std::vector<ShaderProgram*> mPrograms;
 	ShaderProgram* mMeshProgram;
 	ShaderProgram* mHairProgram;
-	ShaderProgram* mOpacityMapProgram;
+	ShaderProgram* mHairOpacityProgram;
 
 	float mHairDensity;
 
+	std::vector<Texture*> mTextures;
 	Texture* mNoiseTexture;
-	Texture* mShadowDepthTexture;
+	Texture* mHairDepthTexture;
+	Texture* mMeshDepthTexture;
 	Texture* mOpacityMapTexture;
 
-	Framebuffer* mShadowFramebuffer;
+	std::vector<Framebuffer*> mFramebuffers;
+	Framebuffer* mHairShadowFramebuffer;
+	Framebuffer* mMeshShadowFramebuffer;
 	Framebuffer* mOpacityMapFramebuffer;
 
 	Camera* mCamera;

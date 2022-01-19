@@ -55,6 +55,10 @@ struct Vertex
 	glm::vec2 texCoords;
 	glm::vec3 normal;
 
+	bool operator==(const Vertex& other) const
+	{
+		return (position == other.position && texCoords == other.texCoords && normal == other.normal);
+	}
 };
 
 struct Triangle
@@ -155,7 +159,14 @@ struct Triangle
 			return false;
 		}
 	}
+
+	bool operator==(const Triangle& other) const
+	{
+		return (vertex1 == other.vertex1 && vertex2 == other.vertex2 && vertex3 == other.vertex3);
+	}
 };
+
+class MeshOctree;
 
 class Mesh
 {
@@ -178,4 +189,6 @@ private:
 	glm::vec3 mMin;
 	glm::vec3 mMax;
 	float mScale;
+
+	MeshOctree* mOctree;
 };

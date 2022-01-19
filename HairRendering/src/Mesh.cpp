@@ -2,6 +2,7 @@
 #include <glew.h>
 #include <glm.hpp>
 #include <gtc/random.hpp>
+#include "MeshOctree.h"
 
 Mesh::Mesh(std::vector<Vertex> vertices, std::vector<unsigned int> indices, float scale)
 {
@@ -44,6 +45,8 @@ void Mesh::SetupMesh()
 
 		triangles.push_back(Triangle(v1, v2, v3));
 	}
+
+	//mOctree = new MeshOctree(this);
 
 	glGenVertexArrays(1, &mVAO);
 	glGenBuffers(1, &mVBO);
