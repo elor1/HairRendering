@@ -25,7 +25,7 @@ Application::Application(int width, int height)
 	mLastY = width / 2.f;
 	mFrame = 0;
 	mIsPaused = false;
-	mSpaceDown = false;
+	mIsSpaceDown = false;
 
 	Initialise();
 }
@@ -113,6 +113,8 @@ void Application::Initialise()
 		mMeshProgram = new ShaderProgram("../HairRendering/src/shaders/mesh.vert", "../HairRendering/src/shaders/mesh.frag"),
 		mHairProgram = new ShaderProgram("../HairRendering/src/shaders/hair.vert", "../HairRendering/src/shaders/hair.frag", "../HairRendering/src/shaders/hair.geom", "../HairRendering/src/shaders/hair.tcs", "../HairRendering/src/shaders/hair.tes"),
 		mHairOpacityProgram = new ShaderProgram("../HairRendering/src/shaders/hair.vert", "../HairRendering/src/shaders/hairOpacity.frag", "../HairRendering/src/shaders/hair.geom", "../HairRendering/src/shaders/hair.tcs", "../HairRendering/src/shaders/hair.tes"),
+		mWhiteHairProgram = new ShaderProgram("../HairRendering/src/shaders/hair.vert", "../HairRendering/src/shaders/white.frag", "../HairRendering/src/shaders/hair.geom", "../HairRendering/src/shaders/hair.tcs", "../HairRendering/src/shaders/hair.tes"),
+		mWhiteMeshProgram = new ShaderProgram("../HairRendering/src/shaders/mesh.vert", "../HairRendering/src/shaders/white.frag"),
 	};
 
 	//Textures
@@ -125,8 +127,8 @@ void Application::Initialise()
 
 	int shadowMapSize = 2048;
 	mNoiseTexture->Create("../images/Noise.jpg", GL_LINEAR, GL_LINEAR);
-	mHairDepthTexture->CreateDepthTexture(shadowMapSize, shadowMapSize);
-	mMeshDepthTexture->CreateDepthTexture(shadowMapSize, shadowMapSize);
+	mHairDepthTexture->CreateDepthTexture(shadowMapSize, shadowMapSize, GL_NEAREST, GL_NEAREST);
+	mMeshDepthTexture->CreateDepthTexture(shadowMapSize, shadowMapSize, GL_LINEAR, GL_LINEAR);
 	mOpacityMapTexture->Create(shadowMapSize, shadowMapSize, GL_NEAREST, GL_NEAREST);
 
 	//Framebuffers
@@ -180,6 +182,8 @@ void Application::InitSimulation()
 	//Scalp model
 	Model* scalp = new Model("../models/ScalpLow.obj");
 	mHair = new Hair(scalp->GetFirstMesh(), mHairDensity, mSimulation, mHair);
+
+	delete scalp;
 }
 
 void Application::Draw()
@@ -193,9 +197,8 @@ void Application::Draw()
 		mHair->Update(time);
 	}
 	
-	glm::mat4 model = glm::mat4(1.0f);
-	model = mSimulation->GetTransform();
-	glm::vec3 lightPosition = glm::vec3(2.0f, 1.0f, 3.0f);
+	glm::mat4 model = mSimulation->GetTransform();
+	glm::vec3 lightPosition = glm::vec3(1.0f, 2.0f, 4.0f);
 	glm::mat4 lightProjection = glm::perspective(1.3f, 1.0f, 1.0f, 100.0f);
 	glm::mat4 lightView = glm::lookAt(lightPosition, glm::vec3(0.0f), glm::vec3(0.0f, 1.0f, 0.0f));
 	glm::mat4 eyeToLight = lightProjection * lightView * glm::inverse(mCamera->GetViewMatrix());
@@ -214,32 +217,31 @@ void Application::Draw()
 		mHairShadowFramebuffer->Bind();
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-		mHairProgram->Bind();
-		mHairProgram->uniforms.noiseTexture = 0;
-		mHairProgram->uniforms.hairShadowMap = 1;
-		mHairProgram->uniforms.opacityMap = 2;
-		mHairProgram->uniforms.projection = lightProjection;
-		mHairProgram->uniforms.view = lightView;
-		mHairProgram->uniforms.model = model;
-		mHairProgram->uniforms.dirToLight = eyeToLight;
-		mHairProgram->uniforms.lightPosition = lightPosition;
-		mHairProgram->SetGlobalUniforms();
-		mHair->Draw(mHairProgram);
-		mHairProgram->Unbind();
+		mWhiteHairProgram->Bind();
+		mWhiteHairProgram->uniforms.noiseTexture = 0;
+		mWhiteHairProgram->uniforms.hairShadowMap = 1;
+		mWhiteHairProgram->uniforms.projection = lightProjection;
+		mWhiteHairProgram->uniforms.view = lightView;
+		mWhiteHairProgram->uniforms.model = model;
+		mWhiteHairProgram->uniforms.dirToLight = eyeToLight;
+		mWhiteHairProgram->uniforms.lightPosition = lightPosition;
+		mWhiteHairProgram->SetGlobalUniforms();
+		mHair->Draw(mWhiteHairProgram);
+		mWhiteHairProgram->Unbind();
 		mHairShadowFramebuffer->Unbind();
 
 		//Mesh shadows
 		mMeshShadowFramebuffer->Bind();
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-		mMeshProgram->Bind();
-		mMeshProgram->uniforms.projection = lightProjection;
-		mMeshProgram->uniforms.view = lightView;
-		mMeshProgram->uniforms.model = model;
-		mMeshProgram->SetGlobalUniforms();
-		mMeshProgram->SetObjectUniforms();
+		mWhiteMeshProgram->Bind();
+		mWhiteMeshProgram->uniforms.projection = lightProjection;
+		mWhiteMeshProgram->uniforms.view = lightView;
+		mWhiteMeshProgram->uniforms.model = model;
+		mWhiteMeshProgram->SetGlobalUniforms();
+		mWhiteMeshProgram->SetObjectUniforms();
 		mMesh->Draw();
-		mMeshProgram->Unbind();
+		mWhiteMeshProgram->Unbind();
 
 		mMeshShadowFramebuffer->Unbind();
 
@@ -251,7 +253,6 @@ void Application::Draw()
 		glViewport(0, 0, mHairDepthTexture->GetWidth(), mHairDepthTexture->GetHeight());
 
 		mOpacityMapFramebuffer->Bind();
-		glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
 		mHairOpacityProgram->Bind();
@@ -270,7 +271,6 @@ void Application::Draw()
 		glEnable(GL_DEPTH_TEST);
 		glDisable(GL_BLEND);
 	}
-	
 
 	//Render hair
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
@@ -301,7 +301,7 @@ void Application::Draw()
 	mMeshProgram->uniforms.model = model;
 	mMeshProgram->uniforms.lightPosition = lightPosition;
 	mMeshProgram->uniforms.dirToLight = eyeToLight;
-	mMeshProgram->uniforms.shadowIntensity = 10.0f;
+	mMeshProgram->uniforms.shadowIntensity = 15.0f;
 	mMeshProgram->uniforms.useShadows = SHADOWS;
 	mMeshProgram->SetGlobalUniforms();
 	mMeshProgram->SetObjectUniforms();
@@ -360,6 +360,20 @@ void Application::ProcessInput()
 		glfwSetWindowShouldClose(mWindow, true);
 	}
 
+	if (glfwGetKey(mWindow, GLFW_KEY_SPACE) == GLFW_PRESS)
+	{
+		if (!mIsSpaceDown)
+		{
+			mIsPaused = !mIsPaused;
+		}
+
+		mIsSpaceDown = true;
+	}
+	else
+	{
+		mIsSpaceDown = false;
+	}
+
 	if (glfwGetKey(mWindow, GLFW_KEY_W) == GLFW_PRESS)
 	{
 		mCamera->Move(EMovementDirection::Forward, mDeltaTime);
@@ -382,12 +396,12 @@ void Application::ProcessInput()
 
 	if (glfwGetKey(mWindow, GLFW_KEY_UP) == GLFW_PRESS)
 	{
-		mCamera->Rotate(0.0f, mDeltaTime * 1);
+		mCamera->Rotate(0.0f, mDeltaTime);
 	}
 
 	if (glfwGetKey(mWindow, GLFW_KEY_DOWN) == GLFW_PRESS)
 	{
-		mCamera->Rotate(0.0f, -mDeltaTime * 1);
+		mCamera->Rotate(0.0f, -mDeltaTime);
 	}
 
 	if (glfwGetKey(mWindow, GLFW_KEY_LEFT) == GLFW_PRESS)
@@ -398,20 +412,6 @@ void Application::ProcessInput()
 	if (glfwGetKey(mWindow, GLFW_KEY_RIGHT) == GLFW_PRESS)
 	{
 		mCamera->Rotate(mDeltaTime, 0.0f);
-	}
-
-	if (glfwGetKey(mWindow, GLFW_KEY_SPACE) == GLFW_PRESS)
-	{
-		if (!mSpaceDown)
-		{
-			mIsPaused = !mIsPaused;
-		}
-		
-		mSpaceDown = true;
-	}
-	else
-	{
-		mSpaceDown = false;
 	}
 }
 

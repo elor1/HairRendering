@@ -9,15 +9,21 @@ uniform vec3 lightPosition;
 uniform mat4 view;
 uniform mat4 dirToLight;
 uniform sampler2D hairShadowMap;
-uniform sampler2D meshShadowMap;
+uniform sampler2DShadow meshShadowMap;
 uniform sampler2D opacityMap;
 uniform float shadowIntensity;
 uniform float layerSize;
 uniform bool useShadows;
 
-const vec3 MESH_COLOUR = vec3(221.0f, 211.0f, 242.0f) / 255.0f;
+const vec3 MESH_COLOUR = vec3(0.87f, 0.83f, 0.93f);
+const vec4 FILL_LIGHT_POSITION = vec4(-2.0f, 1.0f, 1.0f, 1.0f);
+const float AMBIENT_INTENSITY = 0.2f;
+const float DIFFUSE_INTENSITY = 0.6f;
+const float FILL_LIGHT_INTENSITY = 0.4f;
+
 float currentDepth;
 
+//Sample opacity maps layers at the given texcoord to get occlusion from other strands
 float ShadowOcclusion(vec2 coord)
 {
 	vec4 opacityValues = texture(opacityMap, coord);
@@ -30,17 +36,18 @@ float ShadowOcclusion(vec2 coord)
 		occlusion += mix(0.0f, opacityValues[i], t);
 
 		layerStart += currentLayerSize;
-		currentLayerSize *= 2;
+		currentLayerSize *= 2.0f;
 	}
 
 	return occlusion;
 }
 
+//Calculate transmittance of the light to a point based on opacity map
 float CalculateTransmittance(vec4 vec)
 {
 	vec4 shadowCoord = (vec / vec.w + 1.0f) / 2.0f;
 	vec2 coord = shadowCoord.xy;
-	currentDepth = shadowCoord.z - 0.001f;
+	currentDepth = shadowCoord.z - 0.0001f;
 
 	vec2 size = textureSize(hairShadowMap, 0);
 	vec2 texelSize = vec2(1.0f) / size;
@@ -51,24 +58,40 @@ float CalculateTransmittance(vec4 vec)
 	float s2 = ShadowOcclusion(coord + texelSize * vec2(0.0f, 1.0f));
 	float s3 = ShadowOcclusion(coord + texelSize * vec2(1.0f, 0.0f));
 	float s4 = ShadowOcclusion(coord + texelSize * vec2(1.0f, 1.0f));
-	float occlusion = mix(mix(s1, s1, f.y), mix(s3, s4, f.y), f.x);
+	float occlusion = mix(mix(s1, s2, f.y), mix(s3, s4, f.y), f.x);
 
-	ivec2 iTexCoord = ivec2(size * coord);
-	s1 = step(currentDepth, texelFetch(meshShadowMap, iTexCoord + ivec2(0.0f, 0.0f), 0).r);
-	s2 = step(currentDepth, texelFetch(meshShadowMap, iTexCoord + ivec2(0.0f, 1.0f), 0).r);
-	s3 = step(currentDepth, texelFetch(meshShadowMap, iTexCoord + ivec2(1.0f, 0.0f), 0).r);
-	s4 = step(currentDepth, texelFetch(meshShadowMap, iTexCoord + ivec2(1.0f, 1.0f), 0).r);
-	float meshVisibility = mix(mix(s1, s2, f.y), mix(s3, s4, f.y), f.x);
-
-	float transmittance = exp(-shadowIntensity * occlusion) * mix(0.2f, 1.0f, meshVisibility);
+	shadowCoord.z -= 0.0005f;
+	float meshVisibility = texture(meshShadowMap, shadowCoord.xyz);
+	float transmittance = exp(-shadowIntensity * occlusion) * mix(0.5f, 1.0f, meshVisibility);
 
 	return mix(1.0f, transmittance, useShadows);
 }
 
+vec3 GetColour(vec4 lightPos)
+{
+	vec4 lightDirection = lightPos - position_v;
+	vec4 normal = normalize(normal_v);
+
+	float diffuse = max(0.0f, dot(normalize(lightDirection), normal));
+
+	return MESH_COLOUR * DIFFUSE_INTENSITY * diffuse;
+}
+
+float GetMeshVisibility(vec4 vec)
+{
+	vec4 shadowCoord = (vec / vec.w + 1.0f) / 2.0f;
+	shadowCoord.z -= 0.0003;
+	float meshVisibility = texture(meshShadowMap, shadowCoord.xyz);
+	return mix(1.0f, meshVisibility, useShadows);
+}
+
 void main()
 {
-	vec4 lightDirection = vec4(lightPosition, 1.0f) - position_v;
-	float diffuse = dot(normalize(lightDirection), normalize(normal_v));
-	fragColour = (0.2f + 0.3f * diffuse) * MESH_COLOUR;
-	fragColour *= CalculateTransmittance(dirToLight * view * position_v);
+	vec4 lightSpacePos = dirToLight * view * position_v;
+	fragColour = GetColour(vec4(lightPosition, 1.0f));
+	fragColour *= CalculateTransmittance(lightSpacePos);
+	fragColour *= GetMeshVisibility(lightSpacePos);
+
+	fragColour += FILL_LIGHT_INTENSITY * GetColour(FILL_LIGHT_POSITION);
+	fragColour += AMBIENT_INTENSITY * MESH_COLOUR;
 }

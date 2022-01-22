@@ -11,7 +11,7 @@ public:
 
 	void Create(const char* filename, GLint magFilter, GLint minFilter);
 	void Create(int width, int height, GLint magFilter, GLint minFilter);
-	void CreateDepthTexture(int width, int height);
+	void CreateDepthTexture(int width, int height, GLint magFilter, GLint minFilter);
 	void Bind(GLenum textureUnit);
 	void Unbind(GLenum textureUnit);
 	void RenderFullScreen();

@@ -16,8 +16,8 @@ Mesh::Mesh(std::vector<Vertex> vertices, std::vector<unsigned int> indices, floa
 
 	for (auto& vertex : vertices)
 	{
-		mMin = glm::min(mMin, vertex.position);
-		mMax = glm::max(mMax, vertex.position);
+		mMin = glm::min(mMin, vertex.position /** mScale*/);
+		mMax = glm::max(mMax, vertex.position /** mScale*/);
 	}
 
 	SetupMesh();
@@ -120,10 +120,15 @@ bool Mesh::Contains(glm::vec3 &normal, glm::vec3 position)
 	//	return true;
 	//}
 
+	//*
 	if (glm::any(glm::lessThan(position, mMin)) || glm::any(glm::greaterThan(position, mMax)))
 	{
 		return false;
 	}
+	/*/
+	normal = glm::normalize(position / glm::pow(mMax, glm::vec3(2.0f)));
+	return glm::dot(glm::pow(position / mMax, glm::vec3(2.0f)), glm::vec3(1.0f));
+	//*/
 
 	Vector3 direction = Vector3(0.0f, 1.0f, 0.0f);
 	Vector3 pos = Vector3(position.x, position.y, position.z);

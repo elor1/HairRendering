@@ -40,6 +40,8 @@ private:
 	ShaderProgram* mMeshProgram;
 	ShaderProgram* mHairProgram;
 	ShaderProgram* mHairOpacityProgram;
+	ShaderProgram* mWhiteHairProgram;
+	ShaderProgram* mWhiteMeshProgram;
 
 	float mHairDensity;
 
@@ -69,5 +71,5 @@ private:
 	int mFrame;
 
 	bool mIsPaused;
-	bool mSpaceDown;
+	bool mIsSpaceDown;
 };

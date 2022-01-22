@@ -116,5 +116,6 @@
     <None Include="src\shaders\quad.vert" />
     <None Include="src\shaders\quad.frag" />
     <None Include="src\shaders\hairOpacity.frag" />
+    <None Include="src\shaders\white.frag" />
   </ItemGroup>
 </Project>

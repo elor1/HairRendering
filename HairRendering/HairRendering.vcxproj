@@ -222,6 +222,7 @@ xcopy /y /d "$(SolutionDir)lib\assimp\assimp-vc140-mt.dll" "$(OutDir)"</Command>
     <None Include="src\shaders\hair.vert" />
     <None Include="src\shaders\quad.frag" />
     <None Include="src\shaders\quad.vert" />
+    <None Include="src\shaders\white.frag" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
