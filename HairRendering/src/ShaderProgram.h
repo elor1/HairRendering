@@ -5,6 +5,17 @@
 #include <string>
 #include <glm.hpp>
 
+enum class Type
+{
+	Hair,
+	Mesh,
+	WhiteHair,
+	WhiteMesh,
+	HairOpacity,
+	Quad,
+	None
+};
+
 struct Uniforms
 {
 	glm::mat4 model;
@@ -35,6 +46,7 @@ class ShaderProgram
 {
 public:
 	ShaderProgram(const char* vertex, const char* fragment, const char* geometry = "", const char* tessControl = "", const char* tessEval = "");
+	ShaderProgram(Type type);
 
 	GLuint GetID();
 	void SetGlobalUniforms();
@@ -49,6 +61,7 @@ private:
 	GLuint CreateShader(GLenum type, const char* path);
 	GLuint CreateProgram(std::vector<GLuint>& shaders);
 	GLuint Load();
+	GLint GetUniformLocation(const GLchar* name);
 
 	const char* mVertex;
 	const char* mFragment;
@@ -57,4 +70,6 @@ private:
 	const char* mTessEval;
 	GLuint mID;
 	std::map<std::string, int> mUniformLocations;
+
+	Type mType;
 };

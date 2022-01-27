@@ -72,7 +72,7 @@ void Texture::RenderFullScreen()
 
 	if (!mProgram)
 	{
-		mProgram = new ShaderProgram("../shaders/quad.vert", "../shaders/quad.frag");
+		mProgram = new ShaderProgram(Type::Quad);
 	}
 
 	mProgram->Bind();

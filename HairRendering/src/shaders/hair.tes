@@ -46,7 +46,6 @@ vec3 Spline(float tessCoordX)
 vec3 SplineOffset(in vec2 tessCoord)
 {
     vec3 position = Spline(tessCoord.x);
-    
 
     //Offset each hair in circle around guide hair
     float r = sqrt(Random(vec2(tessCoord.y)));
@@ -58,8 +57,8 @@ vec3 SplineOffset(in vec2 tessCoord)
     float noise = noiseAmplitude * tessCoord.x;
     tessCoord *= 0.4f;
     position.x += noise * (1.0f - 2.0f * texture(noiseTexture, tessCoord.xy).r) * 0.5f;
-    position.y += noise * (1.0f - 2.0f * texture(noiseTexture, tessCoord.xy + 0.01f).r) * 0.5f;
-    position.z += noise * (1.0f - 2.0f * texture(noiseTexture, tessCoord.xy + 0.02).r) * 0.5f;
+    position.y += noise * (1.0f - 2.0f * texture(noiseTexture, tessCoord.xy + 0.1f).r) * 0.5f;
+    position.z += noise * (1.0f - 2.0f * texture(noiseTexture, tessCoord.xy + 0.2).r) * 0.5f;
 
     return position;
 }
@@ -67,11 +66,11 @@ vec3 SplineOffset(in vec2 tessCoord)
 void main()
 {
 	vec3 position = SplineOffset(gl_TessCoord.xy);
-    //position.x += groupWidth * (gl_TessCoord.y - 0.5f);
 
     //Calculate tangent
     vec3 previousPosition = SplineOffset(vec2(gl_TessCoord.x - 1.0f / (numSplineVertices - 1), gl_TessCoord.y));
     vec3 nextPosition = SplineOffset(vec2(gl_TessCoord.x + 1.0f / (numSplineVertices - 1), gl_TessCoord.y));
+
     tangent_te = (view * model * vec4(nextPosition - previousPosition, 0.0f)).xyz;
     tessx_te = gl_TessCoord.x;
 

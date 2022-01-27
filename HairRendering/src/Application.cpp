@@ -111,11 +111,11 @@ void Application::Initialise()
 
 	//Shaders
 	mPrograms = {
-		mMeshProgram = new ShaderProgram("../HairRendering/src/shaders/mesh.vert", "../HairRendering/src/shaders/mesh.frag"),
-		mHairProgram = new ShaderProgram("../HairRendering/src/shaders/hair.vert", "../HairRendering/src/shaders/hair.frag", "../HairRendering/src/shaders/hair.geom", "../HairRendering/src/shaders/hair.tcs", "../HairRendering/src/shaders/hair.tes"),
-		mHairOpacityProgram = new ShaderProgram("../HairRendering/src/shaders/hair.vert", "../HairRendering/src/shaders/hairOpacity.frag", "../HairRendering/src/shaders/hair.geom", "../HairRendering/src/shaders/hair.tcs", "../HairRendering/src/shaders/hair.tes"),
-		mWhiteHairProgram = new ShaderProgram("../HairRendering/src/shaders/hair.vert", "../HairRendering/src/shaders/white.frag", "../HairRendering/src/shaders/hair.geom", "../HairRendering/src/shaders/hair.tcs", "../HairRendering/src/shaders/hair.tes"),
-		mWhiteMeshProgram = new ShaderProgram("../HairRendering/src/shaders/mesh.vert", "../HairRendering/src/shaders/white.frag"),
+		mMeshProgram = new ShaderProgram(Type::Mesh),
+		mHairProgram = new ShaderProgram(Type::Hair),
+		mHairOpacityProgram = new ShaderProgram(Type::HairOpacity),
+		mWhiteHairProgram = new ShaderProgram(Type::WhiteHair),
+		mWhiteMeshProgram = new ShaderProgram(Type::WhiteMesh),
 	};
 
 	//Textures
