@@ -38,6 +38,16 @@ void Camera::Move(EMovementDirection direction, float deltaTime)
 	{
 		mPosition += mRight * speed;
 	}
+
+	if (direction == EMovementDirection::Up)
+	{
+		mPosition += mUp * speed;
+	}
+
+	if (direction == EMovementDirection::Down)
+	{
+		mPosition -= mUp * speed;
+	}
 }
 
 void Camera::Rotate(float x, float y)

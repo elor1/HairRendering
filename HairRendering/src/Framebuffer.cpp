@@ -16,6 +16,12 @@ void Framebuffer::Unbind(GLenum target)
 	glBindFramebuffer(target, 0);
 }
 
+void Framebuffer::AttachTexture(GLuint textureID, GLenum target)
+{
+	std::vector<GLuint> textureIDs = { textureID };
+	AttachTextures(textureIDs, target);
+}
+
 void Framebuffer::AttachTextures(std::vector<GLuint> textureIDs, GLenum target)
 {
 	Bind(target);
@@ -41,12 +47,11 @@ void Framebuffer::AttachTextures(std::vector<GLuint> textureIDs, GLenum target)
 
 void Framebuffer::GenerateDepthBuffer(int width, int height)
 {
-	GLuint depthbuffer;
 	Bind();
-	glGenRenderbuffers(1, &depthbuffer);
-	glBindRenderbuffer(GL_RENDERBUFFER, depthbuffer);
+	glGenRenderbuffers(1, &mDepthBufferID);
+	glBindRenderbuffer(GL_RENDERBUFFER, mDepthBufferID);
 	glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH_COMPONENT, width, height);
-	glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_RENDERBUFFER, depthbuffer);
+	glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_RENDERBUFFER, mDepthBufferID);
 	Unbind();
 }
 
@@ -55,4 +60,12 @@ void Framebuffer::AttachDepthTexture(GLuint id, GLenum target)
 	Bind(target);
 	glFramebufferTexture(target, GL_DEPTH_ATTACHMENT, id, 0);
 	Unbind(target);
+}
+
+void Framebuffer::ResizeDepthBuffer(int width, int height)
+{
+	Bind();
+	glDeleteRenderbuffers(1, &mDepthBufferID);
+	GenerateDepthBuffer(width, height);
+	Unbind();
 }

@@ -39,6 +39,15 @@ void Texture::CreateDepthTexture(int width, int height, GLint magFilter, GLint m
 	Unbind(GL_TEXTURE0);
 }
 
+void Texture::Resize(int width, int height)
+{
+	mWidth = width;
+	mHeight = height;
+	Bind(GL_TEXTURE0);
+	glTexImage2D(GL_TEXTURE_2D, 0, mInternalFormat, width, height, 0, mFormat, mType, 0);
+	Unbind(GL_TEXTURE0);
+}
+
 void Texture::Bind(GLenum textureUnit)
 {
 	glActiveTexture(textureUnit);
@@ -89,14 +98,17 @@ GLuint Texture::GetHeight()
 	return mHeight;
 }
 
-void Texture::Create(unsigned char* image, GLint format, int width, int height, GLenum format1, GLenum type, GLint magFilter, GLint minFilter)
+void Texture::Create(unsigned char* image, GLint internalFormat, int width, int height, GLenum format, GLenum type, GLint magFilter, GLint minFilter)
 {
+	mInternalFormat = internalFormat;
 	mWidth = width;
 	mHeight = height;
+	mFormat = format;
+	mType = type;
 	glGenTextures(1, &mID);
-	glBindTexture(GL_TEXTURE_2D, mID);
-	glTexImage2D(GL_TEXTURE_2D, 0, format, width, height, 0, format1, type, image);
+	Bind(GL_TEXTURE0);
+	glTexImage2D(GL_TEXTURE_2D, 0, internalFormat, width, height, 0, format, type, image);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, magFilter);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, minFilter);
-	glBindTexture(GL_TEXTURE_2D, 0);
+	Unbind(GL_TEXTURE0);
 }

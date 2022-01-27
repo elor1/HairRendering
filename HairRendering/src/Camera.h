@@ -8,7 +8,9 @@ enum class EMovementDirection
 	Forward,
 	Backward,
 	Left,
-	Right
+	Right,
+	Up,
+	Down
 };
 
 class Camera

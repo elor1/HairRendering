@@ -20,6 +20,5 @@ private:
 	bool mIsCreated;
 	GLuint mVBO;
 	GLuint mVAO;
-	GLuint mEBO;
 	int mNumVertices;
 };

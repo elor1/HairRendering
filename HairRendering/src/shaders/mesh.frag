@@ -77,21 +77,31 @@ vec3 GetColour(vec4 lightPos)
 	return MESH_COLOUR * DIFFUSE_INTENSITY * diffuse;
 }
 
-float GetMeshVisibility(vec4 vec)
+float GetMeshVisibility(vec4 pos)
 {
-	vec4 shadowCoord = (vec / vec.w + 1.0f) / 2.0f;
-	shadowCoord.z -= 0.0003;
+	/*vec3 n = normalize(normal_v.xyz);
+	vec3 l = normalize(lightPosition.xyz - position_v.xyz);
+	float cosTheta = clamp(dot(n, l), 0, 1);
+	float bias = 0.005 * tan(acos(cosTheta));*/
+	vec4 shadowCoord = (pos / pos.w + 1.0f) / 2.0f;
+	shadowCoord.z -= 0.0003f; //bias
 	float meshVisibility = texture(meshShadowMap, shadowCoord.xyz);
+	
 	return mix(1.0f, meshVisibility, useShadows);
 }
 
 void main()
 {
 	vec4 lightSpacePos = dirToLight * view * position_v;
+
+	//Key light
 	fragColour = GetColour(vec4(lightPosition, 1.0f));
 	fragColour *= CalculateTransmittance(lightSpacePos);
 	fragColour *= GetMeshVisibility(lightSpacePos);
 
+	//Fill light
 	fragColour += FILL_LIGHT_INTENSITY * GetColour(FILL_LIGHT_POSITION);
+
+	//Ambient light
 	fragColour += AMBIENT_INTENSITY * MESH_COLOUR;
 }

@@ -4,7 +4,7 @@
 class Quad
 {
 public:
-	Quad() = default;
+	Quad();
 	virtual ~Quad() = default;
 
 	void Initialise();

@@ -11,7 +11,6 @@ void Shape::Create()
 {
 	glGenBuffers(1, &mVBO);
 	glGenVertexArrays(1, &mVAO);
-	glGenBuffers(1, &mEBO);
 
 	mIsCreated = true;
 }

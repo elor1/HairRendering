@@ -22,29 +22,6 @@ float Random(vec2 x)
     return fract(sin(dot(x, vec2(12.9898, 78.233))) * 43758.5453);
 }
 
-float Noise(in vec2 x)
-{
-    vec2 floor = floor(x);
-    vec2 fract = fract(x);
-    vec2 u = fract * fract * (3.0f - 2.0f * fract);
-    return mix(mix(Random(floor + vec2(0.0,0.0)),
-                   Random(floor + vec2(1.0,0.0)), u.x),
-               mix(Random(floor + vec2(0.0,1.0)),
-                   Random(floor + vec2(1.0,1.0)), u.x), u.y);
-}
-
-float NoiseLayers(in vec2 x)
-{
-    float result = 0.0f;
-    for (int i = 0; i < NOISE_LAYERS; i++)
-    {
-        float scale = pow(2.0f, float(i));
-        result += Noise(5.0f * scale * gl_TessCoord.xy) / (2.0f * scale);
-    }
-
-    return 2.0f * result - 1.0f;
-}
-
 vec3 Spline(float tessCoordX)
 {
     float length = clamp(tessCoordX, 0.0f, 1.0f) * numHairSegments;

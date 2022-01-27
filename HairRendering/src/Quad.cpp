@@ -1,5 +1,10 @@
 #include "Quad.h"
 
+Quad::Quad()
+{
+	mShape.Destroy();
+}
+
 void Quad::Initialise()
 {
 	GLfloat data[] = { -1.0f, 1.0f, 0.0f, 0.0f, 1.0f,

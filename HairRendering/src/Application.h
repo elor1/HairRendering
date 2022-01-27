@@ -50,11 +50,13 @@ private:
 	Texture* mHairDepthTexture;
 	Texture* mMeshDepthTexture;
 	Texture* mOpacityMapTexture;
+	Texture* mFinalTexture;
 
 	std::vector<Framebuffer*> mFramebuffers;
 	Framebuffer* mHairShadowFramebuffer;
 	Framebuffer* mMeshShadowFramebuffer;
 	Framebuffer* mOpacityMapFramebuffer;
+	Framebuffer* mFinalFramebuffer;
 
 	Camera* mCamera;
 	bool mFirstMouse;

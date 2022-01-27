@@ -87,48 +87,14 @@ std::vector<Vertex> Mesh::GetVertices()
 
 bool Mesh::Contains(glm::vec3 &normal, glm::vec3 position)
 {
-	//Check if position is outside bounding box
-	/*if (glm::any(glm::lessThan(position, mMin)) || glm::any(glm::greaterThan(position, mMax)))
-	{
-		return false;
-	}*/
+	//Ellipsoid collisions
+	/*normal = glm::normalize(position / glm::pow(mMax, glm::vec3(2.0f)));
+	return glm::dot(glm::pow(position / mMax, glm::vec3(2.0f)), glm::vec3(1.0f)) < 1;*/
 
-	//int numIntersections = 0;
-	///*double rand1 = rand() % 1000;
-	//double rand2 = rand() % 1000;
-	//double rand3 = rand() % 1000;
-	//glm::vec3 randomDir = glm::normalize(glm::vec3(rand1, rand2, rand3));*/
-	//glm::vec3 randomDir = glm::normalize(glm::vec3(1.0f, 1.0f, 1.0f));
-
-	//for (auto& triangle : triangles)
-	//{
-	//	glm::vec3 intersection = glm::vec3(0.0f);
-
-	//	if (triangle.IsIntersecting(intersection, position, randomDir))
-	//	{
-	//		normal = (triangle.vertex1.normal + triangle.vertex2.normal + triangle.vertex3.normal) / 3.0f;
-	//		numIntersections++;
-	//	}
-	//}
-
-	//if (numIntersections % 2 == 0)
-	//{
-	//	return false;
-	//}
-	//else
-	//{
-	//	return true;
-	//}
-
-	//*
 	if (glm::any(glm::lessThan(position, mMin)) || glm::any(glm::greaterThan(position, mMax)))
 	{
 		return false;
 	}
-	/*/
-	normal = glm::normalize(position / glm::pow(mMax, glm::vec3(2.0f)));
-	return glm::dot(glm::pow(position / mMax, glm::vec3(2.0f)), glm::vec3(1.0f));
-	//*/
 
 	Vector3 direction = Vector3(0.0f, 1.0f, 0.0f);
 	Vector3 pos = Vector3(position.x, position.y, position.z);
