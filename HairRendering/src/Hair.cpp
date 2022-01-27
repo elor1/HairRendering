@@ -119,3 +119,23 @@ void Hair::SetAttributes(glm::vec3 colour, int numGroupHairs, float groupSpread,
 	mNoiseAmplitude = noiseAmplitude;
 	mNumSplineVertices = numSplineVertices;
 }
+
+std::vector<Strand*> Hair::GetGuideHairs()
+{
+	return mGuideHairs;
+}
+
+void Hair::SetNumGroupHairs(int num)
+{
+	mNumGroupHairs = num;
+}
+
+void Hair::SetNumSplineVertices(int num)
+{
+	mNumSplineVertices = num;
+}
+
+void Hair::SetColour(glm::vec3 colour)
+{
+	mColour = colour;
+}

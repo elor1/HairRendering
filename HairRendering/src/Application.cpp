@@ -1,6 +1,8 @@
 #include "Application.h"
 #include <iostream>
-#include "ShaderProgram.h"
+#include "shaderPrograms/HairShaderProgram.h"
+#include "shaderPrograms/MeshShaderProgram.h"
+#include "shaderPrograms//HairOpacityShaderProgram.h"
 #define GLM_FORCE_RADIANS
 #include <glm.hpp>
 #include <gtx/transform.hpp>
@@ -111,11 +113,11 @@ void Application::Initialise()
 
 	//Shaders
 	mPrograms = {
-		mMeshProgram = new ShaderProgram(Type::Mesh),
-		mHairProgram = new ShaderProgram(Type::Hair),
-		mHairOpacityProgram = new ShaderProgram(Type::HairOpacity),
-		mWhiteHairProgram = new ShaderProgram(Type::WhiteHair),
-		mWhiteMeshProgram = new ShaderProgram(Type::WhiteMesh),
+		mMeshProgram = new MeshShaderProgram(),
+		mHairProgram = new HairShaderProgram(),
+		mHairOpacityProgram = new HairOpacityShaderProgram(),
+		mWhiteHairProgram = new HairShaderProgram("src/shaders/hair.vert", "src/shaders/white.frag"),
+		mWhiteMeshProgram = new MeshShaderProgram("src/shaders/mesh.vert", "src/shaders/white.frag"),
 	};
 
 	//Textures
@@ -364,17 +366,17 @@ void Application::Update()
 
 void Application::SetPatchHair(int numHairs)
 {
-	mHair->mNumGroupHairs = numHairs;
+	mHair->SetNumGroupHairs(numHairs);
 }
 
 void Application::SetNumSplineVertices(int numVertices)
 {
-	mHair->mNumSplineVertices = numVertices;
+	mHair->SetNumSplineVertices(numVertices);
 }
 
 void Application::SetHairColour(glm::vec3 colour)
 {
-	mHair->mColour = colour / 2550.0f;
+	mHair->SetColour(colour / 2550.0f);
 }
 
 void Application::ProcessInput()

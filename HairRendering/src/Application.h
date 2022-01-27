@@ -1,7 +1,7 @@
 #pragma once
 #include <glew.h>
 #include <glfw3.h>
-#include "ShaderProgram.h"
+#include "shaderPrograms/ShaderProgram.h"
 #include "Camera.h"
 
 class Hair;

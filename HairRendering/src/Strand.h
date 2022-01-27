@@ -2,7 +2,7 @@
 #include <glm.hpp>
 #include "Shape.h"
 #include <vector>
-#include "ShaderProgram.h"
+#include "shaderPrograms/ShaderProgram.h"
 
 struct HairVertex
 {
@@ -64,7 +64,9 @@ public:
 	void Update(float time);
 	void Draw(ShaderProgram* program);
 
-	std::vector<HairVertex*> mVertices;
+	std::vector<HairVertex*> vertices;
+
+private:
 	Shape mPatch;
 	int mNumSegments;
 	double mLength;

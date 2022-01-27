@@ -2,7 +2,7 @@
 #include <SOIL2.h>
 #include <iostream>
 #include "Quad.h"
-#include "ShaderProgram.h"
+#include "shaderPrograms/ShaderProgram.h"
 
 Texture::Texture()
 {
@@ -72,7 +72,7 @@ void Texture::RenderFullScreen()
 
 	if (!mProgram)
 	{
-		mProgram = new ShaderProgram(Type::Quad);
+		mProgram = new ShaderProgram("src/shaders/quad.vert", "src/shaders/quad.frag");
 	}
 
 	mProgram->Bind();

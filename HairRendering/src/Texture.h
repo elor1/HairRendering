@@ -1,7 +1,7 @@
 #pragma once
 #include <glew.h>
 #include "Quad.h"
-#include "ShaderProgram.h"
+#include "shaderPrograms/ShaderProgram.h"
 
 class Texture
 {

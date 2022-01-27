@@ -26,13 +26,13 @@ Strand::Strand(int numSegments, double length, glm::vec3 position, glm::vec3 dir
 		HairVertex* newVertex = new HairVertex(position + direction * (float)(step * i));
 		if (i > 0)
 		{
-			HairVertex* oldVertex = mVertices[i - 1];
+			HairVertex* oldVertex = vertices[i - 1];
 			double dot = glm::clamp(glm::dot(oldVertex->position - newVertex->position, glm::vec3(0.0f, -1.0f, 0.0f)), -1.0f, 1.0f);
 			double det = glm::clamp(glm::dot(oldVertex->position - newVertex->position, glm::vec3(1.0f, 0.0f, 0.0f)), -1.0f, 1.0f);
 			newVertex->theta = -atan2(det, dot);
 		}
 		newVertex->segmentLength = step;
-		mVertices.push_back(newVertex);
+		vertices.push_back(newVertex);
 	}
 
 	GLfloat data[] = { -0.5f, 0.5f, 0.0f,
@@ -57,10 +57,10 @@ void Strand::Draw(ShaderProgram* program)
 {
 	program->uniforms.triangleFace[0] = mTriangleFace[0];
 	program->uniforms.triangleFace[1] = mTriangleFace[1];
-	program->uniforms.numHairVertices = glm::min((int)mVertices.size(), 64);
+	program->uniforms.numHairVertices = glm::min((int)vertices.size(), 64);
 	for (int i = 0; i < program->uniforms.numHairVertices; i++)
 	{
-		program->uniforms.vertexData[i] = mVertices[i]->position;
+		program->uniforms.vertexData[i] = vertices[i]->position;
 	}
 	program->SetDrawUniforms();
 

@@ -50,9 +50,9 @@ glm::mat4 Simulation::GetTransform()
 
 void Simulation::Move(Hair* hair)
 {
-	for (auto& guide : hair->mGuideHairs)
+	for (auto& guide : hair->GetGuideHairs())
 	{
-		for (auto& vertex : guide->mVertices)
+		for (auto& vertex : guide->vertices)
 		{
 			vertex->prevPosition = glm::vec3(mTransform * glm::vec4(vertex->startPosition, 1.0f));
 		}
@@ -64,12 +64,12 @@ void Simulation::Move(Hair* hair)
 
 void Simulation::CalculateExternalForces(Hair* hair)
 {
-	for (auto& guide : hair->mGuideHairs)
+	for (auto& guide : hair->GetGuideHairs())
 	{
-		float numVerts = guide->mVertices.size();
+		float numVerts = guide->vertices.size();
 		for (int i = 0; i < numVerts; i++)
 		{
-			HairVertex* vertex = guide->mVertices[i];
+			HairVertex* vertex = guide->vertices[i];
 
 			glm::vec3 force = glm::vec3(0.0f);
 			force += glm::vec3(0.0f, GRAVITY, 0.0f);
@@ -109,9 +109,9 @@ void Simulation::CalculateGrid(Hair* hair)
 	mDensityGrid = std::map<std::tuple<double, double, double>, double>();
 	mVelocityGrid = std::map<std::tuple<double, double, double>, glm::vec3>();
 
-	for (auto& guide : hair->mGuideHairs)
+	for (auto& guide : hair->GetGuideHairs())
 	{
-		for (auto vertex : guide->mVertices)
+		for (auto vertex : guide->vertices)
 		{
 			float x = vertex->position.x;
 			float y = vertex->position.y;
@@ -160,9 +160,9 @@ void Simulation::CalculateGrid(Hair* hair)
 
 void Simulation::CalculateFriction(Hair* hair)
 {
-	for (auto& guide : hair->mGuideHairs)
+	for (auto& guide : hair->GetGuideHairs())
 	{
-		for (auto& vertex : guide->mVertices)
+		for (auto& vertex : guide->vertices)
 		{
 			float x = vertex->position.x;
 			float y = vertex->position.y;
@@ -218,16 +218,16 @@ void Simulation::CalculateFriction(Hair* hair)
 
 void Simulation::ParticleSimulation(Hair* hair)
 {
-	for (auto& guide : hair->mGuideHairs)
+	for (auto& guide : hair->GetGuideHairs())
 	{
-		float numVertices = guide->mVertices.size();
-		guide->mVertices[0]->tempPosition = guide->mVertices[0]->position;
-		HairVertex* last = guide->mVertices.back();
+		float numVertices = guide->vertices.size();
+		guide->vertices[0]->tempPosition = guide->vertices[0]->position;
+		HairVertex* last = guide->vertices.back();
 
 		//Update velocities
 		for (int i = 1; i < numVertices; i++)
 		{
-			HairVertex* vertex = guide->mVertices[i];
+			HairVertex* vertex = guide->vertices[i];
 
 			if (!vertex->simulate)
 			{
@@ -244,8 +244,8 @@ void Simulation::ParticleSimulation(Hair* hair)
 		glm::vec3 currentPos;
 		for (int i = 1; i < numVertices; i++)
 		{
-			HairVertex* previous = guide->mVertices[i - 1];
-			HairVertex* current = guide->mVertices[i];
+			HairVertex* previous = guide->vertices[i - 1];
+			HairVertex* current = guide->vertices[i];
 			currentPos = current->tempPosition;
 			direction = glm::normalize(current->tempPosition - previous->tempPosition);
 			current->tempPosition = previous->tempPosition + direction * previous->segmentLength;
@@ -255,8 +255,8 @@ void Simulation::ParticleSimulation(Hair* hair)
 		//Velocity correction
 		for (int i = 1; i < numVertices; i++)
 		{
-			HairVertex* previous = guide->mVertices[i - 1];
-			HairVertex* current = guide->mVertices[i];
+			HairVertex* previous = guide->vertices[i - 1];
+			HairVertex* current = guide->vertices[i];
 			previous->velocity = ((previous->tempPosition - previous->position) / TIMESTEP) + DAMPENING * (current->correction / TIMESTEP);
 			previous->position = previous->tempPosition;
 		}

@@ -4,17 +4,7 @@
 #include <map>
 #include <string>
 #include <glm.hpp>
-
-enum class Type
-{
-	Hair,
-	Mesh,
-	WhiteHair,
-	WhiteMesh,
-	HairOpacity,
-	Quad,
-	None
-};
+#include <gtc/type_ptr.hpp>
 
 struct Uniforms
 {
@@ -46,22 +36,23 @@ class ShaderProgram
 {
 public:
 	ShaderProgram(const char* vertex, const char* fragment, const char* geometry = "", const char* tessControl = "", const char* tessEval = "");
-	ShaderProgram(Type type);
 
 	GLuint GetID();
-	void SetGlobalUniforms();
-	void SetObjectUniforms();
-	void SetDrawUniforms();
+	virtual void SetGlobalUniforms();
+	virtual void SetObjectUniforms();
+	virtual void SetDrawUniforms();
 	void Bind();
 	void Unbind();
 
 	Uniforms uniforms;
 
+protected:
+	GLint GetUniformLocation(const GLchar* name);
+
 private:
 	GLuint CreateShader(GLenum type, const char* path);
 	GLuint CreateProgram(std::vector<GLuint>& shaders);
 	GLuint Load();
-	GLint GetUniformLocation(const GLchar* name);
 
 	const char* mVertex;
 	const char* mFragment;
@@ -70,6 +61,4 @@ private:
 	const char* mTessEval;
 	GLuint mID;
 	std::map<std::string, int> mUniformLocations;
-
-	Type mType;
 };
