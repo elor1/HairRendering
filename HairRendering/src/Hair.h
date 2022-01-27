@@ -12,6 +12,7 @@ class Hair
 public:
 	Hair(int numGuides, Simulation* simulation);
 	Hair(Mesh* mesh, float hairDensity, Simulation* simulation, Hair* oldHair = nullptr);
+	Hair(Mesh* mesh, float hairDensity, const char* hairMap, Simulation* simulation, Hair* oldHair = nullptr);
 
 	void Update(float time);
 	void Draw(ShaderProgram* program);

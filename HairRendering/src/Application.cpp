@@ -189,8 +189,8 @@ void Application::InitSimulation()
 
 	//Scalp model
 	Model* scalp = new Model("../models/ScalpLow.obj");
-	mHair = new Hair(scalp->GetFirstMesh(), mHairDensity, mSimulation, mHair);
-
+	//mHair = new Hair(scalp->GetFirstMesh(), mHairDensity, mSimulation, mHair);
+	mHair = new Hair(mMesh, mHairDensity, "../images/hairmap.png", mSimulation);
 	delete scalp;
 }
 

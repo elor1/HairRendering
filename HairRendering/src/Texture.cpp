@@ -22,6 +22,11 @@ void Texture::Create(const char* filename, GLint magFilter, GLint minFilter)
 	int height;
 	unsigned char* image = SOIL_load_image(filename, &width, &height, NULL, SOIL_LOAD_RGBA);
 
+	if (image == NULL)
+	{
+		std::cout << "ERROR: Failed to load image" << std::endl;
+	}
+
 	Create(image, GL_RGBA, width, height, GL_RGBA, GL_UNSIGNED_BYTE, magFilter, minFilter);
 }
 

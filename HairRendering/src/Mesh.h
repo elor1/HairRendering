@@ -74,6 +74,28 @@ struct Triangle
 		vertex3 = v3;
 	}
 
+	float Area()
+	{
+		//return glm::length(glm::cross(vertex3.position - vertex1.position, vertex2.position - vertex1.position)) / 2.0f;
+		float ab = glm::distance(vertex1.position, vertex2.position);
+		float bc = glm::distance(vertex2.position, vertex3.position);
+		float ca = glm::distance(vertex3.position, vertex1.position);
+
+		return (ab + bc + ca) / 3.0f;
+	}
+
+	void randomPoint(Vertex& v)
+	{
+		float t = sqrt(rand() / (float)RAND_MAX);
+		glm::vec3 randomPoint;
+		randomPoint.x = 1 - t;
+		randomPoint.y = rand() / (float)RAND_MAX;
+		randomPoint.z = 1 - randomPoint.x - randomPoint.y;
+		v.position = glm::mat3(vertex1.position, vertex2.position, vertex3.position) * randomPoint;
+		v.texCoords = glm::mat3x2(vertex1.texCoords, vertex2.texCoords, vertex3.texCoords) * randomPoint;
+		v.normal = glm::mat3(vertex1.normal, vertex2.normal, vertex3.normal) * randomPoint;
+	}
+
 	//Triangle-ray intersection
 	/*bool IsIntersecting(glm::vec3& intersection, glm::vec3 position, glm::vec3 randomDir)
 	{

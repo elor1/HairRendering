@@ -20,51 +20,64 @@ Hair::Hair(int numGuides, Simulation* simulation)
 
 Hair::Hair(Mesh* mesh, float hairDensity, Simulation* simulation, Hair* oldHair)
 {
-	/*for (auto& triangle : mesh->triangles)
+	std::default_random_engine generator;
+	std::uniform_real_distribution<float> distribution(-0.03f, 0.03f);
+	for (auto& vertex : mesh->GetVertices())
 	{
-		std::default_random_engine generator;
-		std::uniform_real_distribution<float> distribution(-1.0f, 1.0f);
-		int numHairs = (int)(hairDensity * triangle.Area() + distribution(generator));
-		for (int i = 0; i < numHairs; i++)
-		{
-			glm::vec3 position;
-			glm::vec2 texCoord;
-			glm::vec3 normal;
-			triangle.RandomPoint(position, texCoord, normal);
+		glm::vec3 random = glm::vec3(distribution(generator), distribution(generator), distribution(generator));
+		glm::vec3 position = vertex.position + random;
+		glm::vec3 normal = vertex.normal + random;
+		mGuideHairs.push_back(new Strand(20, 0.4, position, normal));
+	}
 
-			normal.z = 0.0f;
-			normal = glm::normalize(normal);
-			mGuideHairs.push_back(new Strand(3, 1, position, normal));
-		}
-	}*/
+	SetAttributes(oldHair);
+	mSimulation = simulation;
+}
+
+Hair::Hair(Mesh* mesh, float hairDensity, const char* hairMap, Simulation* simulation, Hair* oldHair)
+{
+	int width, height, channels;
+	unsigned char* image = SOIL_load_image(hairMap, &width, &height, &channels, SOIL_LOAD_RGBA);
+	
+	if (image == NULL || width == 0 || height == 0)
+	{
+		std::cout << "ERROR: Failed to load image" << std::endl;
+	}
 
 	std::default_random_engine generator;
 	std::uniform_real_distribution<float> distribution(-0.03f, 0.03f);
 	for (auto& vertex : mesh->GetVertices())
 	{
-		/*int numHairs = (int)(hairDensity / 8);
-		for (int i = 0; i < 1; i++)
-		{*/
-			glm::vec3 random = glm::vec3(distribution(generator), distribution(generator), distribution(generator));
-			glm::vec3 position = vertex.position + random;
-			glm::vec3 normal = vertex.normal + random;
-			mGuideHairs.push_back(new Strand(20, 0.4, position, normal));
-		//}
+		glm::vec3 random = glm::vec3(distribution(generator), distribution(generator), distribution(generator));
+		glm::vec2 texCoord = vertex.texCoords + glm::vec2(random.x, random.y);
+
+		//Get uv colour
+		int x = vertex.texCoords.x * width;
+		int y = ( vertex.texCoords.y) * height;
+
+		/*if (x < 0 || x > width || y < 0 || y > width)
+		{
+			continue;
+		}*/
+
+		unsigned char* pixel = image + y * width * channels + x * channels;
+		unsigned char alpha = pixel[3];
+
+		//If pixel alpha is 0, do not place hair
+		if ((int)alpha == 0)
+		{
+			continue;
+		}
+
+		//Get length from alpha value
+		double length = (double)alpha / 637.5;
+		glm::vec3 position = vertex.position + random;
+		glm::vec3 normal = vertex.normal + random;
+
+		mGuideHairs.push_back(new Strand(20, length, position, normal));
 	}
 
-	/*for (auto& triangle : mesh->triangles)
-	{
-		std::default_random_engine generator;
-		std::uniform_real_distribution<float> distribution(-1.0f, 1.0f);
-		int numHairs = (int)(hairDensity * triangle.Area() + rand() / RAND_MAX);
-		for (int i = 0; i < numHairs; i++)
-		{
-			glm::vec3 position = (triangle.vertex1.position + triangle.vertex2.position + triangle.vertex3.position) / 3.0f;
-			glm::vec3 normal = (triangle.vertex1.normal + triangle.vertex2.normal + triangle.vertex3.normal) / 3.0f;
-			mGuideHairs.push_back(new Strand(3, 1, position, normal));
-		}
-	}*/
-
+	SOIL_free_image_data(image);
 	SetAttributes(oldHair);
 	mSimulation = simulation;
 }
