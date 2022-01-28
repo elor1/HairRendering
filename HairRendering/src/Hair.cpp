@@ -1,5 +1,4 @@
 #include "Hair.h"
-#include "Strand.h"
 #include "Simulation.h"
 #include <SOIL2.h>
 #include <iostream>
@@ -136,6 +135,11 @@ void Hair::SetAttributes(glm::vec3 colour, int numGroupHairs, float groupSpread,
 std::vector<Strand*> Hair::GetGuideHairs()
 {
 	return mGuideHairs;
+}
+
+int Hair::GetNumGroupHairs()
+{
+	return mNumGroupHairs;
 }
 
 void Hair::SetNumGroupHairs(int num)

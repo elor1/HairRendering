@@ -8,7 +8,6 @@
 #include <gtx/transform.hpp>
 #include <gtc/type_ptr.hpp>
 #include "Simulation.h"
-#include "Hair.h"
 #include "Model.h"
 #include "Texture.h"
 #include "Framebuffer.h"
@@ -49,6 +48,7 @@ Application::~Application()
 		delete fb;
 	}
 
+	delete mGui;
 	delete mMesh;
 	delete mCollider;
 	delete mSimulation;
@@ -62,6 +62,16 @@ void Application::Run()
 	{
 		Update();
 	}
+}
+
+double Application::GetDeltaTime()
+{
+	return mDeltaTime;
+}
+
+Hair* Application::GetHair()
+{
+	return mHair;
 }
 
 
@@ -107,6 +117,10 @@ void Application::Initialise()
 	glEnable(GL_DEPTH_TEST);
 	glEnable(GL_CULL_FACE);
 	glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
+
+	//Initialise imgui
+	mGui = new GuiWindow(mWindow);
+	mGui->SetApplication(this);
 
 	//Camera
 	mCamera = new Camera(glm::vec3(10.0f, 0.0f, 0.0f), glm::vec3(0.0f, 1.0f, 0.0f), 180.0f, 0.0f);
@@ -206,6 +220,8 @@ void Application::Draw()
 		mHair->Update(time);
 	}
 	
+	mGui->NewFrame();
+
 	glm::mat4 model = mSimulation->GetTransform();
 	glm::vec3 lightPosition = glm::vec3(1.0f, 2.0f, 4.0f);
 	glm::mat4 lightProjection = glm::perspective(1.3f, 1.0f, 1.0f, 100.0f);
@@ -346,13 +362,18 @@ void Application::Update()
 	mCurrentTime = glfwGetTime();
 	mDeltaTime = mCurrentTime - mPrevTime;
 
-	ProcessInput();
+	if (!ImGui::GetIO().WantCaptureMouse && !ImGui::GetIO().WantCaptureKeyboard)
+	{
+		ProcessInput();
+	}
 
 	//Draw 60 times per second
 	if (mDeltaTime >= 1.0f / 60.0f)
 	{
-		std::cout << 1 / mDeltaTime << " FPS" << std::endl;
+		//std::cout << 1 / mDeltaTime << " FPS" << std::endl;
 		Draw();
+
+		mGui->Update();
 
 		//Swap front and back buffers
 		glfwSwapBuffers(mWindow);
@@ -459,18 +480,21 @@ void Application::FrameBufferCallback(GLFWwindow* window, int width, int height)
 
 void Application::MouseCallback(GLFWwindow* window, double xPos, double yPos)
 {
-	if (mFirstMouse)
+	if (!ImGui::GetIO().WantCaptureMouse)
 	{
+		if (mFirstMouse)
+		{
+			mLastX = xPos;
+			mLastY = yPos;
+			mFirstMouse = false;
+		}
+
+		float xoffset = xPos - mLastX;
+		float yoffset = mLastY - yPos;
+
 		mLastX = xPos;
 		mLastY = yPos;
-		mFirstMouse = false;
+
+		mCamera->Rotate(xoffset, yoffset);
 	}
-
-	float xoffset = xPos - mLastX;
-	float yoffset = mLastY - yPos;
-
-	mLastX = xPos;
-	mLastY = yPos;
-
-	mCamera->Rotate(xoffset, yoffset);
 }

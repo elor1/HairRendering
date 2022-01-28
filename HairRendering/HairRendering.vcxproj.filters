@@ -13,6 +13,12 @@
       <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
       <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
     </Filter>
+    <Filter Include="Source Files\imgui">
+      <UniqueIdentifier>{2d71611a-efb4-4926-8f7f-fbb1bacf3431}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\imgui">
+      <UniqueIdentifier>{fee5cb45-ae5d-41f3-9cf2-8ecd9ef357f7}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\main.cpp">
@@ -69,6 +75,30 @@
     <ClCompile Include="src\shaderPrograms\HairOpacityShaderProgram.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="..\include\imgui\imgui.cpp">
+      <Filter>Source Files\imgui</Filter>
+    </ClCompile>
+    <ClCompile Include="..\include\imgui\imgui_demo.cpp">
+      <Filter>Source Files\imgui</Filter>
+    </ClCompile>
+    <ClCompile Include="..\include\imgui\imgui_draw.cpp">
+      <Filter>Source Files\imgui</Filter>
+    </ClCompile>
+    <ClCompile Include="..\include\imgui\imgui_impl_glfw.cpp">
+      <Filter>Source Files\imgui</Filter>
+    </ClCompile>
+    <ClCompile Include="..\include\imgui\imgui_impl_opengl3.cpp">
+      <Filter>Source Files\imgui</Filter>
+    </ClCompile>
+    <ClCompile Include="..\include\imgui\imgui_tables.cpp">
+      <Filter>Source Files\imgui</Filter>
+    </ClCompile>
+    <ClCompile Include="..\include\imgui\imgui_widgets.cpp">
+      <Filter>Source Files\imgui</Filter>
+    </ClCompile>
+    <ClCompile Include="src\GuiWindow.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\Application.h">
@@ -122,18 +152,70 @@
     <ClInclude Include="src\shaderPrograms\HairOpacityShaderProgram.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="..\include\imgui\imconfig.h">
+      <Filter>Header Files\imgui</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\imgui\imgui.h">
+      <Filter>Header Files\imgui</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\imgui\imgui_impl_glfw.h">
+      <Filter>Header Files\imgui</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\imgui\imgui_impl_opengl3.h">
+      <Filter>Header Files\imgui</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\imgui\imgui_internal.h">
+      <Filter>Header Files\imgui</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\imgui\imstb_rectpack.h">
+      <Filter>Header Files\imgui</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\imgui\imstb_textedit.h">
+      <Filter>Header Files\imgui</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\imgui\imstb_truetype.h">
+      <Filter>Header Files\imgui</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\imgui\imgui_impl_opengl3_loader.h">
+      <Filter>Header Files\imgui</Filter>
+    </ClInclude>
+    <ClInclude Include="src\GuiWindow.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <None Include="src\shaders\mesh.frag" />
-    <None Include="src\shaders\mesh.vert" />
-    <None Include="src\shaders\hair.frag" />
-    <None Include="src\shaders\hair.geom" />
-    <None Include="src\shaders\hair.tcs" />
-    <None Include="src\shaders\hair.tes" />
-    <None Include="src\shaders\hair.vert" />
-    <None Include="src\shaders\quad.vert" />
-    <None Include="src\shaders\quad.frag" />
-    <None Include="src\shaders\hairOpacity.frag" />
-    <None Include="src\shaders\white.frag" />
+    <None Include="src\shaders\hair.frag">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="src\shaders\hair.geom">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="src\shaders\hair.tcs">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="src\shaders\hair.tes">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="src\shaders\hair.vert">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="src\shaders\hairOpacity.frag">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="src\shaders\mesh.frag">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="src\shaders\mesh.vert">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="src\shaders\quad.frag">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="src\shaders\quad.vert">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="src\shaders\white.frag">
+      <Filter>Resource Files</Filter>
+    </None>
   </ItemGroup>
 </Project>

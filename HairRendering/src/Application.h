@@ -1,10 +1,11 @@
 #pragma once
+#include "GuiWindow.h"
 #include <glew.h>
 #include <glfw3.h>
 #include "shaderPrograms/ShaderProgram.h"
 #include "Camera.h"
+#include "Hair.h"
 
-class Hair;
 class Simulation;
 class Mesh;
 class Texture;
@@ -17,6 +18,10 @@ public:
 	~Application();
 
 	void Run();
+
+	//Gui getters
+	double GetDeltaTime();
+	Hair* GetHair();
 
 private:
 	void Initialise();
@@ -74,4 +79,6 @@ private:
 
 	bool mIsPaused;
 	bool mIsSpaceDown;
+
+	GuiWindow* mGui;
 };
