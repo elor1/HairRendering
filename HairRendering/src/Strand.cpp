@@ -47,6 +47,10 @@ Strand::Strand(int numSegments, double length, glm::vec3 position, glm::vec3 dir
 Strand::~Strand()
 {
 	mPatch.Destroy();
+	for (auto& vertex : vertices)
+	{
+		delete vertex;
+	}
 }
 
 void Strand::Update(float time)

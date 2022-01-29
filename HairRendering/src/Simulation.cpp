@@ -3,6 +3,7 @@
 #include "Hair.h"
 #include "gtx/transform.hpp"
 #include "gtx/extended_min_max.hpp"
+#include <iostream>
 
 #define GRAVITY -9.8f
 #define MASS 1.0f
@@ -20,10 +21,9 @@ Simulation::Simulation(Mesh* mesh)
 	mTime = 0;
 	mMesh = mesh;
 	mTransform = glm::mat4(1.0f);
-	mDensityGrid = std::map<std::tuple<double, double, double>, double>();
-	mVelocityGrid = std::map<std::tuple<double, double, double>, glm::vec3>();
+	mGrid = std::unordered_map<GridPosition, Fluid, GridPositionHash>();
 
-	shake = true;
+	shake = false;
 	nod = false;
 }
 
@@ -124,8 +124,8 @@ void Simulation::CalculateExternalForces(Hair* hair)
 
 void Simulation::CalculateGrid(Hair* hair)
 {
-	mDensityGrid = std::map<std::tuple<double, double, double>, double>();
-	mVelocityGrid = std::map<std::tuple<double, double, double>, glm::vec3>();
+	mGrid = std::unordered_map<GridPosition, Fluid, GridPositionHash>(100 * 100);
+	std::unordered_map<GridPosition, Fluid, GridPositionHash>* grid = &mGrid;
 
 	for (auto& guide : hair->GetGuideHairs())
 	{
@@ -155,32 +155,72 @@ void Simulation::CalculateGrid(Hair* hair)
 			float xyZ = (xPercent) * (yPercent) * (1.0 - zPercent);
 			float xyz = (xPercent) * (yPercent) * (zPercent);
 
-			AddToGrid(mDensityGrid, std::make_tuple(xCeil, yCeil, zCeil), XYZ);
-			AddToGrid(mDensityGrid, std::make_tuple(xCeil, yCeil, zFloor), XYz);
-			AddToGrid(mDensityGrid, std::make_tuple(xCeil, yFloor, zCeil), XyZ);
-			AddToGrid(mDensityGrid, std::make_tuple(xCeil, yFloor, zFloor), Xyz);
-			AddToGrid(mDensityGrid, std::make_tuple(xFloor, yCeil, zCeil), xYZ);
-			AddToGrid(mDensityGrid, std::make_tuple(xFloor, yCeil, zFloor), xYz);
-			AddToGrid(mDensityGrid, std::make_tuple(xFloor, yFloor, zCeil), xyZ);
-			AddToGrid(mDensityGrid, std::make_tuple(xFloor, yFloor, zFloor), xyz);
-			
-			AddToGrid(mVelocityGrid, std::make_tuple(xCeil, yCeil, zCeil), XYZ * vertex->velocity);
-			AddToGrid(mVelocityGrid, std::make_tuple(xCeil, yCeil, zFloor), XYz * vertex->velocity);
-			AddToGrid(mVelocityGrid, std::make_tuple(xCeil, yFloor, zCeil), XyZ * vertex->velocity);
-			AddToGrid(mVelocityGrid, std::make_tuple(xCeil, yFloor, zFloor), Xyz * vertex->velocity);
-			AddToGrid(mVelocityGrid, std::make_tuple(xFloor, yCeil, zCeil), xYZ * vertex->velocity);
-			AddToGrid(mVelocityGrid, std::make_tuple(xFloor, yCeil, zFloor), xYz * vertex->velocity);
-			AddToGrid(mVelocityGrid, std::make_tuple(xFloor, yFloor, zCeil), xyZ * vertex->velocity);
-			AddToGrid(mVelocityGrid, std::make_tuple(xFloor, yFloor, zFloor), xyz * vertex->velocity);
+			AddFluid(*grid, glm::vec3(xCeil, yCeil, zCeil), XYZ, vertex->velocity);
+			AddFluid(*grid, glm::vec3(xCeil, yCeil, zFloor), XYz, vertex->velocity);
+			AddFluid(*grid, glm::vec3(xCeil, yFloor, zCeil), XyZ, vertex->velocity);
+			AddFluid(*grid, glm::vec3(xCeil, yFloor, zFloor), Xyz, vertex->velocity);
+			AddFluid(*grid, glm::vec3(xFloor, yCeil, zCeil), xYZ, vertex->velocity);
+			AddFluid(*grid, glm::vec3(xFloor, yCeil, zFloor), xYz, vertex->velocity);
+			AddFluid(*grid, glm::vec3(xFloor, yFloor, zCeil), xyZ, vertex->velocity);
+			AddFluid(*grid, glm::vec3(xFloor, yFloor, zFloor), XYZ, vertex->velocity);
 		}
 	}
 }
 
 void Simulation::CalculateFriction(Hair* hair)
 {
-	for (auto& guide : hair->GetGuideHairs())
+	int numHairs = hair->GetGuideHairs().size();
+	int numThreads = numHairs / STRANDS_PER_THREAD;
+
+	int index;
+	for (int i = 0; i < numThreads; i++)
 	{
-		for (auto& vertex : guide->vertices)
+		HairThread* threadData = new HairThread();
+		threadData->grid = &mGrid;
+
+		index = STRANDS_PER_THREAD * i;
+		for (int j = 0; j < STRANDS_PER_THREAD; j++)
+		{
+			if (index > numHairs)
+			{
+				threadData->strands[j] = NULL;
+			}
+			threadData->strands[j] = hair->GetGuideHairs()[index];
+			index++;
+		}
+
+		mThreadData.push_back(threadData);
+		
+		//mThreads[i] = std::thread(&Simulation::CalculateFrictionThread, mThreadData[i]);
+		//mThreads[i] = std::thread([this, i] {CalculateFrictionThread(mThreadData[i]); });
+		mThreads.push_back(new std::thread([this, i] {CalculateFrictionThread(mThreadData[i]); }));
+		if (!mThreads[i])
+		{
+			std::cout << "ERROR: Thread not created" << std::endl;
+		}
+	}
+
+	for (int i = 0; i < numThreads; i++)
+	{
+		if (mThreads[i]->joinable())
+		{
+			mThreads[i]->join();
+		}
+	}
+}
+
+void Simulation::CalculateFrictionThread(HairThread* threadData)
+{
+	std::unordered_map<GridPosition, Fluid, GridPositionHash>* grid = threadData->grid;
+	for (int i = 0; i < STRANDS_PER_THREAD; i++)
+	{
+		Strand* currentStrand = threadData->strands[i];
+		if (!currentStrand)
+		{
+			break;
+		}
+
+		for (auto& vertex : currentStrand->vertices)
 		{
 			float x = vertex->position.x;
 			float y = vertex->position.y;
@@ -197,18 +237,6 @@ void Simulation::CalculateFriction(Hair* hair)
 			float yPercent = y - yFloor;
 			float zPercent = z - zFloor;
 
-			/*float c00 = mDensityGrid.at(std::make_tuple(xFloor, yFloor, zFloor)) * (1.0f - xPercent) + mDensityGrid.at(std::make_tuple(xCeil, yFloor, zFloor)) * xPercent;
-			float c10 = mDensityGrid.at(std::make_tuple(xFloor, yCeil, zFloor)) * (1.0f - xPercent) + mDensityGrid.at(std::make_tuple(xCeil, yCeil, zFloor)) * xPercent;
-			float c01 = mDensityGrid.at(std::make_tuple(xFloor, yFloor, zCeil)) * (1.0f - xPercent) + mDensityGrid.at(std::make_tuple(xCeil, yFloor, zCeil)) * xPercent;
-			float c11 = mDensityGrid.at(std::make_tuple(xFloor, yCeil, zCeil)) * (1.0f - xPercent) + mDensityGrid.at(std::make_tuple(xCeil, yCeil, zCeil)) * xPercent;
-
-			float c0 = c00 * (1.0f - yPercent) + c10 * yPercent;
-			float c1 = c01 * (1.0f - yPercent) + c11 * yPercent;
-			float c = c0 * (1.0f - zPercent) + c1 * zPercent;*/
-
-			//Density
-			glm::vec3 gradient = GetGradient(mDensityGrid, vertex->position);
-
 			float XYZ = (1.0 - xPercent) * (1.0 - yPercent) * (1.0 - zPercent);
 			float XYz = (1.0 - xPercent) * (1.0 - yPercent) * (zPercent);
 			float XyZ = (1.0 - xPercent) * (yPercent) * (1.0 - zPercent);
@@ -218,10 +246,10 @@ void Simulation::CalculateFriction(Hair* hair)
 			float xyZ = (xPercent) * (yPercent) * (1.0 - zPercent);
 			float xyz = (xPercent) * (yPercent) * (zPercent);
 
-			glm::vec3 v00 = GetVelocity(mVelocityGrid, mDensityGrid, glm::vec3(xFloor, yFloor, zFloor)) * (1.0f - xPercent) * xyz + GetVelocity(mVelocityGrid, mDensityGrid, glm::vec3(xCeil, yFloor, zFloor)) * xPercent * Xyz;
-			glm::vec3 v10 = GetVelocity(mVelocityGrid, mDensityGrid, glm::vec3(xFloor, yCeil, zFloor)) * (1.0f - xPercent) * xYz + GetVelocity(mVelocityGrid, mDensityGrid, glm::vec3(xCeil, yCeil, zFloor)) * xPercent * XYz;
-			glm::vec3 v01 = GetVelocity(mVelocityGrid, mDensityGrid, glm::vec3(xFloor, yFloor, zCeil)) * (1.0f - xPercent) * xyZ + GetVelocity(mVelocityGrid, mDensityGrid, glm::vec3(xCeil, yFloor, zCeil)) * xPercent * XyZ;
-			glm::vec3 v11 = GetVelocity(mVelocityGrid, mDensityGrid, glm::vec3(xFloor, yCeil, zCeil)) * (1.0f - xPercent) * xYZ + GetVelocity(mVelocityGrid, mDensityGrid, glm::vec3(xCeil, yCeil, zCeil)) * xPercent * XYZ;
+			glm::vec3 v00 = GetVelocity(*grid, glm::vec3(xFloor, yFloor, zFloor)) * (1.0f - xPercent) * xyz + GetVelocity(*grid, glm::vec3(xCeil, yFloor, zFloor)) * xPercent * Xyz;
+			glm::vec3 v10 = GetVelocity(*grid, glm::vec3(xFloor, yCeil, zFloor)) * (1.0f - xPercent) * xYz + GetVelocity(*grid, glm::vec3(xCeil, yCeil, zFloor)) * xPercent * XYz;
+			glm::vec3 v01 = GetVelocity(*grid, glm::vec3(xFloor, yFloor, zCeil)) * (1.0f - xPercent) * xyZ + GetVelocity(*grid, glm::vec3(xCeil, yFloor, zCeil)) * xPercent * XyZ;
+			glm::vec3 v11 = GetVelocity(*grid, glm::vec3(xFloor, yCeil, zCeil)) * (1.0f - xPercent) * xYZ + GetVelocity(*grid, glm::vec3(xCeil, yCeil, zCeil)) * xPercent * XYZ;
 
 			glm::vec3 v0 = v00 * (1.0f - yPercent) + v10 * yPercent;
 			glm::vec3 v1 = v01 * (1.0f - yPercent) + v11 * yPercent;
@@ -229,7 +257,6 @@ void Simulation::CalculateFriction(Hair* hair)
 			//Velocity
 			glm::vec3 v = v0 * (1.0f - zPercent) + v1 * zPercent;
 			vertex->velocity = (1.0f - FRICTION) * vertex->velocity + FRICTION * v;
-			vertex->velocity += REPULSION * gradient / TIMESTEP;
 		}
 	}
 }
@@ -286,19 +313,7 @@ void Simulation::ParticleSimulation(Hair* hair)
 	}
 }
 
-void Simulation::AddToGrid(std::map<std::tuple<double, double, double>, double>& grid, std::tuple<double, double, double> key, double value)
-{
-	double valueAtKey = GetGridValue(grid, key, 0.0);
-	grid.insert(std::pair<std::tuple<double, double, double>, double>(key, valueAtKey + value));
-}
-
-void Simulation::AddToGrid(std::map<std::tuple<double, double, double>, glm::vec3>& grid, std::tuple<double, double, double> key, glm::vec3 value)
-{
-	glm::vec3 valueAtKey = GetGridValue(grid, key, glm::vec3(0.0f));
-	grid.insert(std::pair<std::tuple<double, double, double>, glm::vec3>(key, valueAtKey + value));
-}
-
-glm::vec3 Simulation::GetGradient(std::map<std::tuple<double, double, double>, double>& grid, glm::vec3 point)
+glm::vec3 Simulation::GetGradient(std::unordered_map<GridPosition, Fluid, GridPositionHash>& grid, glm::vec3 point)
 {
 	float scale = 1.0f / GRID_WIDTH;
 
@@ -309,43 +324,63 @@ glm::vec3 Simulation::GetGradient(std::map<std::tuple<double, double, double>, d
 	float yCeil = ceil(point.y * scale) / scale;
 	float zCeil = ceil(point.z * scale) / scale;
 
-	std::tuple<double, double, double> tuple = std::make_tuple(xCeil, yCeil, zCeil);
-	float XYZ = GetGridValue(grid, tuple, 0.0);
-	tuple = std::make_tuple(xCeil, yCeil, zFloor);
-	float XYz = GetGridValue(grid, tuple, 0.0);
-	tuple = std::make_tuple(xCeil, yFloor, zCeil);
-	float XyZ = GetGridValue(grid, tuple, 0.0);
-	tuple = std::make_tuple(xCeil, yFloor, zFloor);
-	float Xyz = GetGridValue(grid, tuple, 0.0);
-	tuple = std::make_tuple(xFloor, yCeil, zCeil);
-	float xYZ = GetGridValue(grid, tuple, 0.0);
-	tuple = std::make_tuple(xFloor, yCeil, zFloor);
-	float xYz = GetGridValue(grid, tuple, 0.0);
-	tuple = std::make_tuple(xFloor, yFloor, zCeil);
-	float xyZ = GetGridValue(grid, tuple, 0.0);
-	tuple = std::make_tuple(xFloor, yFloor, zFloor);
-	float xyz = GetGridValue(grid, tuple, 0.0);
+	float XYZ = GetDensity(grid, glm::vec3(xCeil, yCeil, zCeil));
+	float XYz = GetDensity(grid, glm::vec3(xCeil, yCeil, zFloor));
+	float XyZ = GetDensity(grid, glm::vec3(xCeil, yFloor, zCeil));
+	float Xyz = GetDensity(grid, glm::vec3(xCeil, yFloor, zFloor));
+	float xYZ = GetDensity(grid, glm::vec3(xFloor, yCeil, zCeil));
+	float xYz = GetDensity(grid, glm::vec3(xFloor, yCeil, zFloor));
+	float xyZ = GetDensity(grid, glm::vec3(xFloor, yFloor, zCeil));
+	float xyz = GetDensity(grid, glm::vec3(xFloor, yFloor, zFloor));
 
 	float maxX = std::max(XYZ - xYZ, std::max(XyZ - xyZ, std::max(XYz - xYz, Xyz - xyz)));
 	float maxY = std::max(XYZ - XyZ, std::max(xYZ - xyZ, std::max(XYz - Xyz, xYz - xyz)));
 	float maxZ = std::max(XYZ - XYz, std::max(xYZ - xYz, std::max(XyZ - Xyz, xyZ - xyz)));
-	
-	if (fabs((glm::max(glm::max(maxX, maxY), maxZ)) - (maxX)) < 1e-6)
+
+	const float epsilon = 1e-6;
+	if (fabs(glm::max(maxX, glm::max(maxY, maxZ)) - maxX) < epsilon)
 	{
-		return glm::vec3(1.0f, 0.0f, 0.0f) * (float)((0 < maxX) - (maxX < 0));
+		return glm::vec3(1.0f, 0.0f, 0.0f) * (float)((0.0f < maxX) - (maxX < 0.0f));
 	}
-	else if (fabs((glm::max(glm::max(maxX, maxY), maxZ)) - (maxY)) < 1e-6)
+	else if (fabs(glm::max(maxX, glm::max(maxY, maxZ)) - maxY) < epsilon)
 	{
-		return glm::vec3(0.0f, 1.0f, 0.0f) * (float)((0 < maxY) - (maxY < 0));
+		return glm::vec3(0.0f, 1.0f, 0.0f) * (float)((0.0f < maxY) - (maxY < 0.0f));
 	}
 	else
 	{
-		return glm::vec3(0.0f, 0.0f, 1.0f) * (float)((0 < maxZ) - (maxZ < 0));
+		return glm::vec3(0.0f, 0.0f, 1.0f) * (float)((0.0f < maxZ) - (maxZ < 0.0f));
 	}
 }
 
-glm::vec3 Simulation::GetVelocity(std::map<std::tuple<double, double, double>, glm::vec3>& velocityGrid, std::map<std::tuple<double, double, double>, double>& densityGrid, glm::vec3 point)
+void Simulation::AddFluid(std::unordered_map<GridPosition, Fluid, GridPositionHash>& grid, glm::vec3 position, double density, glm::vec3 velocity)
 {
-	std::tuple<double, double, double> key = std::make_tuple(point.x, point.y, point.z);
-	return GetGridValue(velocityGrid, key, glm::vec3(0.0f)) / (float)GetGridValue(densityGrid, key, 0.0);
+	GridPosition key = GridPosition(position);
+	Fluid value = Fluid((float)density * velocity, density);
+	grid[key] = value;
 }
+
+Fluid Simulation::GetFluid(std::unordered_map<GridPosition, Fluid, GridPositionHash>& grid, glm::vec3 position)
+{
+	GridPosition key = GridPosition(position);
+	auto location = grid.find(key);
+	if (location == grid.end())
+	{
+		return Fluid();
+	}
+
+	return location->second;
+}
+
+glm::vec3 Simulation::GetVelocity(std::unordered_map<GridPosition, Fluid, GridPositionHash>& grid, glm::vec3 position)
+{
+	Fluid fluid = GetFluid(grid, position);
+	return fluid.velocity / (float)fluid.density;
+}
+
+double Simulation::GetDensity(std::unordered_map<GridPosition, Fluid, GridPositionHash>& grid, glm::vec3 position)
+{
+	Fluid fluid = GetFluid(grid, position);
+	return fluid.density;
+}
+
+

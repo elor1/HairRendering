@@ -50,6 +50,7 @@ void GuiWindow::Update()
 		ImGui::SliderInt("Spline vertices", &hair->mNumSplineVertices, 0, 50);
 		ImGui::SliderFloat("Hair radius", &hair->mHairRadius, 0.0f, 0.1f);
 		ImGui::ColorEdit3("Hair colour", &hair->mColour.x);
+		ImGui::SliderFloat("Noise amplitude", &hair->mNoiseAmplitude, 0.0f, 1.0f);
 	}
 
 	if (ImGui::CollapsingHeader("Simulation", ImGuiTreeNodeFlags_DefaultOpen))
@@ -82,7 +83,7 @@ void GuiWindow::Update()
 	if (ImGui::CollapsingHeader("Rendering", ImGuiTreeNodeFlags_DefaultOpen))
 	{
 		ImGui::Checkbox("Shadows", &mApp->useShadows);
-		ImGui::Checkbox("Super sampling", &mApp->useSuperSampling);
+		ImGui::Checkbox("Supersampling", &mApp->useSuperSampling);
 	}
 
 	ImGui::End();

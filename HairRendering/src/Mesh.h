@@ -211,6 +211,4 @@ private:
 	glm::vec3 mMin;
 	glm::vec3 mMax;
 	float mScale;
-
-	MeshOctree* mOctree;
 };

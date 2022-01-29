@@ -46,8 +46,6 @@ void Mesh::SetupMesh()
 		triangles.push_back(Triangle(v1, v2, v3));
 	}
 
-	//mOctree = new MeshOctree(this);
-
 	glGenVertexArrays(1, &mVAO);
 	glGenBuffers(1, &mVBO);
 	glGenBuffers(1, &mEBO);

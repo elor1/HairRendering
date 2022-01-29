@@ -81,6 +81,14 @@ Hair::Hair(Mesh* mesh, float hairDensity, const char* hairMap, Simulation* simul
 	mSimulation = simulation;
 }
 
+Hair::~Hair()
+{
+	for (auto& guide : mGuideHairs)
+	{
+		delete guide;
+	}
+}
+
 void Hair::Update(float time)
 {
 	if (SIMULATE_PHYSICS && mSimulation)
