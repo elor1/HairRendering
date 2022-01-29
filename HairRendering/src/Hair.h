@@ -10,6 +10,7 @@ class Simulation;
 class Hair
 {
 public:
+	friend class GuiWindow;
 	Hair(int numGuides, Simulation* simulation);
 	Hair(Mesh* mesh, float hairDensity, Simulation* simulation, Hair* oldHair = nullptr);
 	Hair(Mesh* mesh, float hairDensity, const char* hairMap, Simulation* simulation, Hair* oldHair = nullptr);

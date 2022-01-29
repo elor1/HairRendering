@@ -22,6 +22,9 @@ Simulation::Simulation(Mesh* mesh)
 	mTransform = glm::mat4(1.0f);
 	mDensityGrid = std::map<std::tuple<double, double, double>, double>();
 	mVelocityGrid = std::map<std::tuple<double, double, double>, glm::vec3>();
+
+	shake = true;
+	nod = false;
 }
 
 Simulation::~Simulation()
@@ -48,6 +51,13 @@ glm::mat4 Simulation::GetTransform()
 	return mTransform;
 }
 
+void Simulation::ResetPosition()
+{
+	shake = false;
+	nod = false;
+	mTransform = glm::mat4(1.0f);
+}
+
 void Simulation::Move(Hair* hair)
 {
 	for (auto& guide : hair->GetGuideHairs())
@@ -58,7 +68,15 @@ void Simulation::Move(Hair* hair)
 		}
 	}
 
-	mTransform = glm::rotate((float)sin(mTime), glm::vec3(0, 1, 0));
+	if (shake || nod)
+	{
+		mTransform = glm::rotate((float)sin(mTime), glm::vec3(nod, shake, 0));
+	}
+	
+	/*if (nod)
+	{
+		mTransform = glm::rotate((float)sin(mTime), glm::vec3(1, 0, 0));
+	}*/
 	//mTransform = glm::translate(glm::mat4(1.0f), glm::vec3(sin(mTime), 0.0f, cos(mTime)));
 }
 

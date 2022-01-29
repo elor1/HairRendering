@@ -12,8 +12,6 @@
 #include "Texture.h"
 #include "Framebuffer.h"
 
-#define SHADOWS true
-
 Application::Application(int width, int height)
 {
 	mPrevTime = glfwGetTime();
@@ -27,6 +25,8 @@ Application::Application(int width, int height)
 	mFrame = 0;
 	mIsPaused = false;
 	mIsSpaceDown = false;
+	useShadows = true;
+	useSuperSampling = true;
 
 	Initialise();
 }
@@ -72,6 +72,21 @@ double Application::GetDeltaTime()
 Hair* Application::GetHair()
 {
 	return mHair;
+}
+
+void Application::TogglePause()
+{
+	mIsPaused = !mIsPaused;
+}
+
+void Application::ResetSimulation()
+{
+	InitSimulation();
+}
+
+bool Application::IsPaused()
+{
+	return mIsPaused;
 }
 
 
@@ -176,9 +191,20 @@ void Application::Initialise()
 
 void Application::InitSimulation()
 {
-	delete mMesh;
-	delete mCollider;
-	delete mSimulation;
+	if (mMesh)
+	{
+		mMesh = nullptr;
+	}
+	
+	if (mCollider)
+	{
+		mCollider = nullptr;
+	}
+	
+	if (mSimulation)
+	{
+		mSimulation = nullptr;
+	}
 
 	//Head model
 	Model* model = new Model("../models/Head3.obj");
@@ -208,7 +234,7 @@ void Application::InitSimulation()
 	delete scalp;
 }
 
-#define SUPERSAMPLING false
+
 void Application::Draw()
 {
 	float time = mFrame++ / 60.0f;
@@ -236,7 +262,7 @@ void Application::Draw()
 	mFinalTexture->Bind(GL_TEXTURE4);
 
 	//Shadow map
-	if (SHADOWS)
+	if (useShadows)
 	{
 		//Hair shadows
 		glViewport(0, 0, mHairDepthTexture->GetWidth(), mHairDepthTexture->GetHeight());
@@ -296,7 +322,7 @@ void Application::Draw()
 		glDisable(GL_BLEND);
 	}
 
-	if (SUPERSAMPLING)
+	if (useSuperSampling)
 	{
 		mFinalFramebuffer->Bind();
 		glViewport(0, 0, mFinalTexture->GetWidth(), mFinalTexture->GetHeight());
@@ -319,7 +345,7 @@ void Application::Draw()
 	mHairProgram->uniforms.dirToLight = eyeToLight;
 	mHairProgram->uniforms.lightPosition = lightPosition;
 	mHairProgram->uniforms.shadowIntensity = 15.0f;
-	mHairProgram->uniforms.useShadows = SHADOWS;
+	mHairProgram->uniforms.useShadows = useShadows;
 	mHairProgram->SetGlobalUniforms();
 	mHair->Draw(mHairProgram);
 	mHairProgram->Unbind();
@@ -335,14 +361,14 @@ void Application::Draw()
 	mMeshProgram->uniforms.lightPosition = lightPosition;
 	mMeshProgram->uniforms.dirToLight = eyeToLight;
 	mMeshProgram->uniforms.shadowIntensity = 15.0f;
-	mMeshProgram->uniforms.useShadows = SHADOWS;
+	mMeshProgram->uniforms.useShadows = useShadows;
 	mMeshProgram->SetGlobalUniforms();
 	mMeshProgram->SetObjectUniforms();
 	mMesh->Draw();
 	//mCollider->Draw();
 	mMeshProgram->Unbind();
 
-	if (SUPERSAMPLING)
+	if (useSuperSampling)
 	{
 		mFinalFramebuffer->Unbind();
 		glViewport(0, 0, mWidth, mHeight);
@@ -411,7 +437,7 @@ void Application::ProcessInput()
 	{
 		if (!mIsSpaceDown)
 		{
-			mIsPaused = !mIsPaused;
+			TogglePause();
 		}
 
 		mIsSpaceDown = true;
@@ -480,7 +506,7 @@ void Application::FrameBufferCallback(GLFWwindow* window, int width, int height)
 
 void Application::MouseCallback(GLFWwindow* window, double xPos, double yPos)
 {
-	if (!ImGui::GetIO().WantCaptureMouse)
+	if (glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_RIGHT) == GLFW_PRESS && !ImGui::GetIO().WantCaptureMouse)
 	{
 		if (mFirstMouse)
 		{

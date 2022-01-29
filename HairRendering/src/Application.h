@@ -19,9 +19,14 @@ public:
 
 	void Run();
 
-	//Gui getters
+	//Gui
 	double GetDeltaTime();
 	Hair* GetHair();
+	void TogglePause();
+	void ResetSimulation();
+	bool IsPaused();
+	bool useShadows;
+	bool useSuperSampling;
 
 private:
 	void Initialise();

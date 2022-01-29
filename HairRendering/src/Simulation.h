@@ -20,6 +20,12 @@ public:
 	std::vector<glm::vec3> mForces;
 	glm::mat4 GetTransform();
 
+	//Gui
+	bool shake;
+	bool nod;
+
+	void ResetPosition();
+
 private:
 	float mTime;
 	Mesh* mMesh;
