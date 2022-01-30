@@ -6,28 +6,26 @@ Model::Model(std::string filename, float scale)
 	LoadModel(filename);
 }
 
+Model::~Model()
+{
+	for (auto& mesh : mMeshes)
+	{
+		delete mesh;
+	}
+}
+
 void Model::Draw()
 {
 	for (auto& mesh : mMeshes)
 	{
-		mesh.Draw();
+		mesh->Draw();
 	}
 }
 
-std::vector<Mesh*> Model::GetMeshes()
-{
-	std::vector<Mesh*> meshes;
-	for (auto& mesh : mMeshes)
-	{
-		meshes.push_back(&mesh);
-	}
-
-	return meshes;
-}
 
 Mesh* Model::GetFirstMesh()
 {
-	return &mMeshes[0];
+	return mMeshes[0];
 }
 
 void Model::LoadModel(std::string filename)
@@ -59,7 +57,7 @@ void Model::ProcessNode(aiNode* node, const aiScene* scene)
 	}
 }
 
-Mesh Model::ProcessMesh(aiMesh* mesh, const aiScene* scene)
+Mesh* Model::ProcessMesh(aiMesh* mesh, const aiScene* scene)
 {
 	std::vector<Vertex> vertices;
 	std::vector<unsigned int> indices;
@@ -105,7 +103,7 @@ Mesh Model::ProcessMesh(aiMesh* mesh, const aiScene* scene)
 		}
 	}
 
-	return Mesh(vertices, indices, mScale);
+	return new Mesh(vertices, indices, mScale);
 }
 
 

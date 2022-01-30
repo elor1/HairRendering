@@ -5,11 +5,23 @@
 
 #define SIMULATE_PHYSICS true
 
+#define _CRTDBG_MAP_ALLOC
+#include <stdlib.h>
+#include <crtdbg.h>
+
+#ifdef _DEBUG
+#define DBG_NEW new ( _NORMAL_BLOCK , __FILE__ , __LINE__ )
+// Replace _NORMAL_BLOCK with _CLIENT_BLOCK if you want the
+// allocations to be of _CLIENT_BLOCK type
+#else
+#define DBG_NEW new
+#endif
+
 Hair::Hair(int numGuides, Simulation* simulation)
 {
 	for (int i = 0; i < numGuides; i++)
 	{
-		mGuideHairs.push_back(new Strand(20, 1.0, glm::vec3(i + 0.25f, 1.0f, 0.0f), glm::vec3(0.0f, -1.0f, 0.0f)));
+		mGuideHairs.push_back(DBG_NEW Strand(20, 1.0, glm::vec3(i + 0.25f, 1.0f, 0.0f), glm::vec3(0.0f, -1.0f, 0.0f)));
 	}
 
 	SetAttributes();
@@ -26,7 +38,7 @@ Hair::Hair(Mesh* mesh, float hairDensity, Simulation* simulation, Hair* oldHair)
 		glm::vec3 random = glm::vec3(distribution(generator), distribution(generator), distribution(generator));
 		glm::vec3 position = vertex.position + random;
 		glm::vec3 normal = vertex.normal + random;
-		mGuideHairs.push_back(new Strand(20, 0.4, position, normal));
+		mGuideHairs.push_back(DBG_NEW Strand(20, 0.4, position, normal));
 	}
 
 	SetAttributes(oldHair);
@@ -73,7 +85,7 @@ Hair::Hair(Mesh* mesh, float hairDensity, const char* hairMap, Simulation* simul
 		glm::vec3 position = vertex.position + random;
 		glm::vec3 normal = vertex.normal + random;
 
-		mGuideHairs.push_back(new Strand(20, length, position, normal));
+		mGuideHairs.push_back(DBG_NEW Strand(20, length, position, normal));
 	}
 
 	SOIL_free_image_data(image);

@@ -57,6 +57,7 @@ void GuiWindow::Update()
 	{
 		ImGui::Checkbox("Shake", &hair->mSimulation->shake);
 		ImGui::Checkbox("Nod", &hair->mSimulation->nod);
+		ImGui::Checkbox("Friction", &hair->mSimulation->useFriction);
 
 		std::string pauseLabel = "Pause";
 		if (mApp->IsPaused())

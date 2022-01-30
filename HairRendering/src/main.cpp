@@ -14,9 +14,13 @@
 int main(void)
 {
     _CrtSetDbgFlag(_CRTDBG_ALLOC_MEM_DF | _CRTDBG_LEAK_CHECK_DF);
-    Application* app = new Application(1920, 1080);
+    Application* app = DBG_NEW Application(1920, 1080);
     app->Run();
-
-   glfwTerminate();
+    if (app)
+    {
+        delete app;
+    }
+    
+    glfwTerminate();
     return 0;
 }

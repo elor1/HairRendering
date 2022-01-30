@@ -12,6 +12,18 @@
 #include "Texture.h"
 #include "Framebuffer.h"
 
+#define _CRTDBG_MAP_ALLOC
+#include <stdlib.h>
+#include <crtdbg.h>
+
+#ifdef _DEBUG
+#define DBG_NEW new ( _NORMAL_BLOCK , __FILE__ , __LINE__ )
+// Replace _NORMAL_BLOCK with _CLIENT_BLOCK if you want the
+// allocations to be of _CLIENT_BLOCK type
+#else
+#define DBG_NEW new
+#endif
+
 Application::Application(int width, int height)
 {
 	mPrevTime = glfwGetTime();
@@ -49,10 +61,11 @@ Application::~Application()
 	}
 
 	delete mGui;
-	delete mMesh;
+	delete mHead;
 	delete mCollider;
 	delete mSimulation;
 	delete mHair;
+	delete mCamera;
 }
 
 void Application::Run()
@@ -134,28 +147,28 @@ void Application::Initialise()
 	glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
 
 	//Initialise imgui
-	mGui = new GuiWindow(mWindow);
+	mGui = DBG_NEW GuiWindow(mWindow);
 	mGui->SetApplication(this);
 
 	//Camera
-	mCamera = new Camera(glm::vec3(10.0f, 0.0f, 0.0f), glm::vec3(0.0f, 1.0f, 0.0f), 180.0f, 0.0f);
+	mCamera = DBG_NEW Camera(glm::vec3(10.0f, 0.0f, 0.0f), glm::vec3(0.0f, 1.0f, 0.0f), 180.0f, 0.0f);
 
 	//Shaders
 	mPrograms = {
-		mMeshProgram = new MeshShaderProgram(),
-		mHairProgram = new HairShaderProgram(),
-		mHairOpacityProgram = new HairOpacityShaderProgram(),
-		mWhiteHairProgram = new HairShaderProgram("src/shaders/hair.vert", "src/shaders/white.frag"),
-		mWhiteMeshProgram = new MeshShaderProgram("src/shaders/mesh.vert", "src/shaders/white.frag"),
+		mMeshProgram = DBG_NEW MeshShaderProgram(),
+		mHairProgram = DBG_NEW HairShaderProgram(),
+		mHairOpacityProgram = DBG_NEW HairOpacityShaderProgram(),
+		mWhiteHairProgram = DBG_NEW HairShaderProgram("src/shaders/hair.vert", "src/shaders/white.frag"),
+		mWhiteMeshProgram = DBG_NEW MeshShaderProgram("src/shaders/mesh.vert", "src/shaders/white.frag"),
 	};
 
 	//Textures
 	mTextures = {
-		mNoiseTexture = new Texture(),
-		mHairDepthTexture = new Texture(),
-		mMeshDepthTexture = new Texture(),
-		mOpacityMapTexture = new Texture(),
-		mFinalTexture = new Texture(),
+		mNoiseTexture = DBG_NEW Texture(),
+		mHairDepthTexture = DBG_NEW Texture(),
+		mMeshDepthTexture = DBG_NEW Texture(),
+		mOpacityMapTexture = DBG_NEW Texture(),
+		mFinalTexture = DBG_NEW Texture(),
 	};
 
 	int shadowMapSize = 2048;
@@ -167,10 +180,10 @@ void Application::Initialise()
 
 	//Framebuffers
 	mFramebuffers = {
-		mHairShadowFramebuffer = new Framebuffer(),
-		mMeshShadowFramebuffer = new Framebuffer(),
-		mOpacityMapFramebuffer = new Framebuffer(),
-		mFinalFramebuffer = new Framebuffer(),
+		mHairShadowFramebuffer = DBG_NEW Framebuffer(),
+		mMeshShadowFramebuffer = DBG_NEW Framebuffer(),
+		mOpacityMapFramebuffer = DBG_NEW Framebuffer(),
+		mFinalFramebuffer = DBG_NEW Framebuffer(),
 	};
 
 	for (auto& fb : mFramebuffers)
@@ -191,9 +204,9 @@ void Application::Initialise()
 
 void Application::InitSimulation()
 {
-	if (mMesh)
+	if (mHead)
 	{
-		mMesh = nullptr;
+		mHead = nullptr;
 	}
 	
 	if (mCollider)
@@ -207,12 +220,12 @@ void Application::InitSimulation()
 	}
 
 	//Head model
-	Model* model = new Model("../models/Head3.obj");
-	mMesh = model->GetFirstMesh();
+	mHead = DBG_NEW Model("../models/Head3.obj");
+	//mHead = model->GetFirstMesh();
 
 	//Collision model
-	Model* collisionModel = new Model("../models/Collider.obj", 1.1f);
-	mCollider = collisionModel->GetFirstMesh();
+	mCollider = DBG_NEW Model("../models/Collider.obj", 1.1f);
+	//mCollider = collisionModel->GetFirstMesh();
 	/*cube->triangles = { Triangle(Vertex(glm::vec3(-5.0f, -0.7f, -5.0f), glm::vec2(0.875f, 0.5f), glm::vec3(0.0f, 1.0f, 0.0f)), Vertex(glm::vec3(5.0f, -0.3f, 5.0f), glm::vec2(0.625, 0.75), glm::vec3(0.0f, 1.0f, 0.0f)), Vertex(glm::vec3(5.0f, -0.3f, -5.0f), glm::vec2(0.625, 0.5f), glm::vec3(0.0f, 1.0f, 0.0f))),
 	Triangle(Vertex(glm::vec3(5.0f, -0.3f, 5.0f), glm::vec2(0.625f, 0.75f), glm::vec3(0.0f, 0.0f, 1.0f)), Vertex(glm::vec3(-5.0f, -0.7f, 5.0f), glm::vec2(0.375, 1.0), glm::vec3(0.0f, 0.0f, 1.0f)), Vertex(glm::vec3(-5.0f, -0.3f, -5.0f), glm::vec2(0.375, 0.75f), glm::vec3(0.0f, 0.0f, 1.0f))),
 	Triangle(Vertex(glm::vec3(-5.0f, -0.3f, 5.0f), glm::vec2(0.625f, 0.5f), glm::vec3(-1.0f, 0.0f, 0.0f)), Vertex(glm::vec3(-5.0f, -0.7f, -5.0f), glm::vec2(0.375, 0.25), glm::vec3(-1.0f, 0.0f, 0.0f)), Vertex(glm::vec3(-5.0f, -0.7f, 5.0f), glm::vec2(0.375, 0.0f), glm::vec3(-1.0f, 0.0f, 0.0f))),
@@ -225,12 +238,12 @@ void Application::InitSimulation()
 	Triangle(Vertex(glm::vec3(5.0f, -0.7f, -5.0f), glm::vec2(0.375f, 0.5f), glm::vec3(0.0f, -1.0f, 0.0f)), Vertex(glm::vec3(5.0f, -0.7f, 5.0f), glm::vec2(0.375, 0.75), glm::vec3(0.0f, -1.0f, 0.0f)), Vertex(glm::vec3(-5.0f, -0.7f, 5.0f), glm::vec2(0.125, 0.75f), glm::vec3(0.0f, -1.0f, 0.0f))),
 	Triangle(Vertex(glm::vec3(5.0f, -0.3f, -5.0f), glm::vec2(0.625f, 0.5f), glm::vec3(1.0f, 0.0f, 0.0f)), Vertex(glm::vec3(5.0f, -0.3f, 5.0f), glm::vec2(0.625, 0.75), glm::vec3(1.0f, 0.0f, 0.0f)), Vertex(glm::vec3(5.0f, -0.7f, 5.0f), glm::vec2(0.375, 0.75f), glm::vec3(1.0f, 0.0f, 0.0f))),
 	Triangle(Vertex(glm::vec3(-5.0f, -0.3f, -5.0f), glm::vec2(0.625f, 0.25f), glm::vec3(0.0f, 0.0f, -1.0f)), Vertex(glm::vec3(5.0f, -0.3f, -5.0f), glm::vec2(0.625, 0.5), glm::vec3(0.0f, 0.0f, -1.0f)), Vertex(glm::vec3(5.0f, -0.7f, -5.0f), glm::vec2(0.375, 0.5f), glm::vec3(0.0f, 0.0f, -1.0f))) };*/
-	mSimulation = new Simulation(mCollider);
+	mSimulation = DBG_NEW Simulation(mCollider->GetFirstMesh());
 
 	//Scalp model
-	Model* scalp = new Model("../models/ScalpLow.obj");
+	Model* scalp = DBG_NEW Model("../models/ScalpLow.obj");
 	//mHair = new Hair(scalp->GetFirstMesh(), mHairDensity, mSimulation, mHair);
-	mHair = new Hair(mMesh, mHairDensity, "../images/hairmap.png", mSimulation);
+	mHair = DBG_NEW Hair(mHead->GetFirstMesh(), mHairDensity, "../images/hairmap.png", mSimulation);
 	delete scalp;
 }
 
@@ -292,7 +305,7 @@ void Application::Draw()
 		mWhiteMeshProgram->uniforms.model = model;
 		mWhiteMeshProgram->SetGlobalUniforms();
 		mWhiteMeshProgram->SetObjectUniforms();
-		mMesh->Draw();
+		mHead->Draw();
 		mWhiteMeshProgram->Unbind();
 		mMeshShadowFramebuffer->Unbind();
 
@@ -364,7 +377,7 @@ void Application::Draw()
 	mMeshProgram->uniforms.useShadows = useShadows;
 	mMeshProgram->SetGlobalUniforms();
 	mMeshProgram->SetObjectUniforms();
-	mMesh->Draw();
+	mHead->Draw();
 	//mCollider->Draw();
 	mMeshProgram->Unbind();
 

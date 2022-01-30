@@ -16,20 +16,24 @@
 #define WIND false
 #define COLLISIONS true
 
+#ifdef _DEBUG
+#define DBG_NEW new ( _NORMAL_BLOCK , __FILE__ , __LINE__ )
+// Replace _NORMAL_BLOCK with _CLIENT_BLOCK if you want the
+// allocations to be of _CLIENT_BLOCK type
+#else
+#define DBG_NEW new
+#endif
+
 Simulation::Simulation(Mesh* mesh)
 {
 	mTime = 0;
 	mMesh = mesh;
 	mTransform = glm::mat4(1.0f);
-	mGrid = std::unordered_map<GridPosition, Fluid, GridPositionHash>();
+	mGrid = std::map<GridPosition, Fluid>();
 
 	shake = false;
 	nod = false;
-}
-
-Simulation::~Simulation()
-{
-	delete mMesh;
+	useFriction = true;
 }
 
 void Simulation::Update(float time)
@@ -41,8 +45,11 @@ void Simulation::Simulate(Hair* hair)
 {
 	Move(hair);
 	CalculateExternalForces(hair);
-	/*CalculateGrid(hair);
-	CalculateFriction(hair);*/
+	if (useFriction)
+	{
+		CalculateGrid(hair);
+		CalculateFriction(hair);
+	}
 	ParticleSimulation(hair);
 }
 
@@ -124,8 +131,8 @@ void Simulation::CalculateExternalForces(Hair* hair)
 
 void Simulation::CalculateGrid(Hair* hair)
 {
-	mGrid = std::unordered_map<GridPosition, Fluid, GridPositionHash>(100 * 100);
-	std::unordered_map<GridPosition, Fluid, GridPositionHash>* grid = &mGrid;
+	mGrid = std::map<GridPosition, Fluid>();
+	std::map<GridPosition, Fluid>* grid = &mGrid;
 
 	for (auto& guide : hair->GetGuideHairs())
 	{
@@ -146,23 +153,42 @@ void Simulation::CalculateGrid(Hair* hair)
 			float yPercent = y - yFloor;
 			float zPercent = z - zFloor;
 
-			float XYZ = (1.0 - xPercent) * (1.0 - yPercent) * (1.0 - zPercent);
-			float XYz = (1.0 - xPercent) * (1.0 - yPercent) * (zPercent);
-			float XyZ = (1.0 - xPercent) * (yPercent) * (1.0 - zPercent);
-			float Xyz = (1.0 - xPercent) * (yPercent) * (zPercent);
-			float xYZ = (xPercent) * (1.0 - yPercent) * (1.0 - zPercent);
-			float xYz = (xPercent) * (1.0 - yPercent) * (zPercent);
-			float xyZ = (xPercent) * (yPercent) * (1.0 - zPercent);
-			float xyz = (xPercent) * (yPercent) * (zPercent);
+			for (int i = 0; i < 8; i++)
+			{
+				float fract = (((i & 1) >> 0) * (1.0 - xPercent) + (1 - ((i & 1) >> 0)) * (xPercent)) *
+							  (((i & 2) >> 1) * (1.0 - yPercent) + (1 - ((i & 2) >> 1)) * (yPercent)) *
+							  (((i & 4) >> 2) * (1.0 - zPercent) + (1 - ((i & 4) >> 2)) * (zPercent));
 
-			AddFluid(*grid, glm::vec3(xCeil, yCeil, zCeil), XYZ, vertex->velocity);
-			AddFluid(*grid, glm::vec3(xCeil, yCeil, zFloor), XYz, vertex->velocity);
-			AddFluid(*grid, glm::vec3(xCeil, yFloor, zCeil), XyZ, vertex->velocity);
-			AddFluid(*grid, glm::vec3(xCeil, yFloor, zFloor), Xyz, vertex->velocity);
-			AddFluid(*grid, glm::vec3(xFloor, yCeil, zCeil), xYZ, vertex->velocity);
-			AddFluid(*grid, glm::vec3(xFloor, yCeil, zFloor), xYz, vertex->velocity);
-			AddFluid(*grid, glm::vec3(xFloor, yFloor, zCeil), xyZ, vertex->velocity);
-			AddFluid(*grid, glm::vec3(xFloor, yFloor, zFloor), XYZ, vertex->velocity);
+				glm::vec3 position;
+				if ((i & 1) >> 0)
+				{
+					position.x = xCeil;
+				}
+				else
+				{
+					position.x = xFloor;
+				}
+
+				if ((i & 2) >> 1)
+				{
+					position.y = yCeil;
+				}
+				else
+				{
+					position.y = yFloor;
+				}
+
+				if ((i & 4) >> 2)
+				{
+					position.z = zCeil;
+				}
+				else
+				{
+					position.z = zFloor;
+				}
+
+				AddFluid(*grid, position, fract, vertex->velocity * fract);
+			}
 		}
 	}
 }
@@ -175,7 +201,7 @@ void Simulation::CalculateFriction(Hair* hair)
 	int index;
 	for (int i = 0; i < numThreads; i++)
 	{
-		HairThread* threadData = new HairThread();
+		HairThread* threadData = DBG_NEW HairThread();
 		threadData->grid = &mGrid;
 
 		index = STRANDS_PER_THREAD * i;
@@ -193,7 +219,7 @@ void Simulation::CalculateFriction(Hair* hair)
 		
 		//mThreads[i] = std::thread(&Simulation::CalculateFrictionThread, mThreadData[i]);
 		//mThreads[i] = std::thread([this, i] {CalculateFrictionThread(mThreadData[i]); });
-		mThreads.push_back(new std::thread([this, i] {CalculateFrictionThread(mThreadData[i]); }));
+		mThreads.push_back(DBG_NEW std::thread([this, i] {CalculateFrictionThread(mThreadData[i]); }));
 		if (!mThreads[i])
 		{
 			std::cout << "ERROR: Thread not created" << std::endl;
@@ -211,7 +237,8 @@ void Simulation::CalculateFriction(Hair* hair)
 
 void Simulation::CalculateFrictionThread(HairThread* threadData)
 {
-	std::unordered_map<GridPosition, Fluid, GridPositionHash>* grid = threadData->grid;
+	std::map<GridPosition, Fluid>* grid = threadData->grid;
+
 	for (int i = 0; i < STRANDS_PER_THREAD; i++)
 	{
 		Strand* currentStrand = threadData->strands[i];
@@ -313,7 +340,7 @@ void Simulation::ParticleSimulation(Hair* hair)
 	}
 }
 
-glm::vec3 Simulation::GetGradient(std::unordered_map<GridPosition, Fluid, GridPositionHash>& grid, glm::vec3 point)
+glm::vec3 Simulation::GetGradient(std::map<GridPosition, Fluid>& grid, glm::vec3 point)
 {
 	float scale = 1.0f / GRID_WIDTH;
 
@@ -352,14 +379,14 @@ glm::vec3 Simulation::GetGradient(std::unordered_map<GridPosition, Fluid, GridPo
 	}
 }
 
-void Simulation::AddFluid(std::unordered_map<GridPosition, Fluid, GridPositionHash>& grid, glm::vec3 position, double density, glm::vec3 velocity)
+void Simulation::AddFluid(std::map<GridPosition, Fluid>& grid, glm::vec3 position, double density, glm::vec3 velocity)
 {
 	GridPosition key = GridPosition(position);
 	Fluid value = Fluid((float)density * velocity, density);
 	grid[key] = value;
 }
 
-Fluid Simulation::GetFluid(std::unordered_map<GridPosition, Fluid, GridPositionHash>& grid, glm::vec3 position)
+Fluid Simulation::GetFluid(std::map<GridPosition, Fluid>& grid, glm::vec3 position)
 {
 	GridPosition key = GridPosition(position);
 	auto location = grid.find(key);
@@ -371,13 +398,13 @@ Fluid Simulation::GetFluid(std::unordered_map<GridPosition, Fluid, GridPositionH
 	return location->second;
 }
 
-glm::vec3 Simulation::GetVelocity(std::unordered_map<GridPosition, Fluid, GridPositionHash>& grid, glm::vec3 position)
+glm::vec3 Simulation::GetVelocity(std::map<GridPosition, Fluid>& grid, glm::vec3 position)
 {
 	Fluid fluid = GetFluid(grid, position);
 	return fluid.velocity / (float)fluid.density;
 }
 
-double Simulation::GetDensity(std::unordered_map<GridPosition, Fluid, GridPositionHash>& grid, glm::vec3 position)
+double Simulation::GetDensity(std::map<GridPosition, Fluid>& grid, glm::vec3 position)
 {
 	Fluid fluid = GetFluid(grid, position);
 	return fluid.density;

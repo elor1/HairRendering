@@ -4,6 +4,18 @@
 #include "Quad.h"
 #include "shaderPrograms/ShaderProgram.h"
 
+#define _CRTDBG_MAP_ALLOC
+#include <stdlib.h>
+#include <crtdbg.h>
+
+#ifdef _DEBUG
+#define DBG_NEW new ( _NORMAL_BLOCK , __FILE__ , __LINE__ )
+// Replace _NORMAL_BLOCK with _CLIENT_BLOCK if you want the
+// allocations to be of _CLIENT_BLOCK type
+#else
+#define DBG_NEW new
+#endif
+
 Texture::Texture()
 {
 	mQuad = nullptr;
@@ -71,13 +83,13 @@ void Texture::RenderFullScreen()
 {
 	if (!mQuad)
 	{
-		mQuad = new Quad();
+		mQuad = DBG_NEW Quad();
 		mQuad->Initialise();
 	}
 
 	if (!mProgram)
 	{
-		mProgram = new ShaderProgram("src/shaders/quad.vert", "src/shaders/quad.frag");
+		mProgram = DBG_NEW ShaderProgram("src/shaders/quad.vert", "src/shaders/quad.frag");
 	}
 
 	mProgram->Bind();

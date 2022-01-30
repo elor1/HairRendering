@@ -5,9 +5,9 @@
 #include "shaderPrograms/ShaderProgram.h"
 #include "Camera.h"
 #include "Hair.h"
+#include "Model.h"
 
 class Simulation;
-class Mesh;
 class Texture;
 class Framebuffer;
 
@@ -40,8 +40,8 @@ private:
 	static void FrameBufferCallback(GLFWwindow* window, int width, int height);
 	void MouseCallback(GLFWwindow* window, double xPos, double yPos);
 	
-	Mesh* mMesh;
-	Mesh* mCollider;
+	Model* mHead;
+	Model* mCollider;
 
 	Hair* mHair;
 	Simulation* mSimulation;
