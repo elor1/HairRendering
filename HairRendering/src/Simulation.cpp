@@ -11,7 +11,6 @@
 #define TIMESTEP 0.01f
 #define GRID_WIDTH 0.1f
 #define FRICTION 0.07f
-#define REPULSION 0.0f
 
 #define WIND false
 #define COLLISIONS true
@@ -33,7 +32,7 @@ Simulation::Simulation(Mesh* mesh)
 
 	shake = false;
 	nod = false;
-	useFriction = true;
+	useFriction = false;
 }
 
 void Simulation::Update(float time)

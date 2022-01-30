@@ -35,6 +35,7 @@ struct Uniforms
 class ShaderProgram
 {
 public:
+	ShaderProgram() = default;
 	ShaderProgram(const char* vertex, const char* fragment, const char* geometry = "", const char* tessControl = "", const char* tessEval = "");
 
 	GLuint GetID();
@@ -48,17 +49,18 @@ public:
 
 protected:
 	GLint GetUniformLocation(const GLchar* name);
-
-private:
 	GLuint CreateShader(GLenum type, const char* path);
-	GLuint CreateProgram(std::vector<GLuint>& shaders);
-	GLuint Load();
 
+	GLuint mID;
 	const char* mVertex;
 	const char* mFragment;
 	const char* mGeometry;
 	const char* mTessControl;
 	const char* mTessEval;
-	GLuint mID;
+
+private:
+	GLuint Load();
+	GLuint CreateProgram(std::vector<GLuint>& shaders);
+
 	std::map<std::string, int> mUniformLocations;
 };

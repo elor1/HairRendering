@@ -20,7 +20,7 @@ public:
 	void Draw(ShaderProgram* program);
 
 	void SetAttributes(Hair* oldHair);
-	void SetAttributes(glm::vec3 colour = glm::vec3(0.3f, 0.18f, 0.15f), int numGroupHairs = 64, float groupSpread = 0.2f, float hairRadius = 0.003f, float noiseAmplitude = 0.1f, int numSplineVertices = 20);
+	void SetAttributes(glm::vec3 colour = glm::vec3(0.3f, 0.18f, 0.15f), int numGroupHairs = 64, float groupSpread = 0.2f, float hairRadius = 0.003f, float noiseAmplitude = 0.3f, int numSplineVertices = 20);
 
 	std::vector<Strand*> GetGuideHairs();
 	int GetNumGroupHairs();

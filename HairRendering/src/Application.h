@@ -39,6 +39,8 @@ private:
 	void ProcessInput();
 	static void FrameBufferCallback(GLFWwindow* window, int width, int height);
 	void MouseCallback(GLFWwindow* window, double xPos, double yPos);
+	void DrawMesh(ShaderProgram* program, glm::mat4 model, glm::mat4 view, glm::mat4 projection);
+	void DrawHair(ShaderProgram* program, glm::mat4 model, glm::mat4 view, glm::mat4 projection);
 	
 	Model* mHead;
 	Model* mCollider;
@@ -76,6 +78,9 @@ private:
 	GLFWwindow* mWindow;
 	int mWidth;
 	int mHeight;
+
+	glm::vec3 mLightPosition;
+	glm::mat4 mDirToLight;
 
 	double mPrevTime;
 	double mCurrentTime;

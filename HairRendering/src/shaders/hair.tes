@@ -5,6 +5,10 @@ layout(isolines) in;
 out vec3 tangent_te;
 out float tessx_te;
 
+out vec3 pos;
+out vec3 tangent;
+out float tessx;
+
 const int MAX_VERTICES = 64; //Max number of hair vertices
 const int NOISE_LAYERS = 3;
 
@@ -75,4 +79,9 @@ void main()
     tessx_te = gl_TessCoord.x;
 
     gl_Position = view * model * vec4(position, 1.0f);
+
+    //Feedback
+    pos = (model * vec4(position, 1.0f)).xyz;
+    tangent = (model * vec4(nextPosition - previousPosition, 0.0f)).xyz;
+    tessx = tessx_te;
 }

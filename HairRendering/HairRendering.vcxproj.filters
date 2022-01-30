@@ -102,6 +102,12 @@
     <ClCompile Include="..\include\md5\md5.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="src\shaderPrograms\FeedbackShaderProgram.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Tessellator.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\Application.h">
@@ -188,6 +194,12 @@
     <ClInclude Include="..\include\md5\md5.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="src\shaderPrograms\FeedbackShaderProgram.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Tessellator.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="src\shaders\hair.frag">
@@ -223,5 +235,6 @@
     <None Include="src\shaders\white.frag">
       <Filter>Resource Files</Filter>
     </None>
+    <None Include="src\shaders\hairRender.vert" />
   </ItemGroup>
 </Project>
