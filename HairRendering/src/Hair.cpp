@@ -2,6 +2,7 @@
 #include "Simulation.h"
 #include <SOIL2.h>
 #include <iostream>
+#include "Texture.h"
 
 #define SIMULATE_PHYSICS true
 
@@ -47,6 +48,11 @@ Hair::Hair(Mesh* mesh, float hairDensity, Simulation* simulation, Hair* oldHair)
 
 Hair::Hair(Mesh* mesh, float hairDensity, const char* hairMap, Simulation* simulation, Hair* oldHair)
 {
+	if (hairMap == "")
+	{
+		Hair(mesh, hairDensity, simulation, oldHair);
+		return;
+	}
 	int width, height, channels;
 	unsigned char* image = SOIL_load_image(hairMap, &width, &height, &channels, SOIL_LOAD_RGBA);
 	
@@ -54,6 +60,9 @@ Hair::Hair(Mesh* mesh, float hairDensity, const char* hairMap, Simulation* simul
 	{
 		std::cout << "ERROR: Failed to load image" << std::endl;
 	}
+
+	mHairMap = new Texture();
+	mHairMap->Create(hairMap, GL_LINEAR, GL_LINEAR);
 
 	std::default_random_engine generator;
 	std::uniform_real_distribution<float> distribution(-0.03f, 0.03f);
@@ -99,6 +108,11 @@ Hair::~Hair()
 	{
 		delete guide;
 	}
+
+	if (mHairMap)
+	{
+		delete mHairMap;
+	}
 }
 
 void Hair::Update(float time)
@@ -121,6 +135,7 @@ void Hair::Draw(ShaderProgram* program)
 	program->uniforms.groupSpread = mGroupSpread;
 	program->uniforms.hairRadius = mHairRadius;
 	program->uniforms.noiseAmplitude = mNoiseAmplitude;
+	program->uniforms.noiseFrequency = mNoiseFrequency;
 	program->uniforms.numSplineVertices = mNumSplineVertices;
 	program->SetObjectUniforms();
 
@@ -142,13 +157,14 @@ void Hair::SetAttributes(Hair* oldHair)
 	}
 }
 
-void Hair::SetAttributes(glm::vec3 colour, int numGroupHairs, float groupSpread, float hairRadius, float noiseAmplitude, int numSplineVertices)
+void Hair::SetAttributes(glm::vec3 colour, int numGroupHairs, float groupSpread, float hairRadius, float noiseAmplitude, float noiseFrequency, int numSplineVertices)
 {
 	mColour = colour;
 	mNumGroupHairs = numGroupHairs;
 	mGroupSpread = groupSpread;
 	mHairRadius = hairRadius;
 	mNoiseAmplitude = noiseAmplitude;
+	mNoiseFrequency = noiseFrequency;
 	mNumSplineVertices = numSplineVertices;
 }
 
@@ -175,4 +191,14 @@ void Hair::SetNumSplineVertices(int num)
 void Hair::SetColour(glm::vec3 colour)
 {
 	mColour = colour;
+}
+
+Texture* Hair::GetHairMap()
+{
+	return mHairMap;
+}
+
+glm::vec3 Hair::GetColour()
+{
+	return mColour;
 }

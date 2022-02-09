@@ -76,6 +76,7 @@ public:
 	bool shake;
 	bool nod;
 	bool useFriction;
+	glm::vec3 windStrength;
 
 	void ResetPosition();
 

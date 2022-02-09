@@ -20,4 +20,6 @@ void MeshShaderProgram::SetGlobalUniforms()
 void MeshShaderProgram::SetObjectUniforms()
 {
 	glUniformMatrix4fv(GetUniformLocation("model"), 1, GL_FALSE, glm::value_ptr(uniforms.model));
+	glUniform1i(GetUniformLocation("hairMap"), uniforms.hairMap);
+	glUniform3fv(GetUniformLocation("hairColour"), 1, glm::value_ptr(uniforms.colour));
 }

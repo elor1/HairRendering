@@ -47,14 +47,16 @@ void GuiWindow::Update()
 	if (ImGui::CollapsingHeader("Hair", ImGuiTreeNodeFlags_DefaultOpen))
 	{
 		ImGui::SliderInt("Strands per guide hair", &hair->mNumGroupHairs, 0, 64);
-		ImGui::SliderInt("Spline vertices", &hair->mNumSplineVertices, 0, 50);
+		ImGui::SliderInt("Vertices per strand", &hair->mNumSplineVertices, 0, 50);
 		ImGui::SliderFloat("Hair radius", &hair->mHairRadius, 0.0f, 0.1f);
 		ImGui::ColorEdit3("Hair colour", &hair->mColour.x);
 		ImGui::SliderFloat("Noise amplitude", &hair->mNoiseAmplitude, 0.0f, 1.0f);
+		ImGui::SliderFloat("Noise frquency", &hair->mNoiseFrequency, 0.0f, 1.0f);
 	}
 
 	if (ImGui::CollapsingHeader("Simulation", ImGuiTreeNodeFlags_DefaultOpen))
 	{
+		ImGui::InputFloat3("Wind", &hair->mSimulation->windStrength.x);
 		ImGui::Checkbox("Shake", &hair->mSimulation->shake);
 		ImGui::Checkbox("Nod", &hair->mSimulation->nod);
 		ImGui::Checkbox("Friction", &hair->mSimulation->useFriction);

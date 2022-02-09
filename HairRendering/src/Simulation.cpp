@@ -33,6 +33,7 @@ Simulation::Simulation(Mesh* mesh)
 	shake = false;
 	nod = false;
 	useFriction = false;
+	windStrength = glm::vec3(0.0f);
 }
 
 void Simulation::Update(float time)
@@ -43,12 +44,12 @@ void Simulation::Update(float time)
 void Simulation::Simulate(Hair* hair)
 {
 	Move(hair);
-	CalculateExternalForces(hair);
 	if (useFriction)
 	{
 		CalculateGrid(hair);
 		CalculateFriction(hair);
 	}
+	CalculateExternalForces(hair);
 	ParticleSimulation(hair);
 }
 
@@ -99,11 +100,11 @@ void Simulation::CalculateExternalForces(Hair* hair)
 			force += glm::vec3(0.0f, GRAVITY, 0.0f);
 
 			//Wind
-			if (WIND)
+			if (windStrength != glm::vec3(0.0f))
 			{
 				if (mTime > 2.0f)
 				{
-					force += glm::vec3(6.0f + 20.0f * ((rand() % 100) / 100.0f) - 10.0f, 0.0f, 0.0f);
+					force += windStrength * glm::vec3(((rand() % 100) / 100.0f), ((rand() % 100) / 100.0f), ((rand() % 100) / 100.0f)) /*glm::vec3(6.0f + 20.0f * ((rand() % 100) / 100.0f) - 10.0f, 0.0f, 0.0f)*/;
 				}
 			}
 

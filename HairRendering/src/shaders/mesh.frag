@@ -2,6 +2,7 @@
 
 in vec4 position_v;
 in vec4 normal_v;
+in vec2 texCoord_v;
 
 out vec3 fragColour;
 
@@ -13,6 +14,8 @@ uniform sampler2DShadow meshShadowMap;
 uniform sampler2D opacityMap;
 uniform float shadowIntensity;
 uniform bool useShadows;
+uniform vec3 hairColour;
+uniform sampler2D hairMap;
 
 const vec3 MESH_COLOUR = vec3(0.87f, 0.83f, 0.93f);
 const vec4 FILL_LIGHT_POSITION = vec4(-2.0f, 1.0f, 1.0f, 1.0f);
@@ -22,6 +25,7 @@ const float FILL_LIGHT_INTENSITY = 0.4f;
 const float OPACITY_LAYER_SIZE = 0.0005f;
 
 float currentDepth;
+vec3 meshColour;
 
 //Sample opacity maps layers at the given texcoord to get occlusion from other strands
 float SampleOcclusion(vec2 coord)
@@ -84,12 +88,13 @@ vec3 GetColour(vec4 lightPos)
 
 	float diffuse = max(0.0f, dot(normalize(lightDirection), normalize(normal_v)));
 
-	return MESH_COLOUR * DIFFUSE_INTENSITY * diffuse;
+	return meshColour * DIFFUSE_INTENSITY * diffuse;
 }
 
 void main()
 {
 	vec4 lightSpacePos = dirToLight * view * position_v;
+	meshColour = mix(MESH_COLOUR, hairColour, texture(hairMap, texCoord_v).r);
 
 	//Key light
 	fragColour = GetColour(vec4(lightPosition, 1.0f));
@@ -100,5 +105,5 @@ void main()
 	fragColour += FILL_LIGHT_INTENSITY * GetColour(FILL_LIGHT_POSITION);
 
 	//Ambient light
-	fragColour += AMBIENT_INTENSITY * MESH_COLOUR;
+	fragColour += AMBIENT_INTENSITY * meshColour;
 }

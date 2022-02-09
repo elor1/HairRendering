@@ -19,6 +19,7 @@ struct Uniforms
 	float hairRadius;
 	float tapering;
 	float noiseAmplitude;
+	float noiseFrequency;
 	glm::vec3 triangleFace[2];
 	glm::vec3 colour;
 	glm::vec3 lightPosition;
@@ -27,6 +28,7 @@ struct Uniforms
 	int hairShadowMap;
 	int meshShadowMap;
 	int opacityMap;
+	int hairMap;
 	bool useShadows;
 	float shadowIntensity;
 	float occlusionLayerSize = 0.0005f;

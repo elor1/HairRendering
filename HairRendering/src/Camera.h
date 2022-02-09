@@ -35,3 +35,19 @@ private:
 
 	void UpdateVectors();
 };
+//
+//#include <glm.hpp>
+//
+//class Camera
+//{
+//public:
+//	Camera(int width, int height);
+//	glm::mat4 GetView();
+//
+//private:
+//	glm::mat4 mProjection;
+//	glm::mat4 mView;
+//	float mZoom;
+//	float mAngleX;
+//	float mAngleY;
+//};

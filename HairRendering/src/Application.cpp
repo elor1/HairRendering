@@ -273,6 +273,7 @@ void Application::Draw()
 	mOpacityMapTexture->Bind(GL_TEXTURE2);
 	mMeshDepthTexture->Bind(GL_TEXTURE3);
 	mFinalTexture->Bind(GL_TEXTURE4);
+	mHair->GetHairMap()->Bind(GL_TEXTURE5);
 
 	//Shadow map
 	if (useShadows)
@@ -485,6 +486,7 @@ void Application::DrawMesh(ShaderProgram* program, glm::mat4 model, glm::mat4 vi
 	program->uniforms.hairShadowMap = 1;
 	program->uniforms.opacityMap = 2;
 	program->uniforms.meshShadowMap = 3;
+	program->uniforms.hairMap = 5;
 	program->uniforms.projection = projection;
 	program->uniforms.view = view;
 	program->uniforms.model = model;
@@ -492,6 +494,7 @@ void Application::DrawMesh(ShaderProgram* program, glm::mat4 model, glm::mat4 vi
 	program->uniforms.dirToLight = mDirToLight;
 	program->uniforms.shadowIntensity = 15;
 	program->uniforms.useShadows = useShadows;
+	program->uniforms.colour = 2.0f * mHair->GetColour();
 	program->SetGlobalUniforms();
 	program->SetObjectUniforms();
 	mHead->Draw();

@@ -44,6 +44,7 @@ void ShaderProgram::SetObjectUniforms()
 	glUniform1f(GetUniformLocation("hairRadius"), uniforms.hairRadius);
 	glUniform1f(GetUniformLocation("tapering"), uniforms.tapering);
 	glUniform1f(GetUniformLocation("noiseAmplitude"), uniforms.noiseAmplitude);
+	glUniform1f(GetUniformLocation("noiseFrequency"), uniforms.noiseFrequency);
 	glUniform3fv(GetUniformLocation("colour"), 1, glm::value_ptr(uniforms.colour));
 }
 

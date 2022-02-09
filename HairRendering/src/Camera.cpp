@@ -80,3 +80,18 @@ void Camera::UpdateVectors()
 	mRight = glm::normalize(glm::cross(mForwards, mWorldUp));
 	mUp = glm::normalize(glm::cross(mRight, mForwards));
 }
+//#include <gtc/matrix_transform.hpp>
+//Camera::Camera(int width, int height)
+//{
+//	mZoom = 5.0f;
+//	mAngleX = 0.0f;
+//	mAngleY = 0.0f;
+//
+//	mView = glm::lookAt(glm::vec3(0.0f, 0.0f, mZoom), glm::vec3(0.0f), glm::vec3(0.0f, 1.0f, 0.0f));
+//	mProjection = glm::perspective(0.8f, (float)width / height, 0.1f, 100.0f);
+//}
+//
+//glm::mat4 Camera::GetView()
+//{
+//	return mView;
+//}
