@@ -30,7 +30,7 @@ Application::Application(int width, int height)
 	mCurrentTime = glfwGetTime();
 	mWidth = width;
 	mHeight = height;
-	mHairDensity = 100;
+	mHairDensity = 150;
 	mFirstMouse = true;
 	mLastX = width / 2.0;
 	mLastY = width / 2.f;
@@ -135,6 +135,22 @@ void Application::Initialise()
 
 	glfwSetCursorPosCallback(mWindow, CursorCallback);
 
+	auto MouseCallback = [](GLFWwindow* window, int button, int action, int mods)
+	{
+		Application* app = (Application*)glfwGetWindowUserPointer(window);
+		app->MouseButtonCallback(window, button, action, mods);
+	};
+
+	glfwSetMouseButtonCallback(mWindow, MouseCallback);
+
+	auto ScrollCallback = [](GLFWwindow* window, double xOffset, double yOffset)
+	{
+		Application* app = (Application*)glfwGetWindowUserPointer(window);
+		app->MouseScrollCallback(window, xOffset, yOffset);
+	};
+
+	glfwSetScrollCallback(mWindow, ScrollCallback);
+
 	//Initialise GLEW
 	glewExperimental = GL_TRUE;
 	if (glewInit() != GLEW_OK)
@@ -151,7 +167,7 @@ void Application::Initialise()
 	mGui->SetApplication(this);
 
 	//Camera
-	mCamera = DBG_NEW Camera(glm::vec3(10.0f, 0.0f, 0.0f), glm::vec3(0.0f, 1.0f, 0.0f), 180.0f, 0.0f);
+	mCamera = DBG_NEW Camera(5.0f, glm::perspective(0.8f, (float)mWidth / mHeight, 0.1f, 100.0f));
 
 	//Shaders
 	mPrograms = {
@@ -265,7 +281,7 @@ void Application::Draw()
 	mLightPosition = glm::vec3(1.0f, 2.0f, 4.0f);
 	glm::mat4 lightProjection = glm::perspective(1.3f, 1.0f, 1.0f, 100.0f);
 	glm::mat4 lightView = glm::lookAt(mLightPosition, glm::vec3(0.0f), glm::vec3(0.0f, 1.0f, 0.0f));
-	mDirToLight = lightProjection * lightView * glm::inverse(mCamera->GetViewMatrix());
+	mDirToLight = lightProjection * lightView * glm::inverse(mCamera->GetView());
 
 	//Bind textures
 	mNoiseTexture->Bind(GL_TEXTURE0);
@@ -317,10 +333,10 @@ void Application::Draw()
 
 	//Render hair
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-	DrawHair(mHairProgram, model, mCamera->GetViewMatrix(), glm::perspective(0.8f, (float)mWidth / mHeight, 0.1f, 100.0f));
+	DrawHair(mHairProgram, model, mCamera->GetView(), mCamera->GetProjection());
 	
 	//Render mesh
-	DrawMesh(mMeshProgram, model, mCamera->GetViewMatrix(), glm::perspective(0.8f, (float)mWidth / mHeight, 0.1f, 100.0f));
+	DrawMesh(mMeshProgram, model, mCamera->GetView(), mCamera->GetProjection());
 
 	if (useSuperSampling)
 	{
@@ -401,56 +417,6 @@ void Application::ProcessInput()
 	{
 		mIsSpaceDown = false;
 	}
-
-	if (glfwGetKey(mWindow, GLFW_KEY_W) == GLFW_PRESS)
-	{
-		mCamera->Move(EMovementDirection::Forward, mDeltaTime);
-	}
-
-	if (glfwGetKey(mWindow, GLFW_KEY_S) == GLFW_PRESS)
-	{
-		mCamera->Move(EMovementDirection::Backward, mDeltaTime);
-	}
-
-	if (glfwGetKey(mWindow, GLFW_KEY_A) == GLFW_PRESS)
-	{
-		mCamera->Move(EMovementDirection::Left, mDeltaTime);
-	}
-
-	if (glfwGetKey(mWindow, GLFW_KEY_D) == GLFW_PRESS)
-	{
-		mCamera->Move(EMovementDirection::Right, mDeltaTime);
-	}
-
-	if (glfwGetKey(mWindow, GLFW_KEY_E) == GLFW_PRESS)
-	{
-		mCamera->Move(EMovementDirection::Up, mDeltaTime);
-	}
-
-	if (glfwGetKey(mWindow, GLFW_KEY_Q) == GLFW_PRESS)
-	{
-		mCamera->Move(EMovementDirection::Down, mDeltaTime);
-	}
-
-	if (glfwGetKey(mWindow, GLFW_KEY_UP) == GLFW_PRESS)
-	{
-		mCamera->Rotate(0.0f, mDeltaTime);
-	}
-
-	if (glfwGetKey(mWindow, GLFW_KEY_DOWN) == GLFW_PRESS)
-	{
-		mCamera->Rotate(0.0f, -mDeltaTime);
-	}
-
-	if (glfwGetKey(mWindow, GLFW_KEY_LEFT) == GLFW_PRESS)
-	{
-		mCamera->Rotate(-mDeltaTime, 0.0f);
-	}
-
-	if (glfwGetKey(mWindow, GLFW_KEY_RIGHT) == GLFW_PRESS)
-	{
-		mCamera->Rotate(mDeltaTime, 0.0f);
-	}
 }
 
 void Application::FrameBufferCallback(GLFWwindow* window, int width, int height)
@@ -461,23 +427,104 @@ void Application::FrameBufferCallback(GLFWwindow* window, int width, int height)
 
 void Application::MouseCallback(GLFWwindow* window, double xPos, double yPos)
 {
-	if (glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_RIGHT) == GLFW_PRESS && !ImGui::GetIO().WantCaptureMouse)
+	if (ImGui::GetIO().WantCaptureMouse)
 	{
-		if (mFirstMouse)
+		return;
+	}
+
+	if (glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_LEFT) == GLFW_PRESS)
+	{
+		glm::mat4 view = mCamera->GetView();
+		glm::vec3 up = glm::normalize(glm::vec3(view[2][1], view[2][2], view[2][3]));
+		glm::vec3 forward = glm::normalize(glm::vec3(glm::inverse(view) * glm::vec4(0.0f, 0.0f, 0.0f, 1.0f)));
+		glm::vec3 right = glm::cross(up, forward);
+		glm::vec2 delta = glm::vec2(xPos, yPos) - mCamera->GetPreviousPosition();
+		glm::vec3 transform = glm::vec3();
+		transform += delta.x * 0.005f * right;
+		transform += -delta.y * 0.005f * up;
+
+		mSimulation->UpdatePosition(mHair, transform);
+		mCamera->SetPreviousPosition(glm::vec2(xPos, yPos));
+	}
+
+	if (glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_RIGHT) == GLFW_PRESS)
+	{
+		float x = 10 * (xPos - mCamera->GetPrevMousePosition().x) / (float)mWidth;
+		float y = 10 * (yPos - mCamera->GetPrevMousePosition().y) / (float)mHeight;
+		
+		mCamera->SetAngles(x, y);
+		mCamera->UpdateViewMatrix();
+		mCamera->SetPrevMousePosition(glm::vec2(xPos, yPos));
+	}
+
+	if (glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_MIDDLE) == GLFW_PRESS)
+	{
+		glm::mat4 view = mCamera->GetView();
+		glm::vec2 delta = glm::vec2(xPos, yPos) - mCamera->GetPreviousRotation();
+		if (fabs(delta.x) > fabs(delta.y))
 		{
-			mLastX = xPos;
-			mLastY = yPos;
-			mFirstMouse = false;
+			//Rotate up
+			glm::vec3 up = glm::normalize(glm::vec3(view[2][1], view[2][2], view[2][3]));
+			float angle = delta.x * 0.001f;
+			mSimulation->UpdateRotation(mHair, angle, glm::vec3(0.0f, 1.0f, 0.0f));
+		}
+		else
+		{
+			//Rotate right
+			float angle = delta.y * 0.001f;
+			mSimulation->UpdateRotation(mHair, angle, glm::vec3(1.0f, 0.0f, 0.0f));
+		}
+	}
+}
+
+void Application::MouseButtonCallback(GLFWwindow* window, int button, int action, int mods)
+{
+	if (ImGui::GetIO().WantCaptureMouse)
+	{
+		return;
+	}
+
+	if (action == GLFW_RELEASE)
+	{
+		mSimulation->SetHeadMoving(false);
+	}
+
+	if (action == GLFW_PRESS)
+	{
+		if (button == GLFW_MOUSE_BUTTON_LEFT)
+		{
+			double x, y;
+			glfwGetCursorPos(window, &x, &y);
+			mCamera->SetPreviousPosition(glm::vec2(x, y));
+			mSimulation->SetHeadMoving(true);
 		}
 
-		float xoffset = xPos - mLastX;
-		float yoffset = mLastY - yPos;
+		if (button = GLFW_MOUSE_BUTTON_RIGHT)
+		{
+			double x, y;
+			glfwGetCursorPos(window, &x, &y);
+			mCamera->SetPrevMousePosition(glm::vec2(x, y));
+		}
 
-		mLastX = xPos;
-		mLastY = yPos;
-
-		mCamera->Rotate(xoffset, yoffset);
+		if (button == GLFW_MOUSE_BUTTON_MIDDLE)
+		{
+			double x, y;
+			glfwGetCursorPos(window, &x, &y);
+			mCamera->SetPreviousRotation(glm::vec2(x, y));
+			mSimulation->SetHeadMoving(true);
+		}
 	}
+}
+
+void Application::MouseScrollCallback(GLFWwindow* window, double xOffset, double yOffset)
+{
+	if (ImGui::GetIO().WantCaptureMouse)
+	{
+		return;
+	}
+
+	mCamera->SetZoom(yOffset / 100.0f);
+	mCamera->UpdateViewMatrix();
 }
 
 void Application::DrawMesh(ShaderProgram* program, glm::mat4 model, glm::mat4 view, glm::mat4 projection)

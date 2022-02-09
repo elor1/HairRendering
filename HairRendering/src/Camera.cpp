@@ -1,97 +1,83 @@
 #include "Camera.h"
+#include <gtx/transform.hpp>
 
-Camera::Camera(glm::vec3 position, glm::vec3 worldUp, float yaw, float pitch)
+Camera::Camera(float zoom,  glm::mat4 projection)
 {
-	mPosition = position;
-	mWorldUp = worldUp;
-	mYaw = yaw;
-	mPitch = pitch;
+	mZoom = 5.0f;
+	mAngleX = 0.0f;
+	mAngleY = 0.0f;
 
-	UpdateVectors();
+	mView = glm::lookAt(glm::vec3(0.0f, 0.0f, mZoom), glm::vec3(0.0f), glm::vec3(0.0f, 1.0f, 0.0f));
+	mProjection = projection;
 }
 
-glm::mat4 Camera::GetViewMatrix()
+glm::mat4 Camera::GetView()
 {
-	return glm::lookAt(mPosition, mPosition + mForwards, mUp);
+	return mView;
 }
 
-void Camera::Move(EMovementDirection direction, float deltaTime)
+glm::mat4 Camera::GetProjection()
 {
-	float speed = mMovementSpeed * deltaTime;
-
-	if (direction == EMovementDirection::Forward)
-	{
-		mPosition += mForwards * speed;
-	}
-
-	if (direction == EMovementDirection::Backward)
-	{
-		mPosition -= mForwards * speed;
-	}
-
-	if (direction == EMovementDirection::Left)
-	{
-		mPosition -= mRight * speed;
-	}
-
-	if (direction == EMovementDirection::Right)
-	{
-		mPosition += mRight * speed;
-	}
-
-	if (direction == EMovementDirection::Up)
-	{
-		mPosition += mUp * speed;
-	}
-
-	if (direction == EMovementDirection::Down)
-	{
-		mPosition -= mUp * speed;
-	}
+	return mProjection;
 }
 
-void Camera::Rotate(float x, float y)
+void Camera::UpdateViewMatrix()
 {
-	x *= mSensitivity;
-	y *= mSensitivity;
-
-	mYaw += x;
-	mPitch += y;
-
-	if (mPitch > 90.0f)
-	{
-		mPitch = 90.0f;
-	}
-
-	if (mPitch < -90.0f)
-	{
-		mPitch = -90.0f;
-	}
-
-	UpdateVectors();
+	mView = glm::translate(glm::vec3(0.0f, 0.0f, -mZoom)) * glm::rotate(mAngleY, glm::vec3(1.0f, 0.0f, 0.0f)) * glm::rotate(mAngleX, glm::vec3(0.0f, 1.0f, 0.0f));
 }
 
-void Camera::UpdateVectors()
+void Camera::SetAngles(float x, float y)
 {
-	glm::vec3 forwards = glm::vec3(cos(glm::radians(mYaw)) * cos(glm::radians(mPitch)),
-		sin(glm::radians(mPitch)),
-		sin(glm::radians(mYaw)) * cos(glm::radians(mPitch)));
-	mForwards = glm::normalize(forwards);
-	mRight = glm::normalize(glm::cross(mForwards, mWorldUp));
-	mUp = glm::normalize(glm::cross(mRight, mForwards));
+	mAngleX += x;
+	mAngleY += y;
 }
-//#include <gtc/matrix_transform.hpp>
-//Camera::Camera(int width, int height)
-//{
-//	mZoom = 5.0f;
-//	mAngleX = 0.0f;
-//	mAngleY = 0.0f;
-//
-//	mView = glm::lookAt(glm::vec3(0.0f, 0.0f, mZoom), glm::vec3(0.0f), glm::vec3(0.0f, 1.0f, 0.0f));
-//	mProjection = glm::perspective(0.8f, (float)width / height, 0.1f, 100.0f);
-//}
-//
-//glm::mat4 Camera::GetView()
-//{
-//	return mView;
-//}
+
+void Camera::SetPreviousPosition(glm::vec2 pos)
+{
+	mPrevPos = pos;
+}
+
+void Camera::SetPreviousRotation(glm::vec2 rotation)
+{
+	mPrevRotation = rotation;
+}
+
+void Camera::SetPrevMousePosition(glm::vec2 pos)
+{
+	mPrevMousePos = pos;
+}
+
+glm::vec2 Camera::GetPreviousPosition()
+{
+	return mPrevPos;
+}
+
+glm::vec2 Camera::GetPreviousRotation()
+{
+	return mPrevRotation;
+}
+
+glm::vec2 Camera::GetPrevMousePosition()
+{
+	return mPrevMousePos;
+}
+
+float Camera::GetZoom()
+{
+	return mZoom;
+}
+
+float Camera::GetAngleX()
+{
+	return mAngleX;
+}
+
+float Camera::GetAngleY()
+{
+	return mAngleY;
+}
+
+void Camera::SetZoom(float offset)
+{
+	mZoom -= offset;
+}

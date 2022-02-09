@@ -39,6 +39,8 @@ private:
 	void ProcessInput();
 	static void FrameBufferCallback(GLFWwindow* window, int width, int height);
 	void MouseCallback(GLFWwindow* window, double xPos, double yPos);
+	void MouseButtonCallback(GLFWwindow* window, int button, int action, int mods);
+	void MouseScrollCallback(GLFWwindow* window, double xOffset, double yOffset);
 	void DrawMesh(ShaderProgram* program, glm::mat4 model, glm::mat4 view, glm::mat4 projection);
 	void DrawHair(ShaderProgram* program, glm::mat4 model, glm::mat4 view, glm::mat4 projection);
 	

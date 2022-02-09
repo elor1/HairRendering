@@ -1,53 +1,32 @@
 #pragma once
 #include <glm.hpp>
-#include <gtc/matrix_transform.hpp>
-#include <vector>
-
-enum class EMovementDirection
-{
-	Forward,
-	Backward,
-	Left,
-	Right,
-	Up,
-	Down
-};
 
 class Camera
 {
 public:
-	Camera(glm::vec3 position = glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3 worldUp = glm::vec3(0.0f, 1.0f, 0.0f), float yaw = -90.0f, float pitch = 0.0f);
-
-	glm::mat4 GetViewMatrix();
-	void Move(EMovementDirection direction, float deltaTime);
-	void Rotate(float x, float y);
+	Camera(float zoom = 5.0f, glm::mat4 projection = glm::mat4(0.0f));
+	glm::mat4 GetView();
+	glm::mat4 GetProjection();
+	void UpdateViewMatrix();
+	void SetAngles(float x = 0.0f, float y = 0.0f);
+	void SetPreviousPosition(glm::vec2 pos);
+	void SetPreviousRotation(glm::vec2 rotation);
+	void SetPrevMousePosition(glm::vec2 pos);
+	glm::vec2 GetPreviousPosition();
+	glm::vec2 GetPreviousRotation();
+	glm::vec2 GetPrevMousePosition();
+	float GetZoom();
+	float GetAngleX();
+	float GetAngleY();
+	void SetZoom(float offset);
 
 private:
-	glm::vec3 mPosition;
-	glm::vec3 mForwards = glm::vec3(0.0f, 0.0f, -1.0f);
-	glm::vec3 mUp;
-	glm::vec3 mRight;
-	glm::vec3 mWorldUp;
-	float mYaw;
-	float mPitch;
-	float mMovementSpeed = 0.01f;
-	float mSensitivity = 0.1f;
-
-	void UpdateVectors();
+	glm::mat4 mProjection;
+	glm::mat4 mView;
+	float mZoom;
+	float mAngleX;
+	float mAngleY;
+	glm::vec2 mPrevPos;
+	glm::vec2 mPrevRotation;
+	glm::vec2 mPrevMousePos;
 };
-//
-//#include <glm.hpp>
-//
-//class Camera
-//{
-//public:
-//	Camera(int width, int height);
-//	glm::mat4 GetView();
-//
-//private:
-//	glm::mat4 mProjection;
-//	glm::mat4 mView;
-//	float mZoom;
-//	float mAngleX;
-//	float mAngleY;
-//};

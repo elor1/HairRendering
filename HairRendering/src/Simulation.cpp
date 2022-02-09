@@ -10,7 +10,7 @@
 #define DAMPENING 0.95f
 #define TIMESTEP 0.01f
 #define GRID_WIDTH 0.1f
-#define FRICTION 0.07f
+#define FRICTION 0.04f
 
 #define WIND false
 #define COLLISIONS true
@@ -29,11 +29,13 @@ Simulation::Simulation(Mesh* mesh)
 	mMesh = mesh;
 	mTransform = glm::mat4(1.0f);
 	mGrid = std::map<GridPosition, Fluid>();
+	mHeadMoving = false;
 
 	shake = false;
 	nod = false;
 	useFriction = false;
-	windStrength = glm::vec3(0.0f);
+	windDirection = glm::vec3(1.0f, 0.0f, 0.0f);
+	windStrength = 0.0f;
 }
 
 void Simulation::Update(float time)
@@ -53,9 +55,37 @@ void Simulation::Simulate(Hair* hair)
 	ParticleSimulation(hair);
 }
 
+void Simulation::UpdateRotation(Hair* hair, float angle, glm::vec3 axis)
+{
+	UpdateHair(hair);
+	mTransform = glm::rotate(mTransform, angle, axis);
+}
+
+void Simulation::UpdatePosition(Hair* hair, glm::vec3 transform)
+{
+	UpdateHair(hair);
+	mTransform = glm::translate(mTransform, transform);
+}
+
+void Simulation::UpdateHair(Hair* hair)
+{
+	for (auto& guide : hair->GetGuideHairs())
+	{
+		for (auto& vertex : guide->vertices)
+		{
+			vertex->prevPosition = glm::vec3(mTransform * glm::vec4(vertex->startPosition, 1.0f));
+		}
+	}
+}
+
 glm::mat4 Simulation::GetTransform()
 {
 	return mTransform;
+}
+
+void Simulation::SetHeadMoving(bool moving)
+{
+	mHeadMoving = moving;
 }
 
 void Simulation::ResetPosition()
@@ -99,18 +129,22 @@ void Simulation::CalculateExternalForces(Hair* hair)
 			glm::vec3 force = glm::vec3(0.0f);
 			force += glm::vec3(0.0f, GRAVITY, 0.0f);
 
-			//Wind
-			if (windStrength != glm::vec3(0.0f))
+			if (true)
 			{
-				if (mTime > 2.0f)
-				{
-					force += windStrength * glm::vec3(((rand() % 100) / 100.0f), ((rand() % 100) / 100.0f), ((rand() % 100) / 100.0f)) /*glm::vec3(6.0f + 20.0f * ((rand() % 100) / 100.0f) - 10.0f, 0.0f, 0.0f)*/;
-				}
+				glm::vec4 current = mTransform * glm::vec4(vertex->startPosition, 1.0f);
+				glm::vec3 acceleration = (glm::vec3(vertex->prevPosition - glm::vec3(current)) - vertex->velocity * TIMESTEP) / (TIMESTEP * TIMESTEP);
+				force += acceleration * vertex->mass * 0.1f;
 			}
 
-			glm::vec4 current = mTransform * glm::vec4(vertex->startPosition, 1.0f);
-			glm::vec3 acceleration = (glm::vec3(vertex->prevPosition - glm::vec3(current)) - vertex->velocity * TIMESTEP) / (TIMESTEP * TIMESTEP);
-			force += acceleration * vertex->mass * 0.1f;
+			//Wind
+			force += glm::normalize(windDirection) * windStrength * glm::vec3(((rand() % 100) / 100.0f), ((rand() % 100) / 100.0f), ((rand() % 100) / 100.0f));
+			//if (windStrength != glm::vec3(0.0f))
+			//{
+			//	if (mTime > 2.0f)
+			//	{
+			//		force += windStrength * glm::vec3(((rand() % 100) / 100.0f), ((rand() % 100) / 100.0f), ((rand() % 100) / 100.0f)) /*glm::vec3(6.0f + 20.0f * ((rand() % 100) / 100.0f) - 10.0f, 0.0f, 0.0f)*/;
+			//	}
+			//}
 
 			if (COLLISIONS)
 			{

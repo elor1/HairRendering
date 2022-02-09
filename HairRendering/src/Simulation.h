@@ -68,15 +68,20 @@ public:
 
 	void Update(float time);
 	void Simulate(Hair* hair);
+	void UpdateRotation(Hair* hair, float angle, glm::vec3 axis);
+	void UpdatePosition(Hair* hair, glm::vec3 transform);
+	void UpdateHair(Hair* hair);
 
 	std::vector<glm::vec3> mForces;
 	glm::mat4 GetTransform();
+	void SetHeadMoving(bool moving);
 
 	//Gui
 	bool shake;
 	bool nod;
 	bool useFriction;
-	glm::vec3 windStrength;
+	glm::vec3 windDirection;
+	float windStrength;
 
 	void ResetPosition();
 
@@ -84,6 +89,7 @@ private:
 	float mTime;
 	Mesh* mMesh;
 	glm::mat4 mTransform;
+	bool mHeadMoving;
 
 	std::vector<std::thread*> mThreads;
 	std::vector<HairThread*> mThreadData;

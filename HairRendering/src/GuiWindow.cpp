@@ -56,7 +56,8 @@ void GuiWindow::Update()
 
 	if (ImGui::CollapsingHeader("Simulation", ImGuiTreeNodeFlags_DefaultOpen))
 	{
-		ImGui::InputFloat3("Wind", &hair->mSimulation->windStrength.x);
+		ImGui::InputFloat3("Wind direction", &hair->mSimulation->windDirection.x);
+		ImGui::SliderFloat("Wind strength", &hair->mSimulation->windStrength, 0.0f, 50.0f);
 		ImGui::Checkbox("Shake", &hair->mSimulation->shake);
 		ImGui::Checkbox("Nod", &hair->mSimulation->nod);
 		ImGui::Checkbox("Friction", &hair->mSimulation->useFriction);
