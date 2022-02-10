@@ -30,6 +30,7 @@ Strand::Strand(int numSegments, double length, glm::vec3 position, glm::vec3 dir
 			double dot = glm::clamp(glm::dot(oldVertex->position - newVertex->position, glm::vec3(0.0f, -1.0f, 0.0f)), -1.0f, 1.0f);
 			double det = glm::clamp(glm::dot(oldVertex->position - newVertex->position, glm::vec3(1.0f, 0.0f, 0.0f)), -1.0f, 1.0f);
 			newVertex->theta = -atan2(det, dot);
+			newVertex->pointVec = direction;
 		}
 		newVertex->segmentLength = step;
 		vertices.push_back(newVertex);

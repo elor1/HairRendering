@@ -46,6 +46,8 @@ void ShaderProgram::SetObjectUniforms()
 	glUniform1f(GetUniformLocation("noiseAmplitude"), uniforms.noiseAmplitude);
 	glUniform1f(GetUniformLocation("noiseFrequency"), uniforms.noiseFrequency);
 	glUniform3fv(GetUniformLocation("colour"), 1, glm::value_ptr(uniforms.colour));
+	glUniform1f(GetUniformLocation("specularIntensity"), uniforms.specularIntensity);
+	glUniform1f(GetUniformLocation("diffuseIntensity"), uniforms.diffuseIntensity);
 }
 
 void ShaderProgram::SetDrawUniforms()

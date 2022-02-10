@@ -166,6 +166,7 @@ void Hair::SetAttributes(glm::vec3 colour, int numGroupHairs, float groupSpread,
 	mNoiseAmplitude = noiseAmplitude;
 	mNoiseFrequency = noiseFrequency;
 	mNumSplineVertices = numSplineVertices;
+	mShadowIntensity = 15.0f;
 }
 
 std::vector<Strand*> Hair::GetGuideHairs()
@@ -201,4 +202,9 @@ Texture* Hair::GetHairMap()
 glm::vec3 Hair::GetColour()
 {
 	return mColour;
+}
+
+float Hair::GetShadowIntensity()
+{
+	return mShadowIntensity;
 }

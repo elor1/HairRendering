@@ -30,7 +30,7 @@ Application::Application(int width, int height)
 	mCurrentTime = glfwGetTime();
 	mWidth = width;
 	mHeight = height;
-	mHairDensity = 150;
+	mHairDensity = 100;
 	mFirstMouse = true;
 	mLastX = width / 2.0;
 	mLastY = width / 2.f;
@@ -266,11 +266,10 @@ void Application::InitSimulation()
 
 void Application::Draw()
 {
-	float time = mFrame++ / 60.0f;
-	
 	//Update hair
 	if (!mIsPaused)
 	{
+		float time = mFrame++ / 60.0f;
 		mSimulation->Update(time);
 		mHair->Update(time);
 	}
@@ -278,7 +277,7 @@ void Application::Draw()
 	mGui->NewFrame();
 
 	glm::mat4 model = mSimulation->GetTransform();
-	mLightPosition = glm::vec3(1.0f, 2.0f, 4.0f);
+	mLightPosition = glm::vec3(2.0f, 2.0f, 2.0f);
 	glm::mat4 lightProjection = glm::perspective(1.3f, 1.0f, 1.0f, 100.0f);
 	glm::mat4 lightView = glm::lookAt(mLightPosition, glm::vec3(0.0f), glm::vec3(0.0f, 1.0f, 0.0f));
 	mDirToLight = lightProjection * lightView * glm::inverse(mCamera->GetView());
@@ -356,8 +355,12 @@ void Application::Draw()
 
 void Application::Update()
 {
-	mCurrentTime = glfwGetTime();
-	mDeltaTime = mCurrentTime - mPrevTime;
+	/*if (!mIsPaused)
+	{*/
+		mCurrentTime = glfwGetTime();
+		mDeltaTime = mCurrentTime - mPrevTime;
+	//}
+	
 
 	if (!ImGui::GetIO().WantCaptureMouse && !ImGui::GetIO().WantCaptureKeyboard)
 	{
@@ -436,7 +439,7 @@ void Application::MouseCallback(GLFWwindow* window, double xPos, double yPos)
 	{
 		glm::mat4 view = mCamera->GetView();
 		glm::vec3 up = glm::normalize(glm::vec3(view[2][1], view[2][2], view[2][3]));
-		glm::vec3 forward = glm::normalize(glm::vec3(glm::inverse(view) * glm::vec4(0.0f, 0.0f, 0.0f, 1.0f)));
+		glm::vec3 forward = glm::normalize(glm::vec3(glm::inverse(view) * glm::vec4(0.0f, 0.0f, -1.0f, 1.0f)));
 		glm::vec3 right = glm::cross(up, forward);
 		glm::vec2 delta = glm::vec2(xPos, yPos) - mCamera->GetPreviousPosition();
 		glm::vec3 transform = glm::vec3();
@@ -539,7 +542,7 @@ void Application::DrawMesh(ShaderProgram* program, glm::mat4 model, glm::mat4 vi
 	program->uniforms.model = model;
 	program->uniforms.lightPosition = mLightPosition;
 	program->uniforms.dirToLight = mDirToLight;
-	program->uniforms.shadowIntensity = 15;
+	program->uniforms.shadowIntensity = mHair->GetShadowIntensity();
 	program->uniforms.useShadows = useShadows;
 	program->uniforms.colour = 2.0f * mHair->GetColour();
 	program->SetGlobalUniforms();
@@ -559,8 +562,10 @@ void Application::DrawHair(ShaderProgram* program, glm::mat4 model, glm::mat4 vi
 	program->uniforms.model = model;
 	program->uniforms.dirToLight = mDirToLight;
 	program->uniforms.lightPosition = mLightPosition;
-	program->uniforms.shadowIntensity = 15.0f;
+	program->uniforms.shadowIntensity = mHair->GetShadowIntensity();
 	program->uniforms.useShadows = useShadows;
+	program->uniforms.specularIntensity = 0.5f;
+	program->uniforms.diffuseIntensity = 1.0f;
 	program->SetGlobalUniforms();
 	mHair->Draw(program);
 }

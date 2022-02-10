@@ -32,6 +32,8 @@ struct Uniforms
 	bool useShadows;
 	float shadowIntensity;
 	float occlusionLayerSize = 0.0005f;
+	float specularIntensity;
+	float diffuseIntensity;
 };
 
 class ShaderProgram

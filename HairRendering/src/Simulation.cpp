@@ -7,10 +7,9 @@
 
 #define GRAVITY -9.8f
 #define MASS 1.0f
-#define DAMPENING 0.95f
+#define DAMPENING 0.99f
 #define TIMESTEP 0.01f
 #define GRID_WIDTH 0.1f
-#define FRICTION 0.04f
 
 #define WIND false
 #define COLLISIONS true
@@ -36,6 +35,8 @@ Simulation::Simulation(Mesh* mesh)
 	useFriction = false;
 	windDirection = glm::vec3(1.0f, 0.0f, 0.0f);
 	windStrength = 0.0f;
+	friction = 0.05f;
+	stiffness = 0.0f;
 }
 
 void Simulation::Update(float time)
@@ -46,13 +47,15 @@ void Simulation::Update(float time)
 void Simulation::Simulate(Hair* hair)
 {
 	Move(hair);
+	CalculateExternalForces(hair);
 	if (useFriction)
 	{
 		CalculateGrid(hair);
 		CalculateFriction(hair);
 	}
-	CalculateExternalForces(hair);
+	
 	ParticleSimulation(hair);
+	UpdateHair(hair);
 }
 
 void Simulation::UpdateRotation(Hair* hair, float angle, glm::vec3 axis)
@@ -97,13 +100,13 @@ void Simulation::ResetPosition()
 
 void Simulation::Move(Hair* hair)
 {
-	for (auto& guide : hair->GetGuideHairs())
+	/*for (auto& guide : hair->GetGuideHairs())
 	{
 		for (auto& vertex : guide->vertices)
 		{
 			vertex->prevPosition = glm::vec3(mTransform * glm::vec4(vertex->startPosition, 1.0f));
 		}
-	}
+	}*/
 
 	if (shake || nod)
 	{
@@ -237,6 +240,7 @@ void Simulation::CalculateFriction(Hair* hair)
 	{
 		HairThread* threadData = DBG_NEW HairThread();
 		threadData->grid = &mGrid;
+		threadData->friction = friction;
 
 		index = STRANDS_PER_THREAD * i;
 		for (int j = 0; j < STRANDS_PER_THREAD; j++)
@@ -272,6 +276,7 @@ void Simulation::CalculateFriction(Hair* hair)
 void Simulation::CalculateFrictionThread(HairThread* threadData)
 {
 	std::map<GridPosition, Fluid>* grid = threadData->grid;
+	float frict = threadData->friction;
 
 	for (int i = 0; i < STRANDS_PER_THREAD; i++)
 	{
@@ -317,7 +322,7 @@ void Simulation::CalculateFrictionThread(HairThread* threadData)
 
 			//Velocity
 			glm::vec3 v = v0 * (1.0f - zPercent) + v1 * zPercent;
-			vertex->velocity = (1.0f - FRICTION) * vertex->velocity + FRICTION * v;
+			vertex->velocity = (1.0f - frict) * vertex->velocity + frict * v;
 		}
 	}
 }
@@ -334,14 +339,16 @@ void Simulation::ParticleSimulation(Hair* hair)
 		for (int i = 1; i < numVertices; i++)
 		{
 			HairVertex* vertex = guide->vertices[i];
+			HairVertex* previous = guide->vertices[i - 1];
 
 			if (!vertex->simulate)
 			{
 				goto skip;
 			}
 
-			vertex->velocity = vertex->velocity + TIMESTEP * (vertex->forces * (1.0f / vertex->mass));
-			vertex->tempPosition += (vertex->velocity * TIMESTEP);
+			vertex->velocity = vertex->velocity + TIMESTEP * (vertex->forces * (1.0f / vertex->mass)) * 0.5f;
+			glm::vec3 stiffPosition = previous->segmentLength * previous->pointVec;
+			vertex->tempPosition += glm::mix((vertex->velocity * TIMESTEP), stiffPosition, stiffness);
 			vertex->forces = glm::vec3(0.0f);
 			vertex->velocity *= 0.99f;
 		}

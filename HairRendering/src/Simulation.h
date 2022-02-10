@@ -59,6 +59,7 @@ struct HairThread
 {
 	Strand* strands[STRANDS_PER_THREAD];
 	std::map<GridPosition, Fluid>* grid;
+	float friction;
 };
 
 class Simulation
@@ -82,6 +83,8 @@ public:
 	bool useFriction;
 	glm::vec3 windDirection;
 	float windStrength;
+	float friction;
+	float stiffness;
 
 	void ResetPosition();
 

@@ -52,6 +52,7 @@ void GuiWindow::Update()
 		ImGui::ColorEdit3("Hair colour", &hair->mColour.x);
 		ImGui::SliderFloat("Noise amplitude", &hair->mNoiseAmplitude, 0.0f, 1.0f);
 		ImGui::SliderFloat("Noise frquency", &hair->mNoiseFrequency, 0.0f, 1.0f);
+		ImGui::SliderFloat("Shadow intensity", &hair->mShadowIntensity, 0.0f, 50.0f);
 	}
 
 	if (ImGui::CollapsingHeader("Simulation", ImGuiTreeNodeFlags_DefaultOpen))
@@ -60,7 +61,9 @@ void GuiWindow::Update()
 		ImGui::SliderFloat("Wind strength", &hair->mSimulation->windStrength, 0.0f, 50.0f);
 		ImGui::Checkbox("Shake", &hair->mSimulation->shake);
 		ImGui::Checkbox("Nod", &hair->mSimulation->nod);
+		ImGui::SliderFloat("Stiffness", &hair->mSimulation->stiffness, 0.0f, 1.0f);
 		ImGui::Checkbox("Friction", &hair->mSimulation->useFriction);
+		ImGui::SliderFloat("Friction amount", &hair->mSimulation->friction, 0.0f, 0.5f);
 
 		std::string pauseLabel = "Pause";
 		if (mApp->IsPaused())

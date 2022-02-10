@@ -30,6 +30,7 @@ public:
 	void SetColour(glm::vec3 colour);
 	Texture* GetHairMap();
 	glm::vec3 GetColour();
+	float GetShadowIntensity();
 
 private:
 	std::vector<Strand*> mGuideHairs;
@@ -45,4 +46,5 @@ private:
 	float mNoiseFrequency;
 	int mNumSplineVertices;
 	Texture* mHairMap;
+	float mShadowIntensity;
 };

@@ -14,11 +14,11 @@ uniform sampler2D opacityMap;
 uniform mat4 dirToLight;
 uniform float shadowIntensity;
 uniform bool useShadows;
+uniform float specularIntensity;
+uniform float diffuseIntensity;
 
 const vec4 FILL_LIGHT_POSITION = vec4(-2.0f, 1.0f, 1.0f, 1.0f);
-const float SHININESS = 30.0f;
-const float SPECULAR_INTENSITY = 0.5f;
-const float DIFFUSE_INTENSITY = 1.0f;
+const float SHININESS = 50.0f;
 const float FILL_LIGHT_INTENSITY = 0.6f;
 const float OPACITY_LAYER_SIZE = 0.0005f;
 
@@ -82,7 +82,7 @@ vec3 GetColour(vec4 lightPos)
 	float diffuse = sqrt(1.0f - abs(dot(normalize(tangent_g), lightDirection.xyz)));
 	float specular = pow(sqrt(1.0f - abs(dot(normalize(tangent_g), normalize(normalize(-position_g.xyz) + lightDirection.xyz)))), SHININESS);
 
-	return colour * (DIFFUSE_INTENSITY * diffuse + SPECULAR_INTENSITY * specular);
+	return colour * (diffuseIntensity * diffuse + specularIntensity * specular);
 }
 
 void main()
@@ -92,7 +92,7 @@ void main()
 	//Key light
 	fragColour = GetColour(view * vec4(lightPosition, 1.0f));
 	fragColour *= CalculateTransmittance(lightSpacePos);
-	fragColour *= mix(0.2f, 1.0f, GetMeshVisibility(lightSpacePos));
+	fragColour *= GetMeshVisibility(lightSpacePos);
 
 	//Fill light
 	fragColour += GetColour(view * FILL_LIGHT_POSITION) * FILL_LIGHT_INTENSITY;
