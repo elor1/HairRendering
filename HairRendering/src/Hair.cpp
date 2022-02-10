@@ -6,23 +6,11 @@
 
 #define SIMULATE_PHYSICS true
 
-#define _CRTDBG_MAP_ALLOC
-#include <stdlib.h>
-#include <crtdbg.h>
-
-#ifdef _DEBUG
-#define DBG_NEW new ( _NORMAL_BLOCK , __FILE__ , __LINE__ )
-// Replace _NORMAL_BLOCK with _CLIENT_BLOCK if you want the
-// allocations to be of _CLIENT_BLOCK type
-#else
-#define DBG_NEW new
-#endif
-
 Hair::Hair(int numGuides, Simulation* simulation)
 {
 	for (int i = 0; i < numGuides; i++)
 	{
-		mGuideHairs.push_back(DBG_NEW Strand(20, 1.0, glm::vec3(i + 0.25f, 1.0f, 0.0f), glm::vec3(0.0f, -1.0f, 0.0f)));
+		mGuideHairs.push_back(new Strand(20, 1.0, glm::vec3(i + 0.25f, 1.0f, 0.0f), glm::vec3(0.0f, -1.0f, 0.0f)));
 	}
 
 	SetAttributes();
@@ -39,7 +27,7 @@ Hair::Hair(Mesh* mesh, float hairDensity, Simulation* simulation, Hair* oldHair)
 		glm::vec3 random = glm::vec3(distribution(generator), distribution(generator), distribution(generator));
 		glm::vec3 position = vertex.position + random;
 		glm::vec3 normal = vertex.normal + random;
-		mGuideHairs.push_back(DBG_NEW Strand(20, 0.4, position, normal));
+		mGuideHairs.push_back(new Strand(20, 0.4, position, normal));
 	}
 
 	SetAttributes(oldHair);
@@ -64,37 +52,71 @@ Hair::Hair(Mesh* mesh, float hairDensity, const char* hairMap, Simulation* simul
 	mHairMap = new Texture();
 	mHairMap->Create(hairMap, GL_LINEAR, GL_LINEAR);
 
-	std::default_random_engine generator;
-	std::uniform_real_distribution<float> distribution(-0.03f, 0.03f);
-	for (auto& vertex : mesh->GetVertices())
+	//std::default_random_engine generator;
+	//std::uniform_real_distribution<float> distribution(-0.03f, 0.03f);
+	//for (auto& vertex : mesh->GetVertices())
+	//{
+	//	glm::vec3 random = glm::vec3(distribution(generator), distribution(generator), distribution(generator));
+	//	glm::vec2 texCoord = vertex.texCoords + glm::vec2(random.x, random.y);
+
+	//	//Get uv colour
+	//	int x = vertex.texCoords.x * width;
+	//	int y = ( vertex.texCoords.y) * height;
+
+	//	/*if (x < 0 || x > width || y < 0 || y > width)
+	//	{
+	//		continue;
+	//	}*/
+
+	//	unsigned char* pixel = image + y * width * channels + x * channels;
+	//	unsigned char alpha = pixel[3];
+
+	//	//If pixel alpha is 0, do not place hair
+	//	if ((int)alpha == 0)
+	//	{
+	//		continue;
+	//	}
+
+	//	//Get length from alpha value
+	//	double length = (double)(alpha / 255) * mMaxLength;
+	//	if (length < 0.01)
+	//	{
+	//		continue;
+	//	}
+	//	glm::vec3 position = vertex.position + random;
+	//	glm::vec3 normal = vertex.normal + random;
+
+	//	mGuideHairs.push_back(DBG_NEW Strand(20, length, position, normal));
+	//}
+
+	for (auto& triangle : mesh->triangles)
 	{
-		glm::vec3 random = glm::vec3(distribution(generator), distribution(generator), distribution(generator));
-		glm::vec2 texCoord = vertex.texCoords + glm::vec2(random.x, random.y);
-
-		//Get uv colour
-		int x = vertex.texCoords.x * width;
-		int y = ( vertex.texCoords.y) * height;
-
-		/*if (x < 0 || x > width || y < 0 || y > width)
+		int numHairs = (int)(hairDensity * triangle.Area() + rand() / (float)RAND_MAX);
+		for (int i = 0; i < numHairs; i++)
 		{
-			continue;
-		}*/
+			Vertex randomPoint;
+			triangle.RandomPoint(randomPoint);
+			randomPoint.texCoords = glm::vec2(glm::min(randomPoint.texCoords.x, 0.999f), glm::min(randomPoint.texCoords.y, 0.999f));
 
-		unsigned char* pixel = image + y * width * channels + x * channels;
-		unsigned char alpha = pixel[3];
+			int x = randomPoint.texCoords.x * width;
+			int y = randomPoint.texCoords.y * height;
 
-		//If pixel alpha is 0, do not place hair
-		if ((int)alpha == 0)
-		{
-			continue;
+			if (x < 0 || x > width || y < 0 || y > width)
+			{
+				continue;
+			}
+
+			unsigned char* pixel = image + y * width * channels + x * channels;
+			unsigned char alpha = pixel[3];
+			double alphaVal = (double)alpha / 255;
+			
+			if (alphaVal < 0.05)
+			{
+				continue;
+			}
+
+			mGuideHairs.push_back(new Strand(20, mMaxLength * alphaVal, randomPoint.position, randomPoint.normal));
 		}
-
-		//Get length from alpha value
-		double length = (double)alpha / 637.5;
-		glm::vec3 position = vertex.position + random;
-		glm::vec3 normal = vertex.normal + random;
-
-		mGuideHairs.push_back(DBG_NEW Strand(20, length, position, normal));
 	}
 
 	SOIL_free_image_data(image);
@@ -167,6 +189,8 @@ void Hair::SetAttributes(glm::vec3 colour, int numGroupHairs, float groupSpread,
 	mNoiseFrequency = noiseFrequency;
 	mNumSplineVertices = numSplineVertices;
 	mShadowIntensity = 15.0f;
+	mDiffuseIntensity = 1.0f;
+	mSpecularIntensity = 0.5f;
 }
 
 std::vector<Strand*> Hair::GetGuideHairs()
@@ -207,4 +231,14 @@ glm::vec3 Hair::GetColour()
 float Hair::GetShadowIntensity()
 {
 	return mShadowIntensity;
+}
+
+float Hair::GetDiffuseIntensity()
+{
+	return mDiffuseIntensity;
+}
+
+float Hair::GetSpecularIntensity()
+{
+	return mSpecularIntensity;
 }

@@ -55,6 +55,7 @@ void ShaderProgram::SetDrawUniforms()
 	glUniform1i(GetUniformLocation("numHairSegments"), uniforms.numHairVertices - 1);
 	glUniform3fv(GetUniformLocation("vertexData"), uniforms.numHairVertices, &uniforms.vertexData[0][0]);
 	glUniform3fv(GetUniformLocation("triangleFace"), 2, &uniforms.triangleFace[0][0]);
+	glUniform1f(GetUniformLocation("length"), uniforms.length);
 }
 
 void ShaderProgram::Bind()

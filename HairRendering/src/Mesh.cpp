@@ -100,10 +100,17 @@ bool Mesh::Contains(glm::vec3 &normal, glm::vec3 position)
 
 	for (auto& triangle : triangles)
 	{
+		//glm::vec3 intersectionPoint = glm::vec3(0.0f);
+		//if (triangle.IsIntersecting(intersectionPoint, position, glm::normalize(position)))
+		//{
+		//	//normal = (triangle.vertex1.normal + triangle.vertex2.normal + triangle.vertex3.normal) / 3.0f;
+		//	normal = (triangle.vertex1.normal + triangle.vertex2.normal + triangle.vertex3.normal) / 3.0f;
+		//	numIntersections++;
+		//}
+
 		if (triangle.Intersects(direction, pos))
 		{
-			//normal = (triangle.vertex1.normal + triangle.vertex2.normal + triangle.vertex3.normal) / 3.0f;
-			normal = (triangle.vertex1.position + triangle.vertex2.position + triangle.vertex3.position) / 3.0f;
+			normal = (triangle.vertex1.normal + triangle.vertex2.normal + triangle.vertex3.normal) / 3.0f;
 			numIntersections++;
 		}
 	}

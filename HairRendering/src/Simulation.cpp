@@ -14,14 +14,6 @@
 #define WIND false
 #define COLLISIONS true
 
-#ifdef _DEBUG
-#define DBG_NEW new ( _NORMAL_BLOCK , __FILE__ , __LINE__ )
-// Replace _NORMAL_BLOCK with _CLIENT_BLOCK if you want the
-// allocations to be of _CLIENT_BLOCK type
-#else
-#define DBG_NEW new
-#endif
-
 Simulation::Simulation(Mesh* mesh)
 {
 	mTime = 0;
@@ -36,7 +28,7 @@ Simulation::Simulation(Mesh* mesh)
 	windDirection = glm::vec3(1.0f, 0.0f, 0.0f);
 	windStrength = 0.0f;
 	friction = 0.05f;
-	stiffness = 0.0f;
+	stiffness = 0.01f;
 }
 
 void Simulation::Update(float time)
@@ -48,6 +40,7 @@ void Simulation::Simulate(Hair* hair)
 {
 	Move(hair);
 	CalculateExternalForces(hair);
+
 	if (useFriction)
 	{
 		CalculateGrid(hair);
@@ -107,12 +100,13 @@ void Simulation::Move(Hair* hair)
 			vertex->prevPosition = glm::vec3(mTransform * glm::vec4(vertex->startPosition, 1.0f));
 		}
 	}*/
-
 	if (shake || nod)
 	{
+		mHeadMoving = true;
+		UpdateHair(hair);
 		mTransform = glm::rotate((float)sin(mTime), glm::vec3(nod, shake, 0));
 	}
-	
+
 	/*if (nod)
 	{
 		mTransform = glm::rotate((float)sin(mTime), glm::vec3(1, 0, 0));
@@ -132,7 +126,7 @@ void Simulation::CalculateExternalForces(Hair* hair)
 			glm::vec3 force = glm::vec3(0.0f);
 			force += glm::vec3(0.0f, GRAVITY, 0.0f);
 
-			if (true)
+			if (mHeadMoving)
 			{
 				glm::vec4 current = mTransform * glm::vec4(vertex->startPosition, 1.0f);
 				glm::vec3 acceleration = (glm::vec3(vertex->prevPosition - glm::vec3(current)) - vertex->velocity * TIMESTEP) / (TIMESTEP * TIMESTEP);
@@ -238,7 +232,7 @@ void Simulation::CalculateFriction(Hair* hair)
 	int index;
 	for (int i = 0; i < numThreads; i++)
 	{
-		HairThread* threadData = DBG_NEW HairThread();
+		HairThread* threadData = new HairThread();
 		threadData->grid = &mGrid;
 		threadData->friction = friction;
 
@@ -257,7 +251,7 @@ void Simulation::CalculateFriction(Hair* hair)
 		
 		//mThreads[i] = std::thread(&Simulation::CalculateFrictionThread, mThreadData[i]);
 		//mThreads[i] = std::thread([this, i] {CalculateFrictionThread(mThreadData[i]); });
-		mThreads.push_back(DBG_NEW std::thread([this, i] {CalculateFrictionThread(mThreadData[i]); }));
+		mThreads.push_back(new std::thread([this, i] {CalculateFrictionThread(mThreadData[i]); }));
 		if (!mThreads[i])
 		{
 			std::cout << "ERROR: Thread not created" << std::endl;
@@ -346,7 +340,7 @@ void Simulation::ParticleSimulation(Hair* hair)
 				goto skip;
 			}
 
-			vertex->velocity = vertex->velocity + TIMESTEP * (vertex->forces * (1.0f / vertex->mass)) * 0.5f;
+			vertex->velocity += TIMESTEP * (vertex->forces * (1.0f / vertex->mass)) * 0.5f;
 			glm::vec3 stiffPosition = previous->segmentLength * previous->pointVec;
 			vertex->tempPosition += glm::mix((vertex->velocity * TIMESTEP), stiffPosition, stiffness);
 			vertex->forces = glm::vec3(0.0f);

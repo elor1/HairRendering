@@ -94,7 +94,13 @@ vec3 GetColour(vec4 lightPos)
 void main()
 {
 	vec4 lightSpacePos = dirToLight * view * position_v;
-	meshColour = mix(MESH_COLOUR, hairColour, texture(hairMap, texCoord_v).r);
+	float alpha = texture(hairMap, vec2(texCoord_v.x, texCoord_v.y)).a;
+	float hair = 0.0f;
+	if (alpha >= 0.05f)
+	{
+		hair = 1.0f;
+	}
+	meshColour = mix(MESH_COLOUR, hairColour, 0.0f);
 
 	//Key light
 	fragColour = GetColour(vec4(lightPosition, 1.0f));

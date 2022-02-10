@@ -29,6 +29,7 @@ void GuiWindow::NewFrame()
 
 void GuiWindow::Update()
 {
+	//ImGui::ShowDemoWindow();
 	ImGui::Begin("Settings");
 	ImGui::PushItemWidth(ImGui::GetWindowWidth() * 0.6f);
 	Hair* hair = mApp->GetHair();
@@ -46,6 +47,13 @@ void GuiWindow::Update()
 
 	if (ImGui::CollapsingHeader("Hair", ImGuiTreeNodeFlags_DefaultOpen))
 	{
+		const char* hairMaps[] = { "hairmap.png", "hairmap2.png" };
+		int currentHairMap = 0;
+		if (ImGui::Combo("Hair map", &currentHairMap, hairMaps, IM_ARRAYSIZE(hairMaps)))
+		{
+			mApp->SetHairMap(hairMaps[currentHairMap]);
+			mApp->ResetSimulation();
+		}
 		ImGui::SliderInt("Strands per guide hair", &hair->mNumGroupHairs, 0, 64);
 		ImGui::SliderInt("Vertices per strand", &hair->mNumSplineVertices, 0, 50);
 		ImGui::SliderFloat("Hair radius", &hair->mHairRadius, 0.0f, 0.1f);
@@ -53,6 +61,8 @@ void GuiWindow::Update()
 		ImGui::SliderFloat("Noise amplitude", &hair->mNoiseAmplitude, 0.0f, 1.0f);
 		ImGui::SliderFloat("Noise frquency", &hair->mNoiseFrequency, 0.0f, 1.0f);
 		ImGui::SliderFloat("Shadow intensity", &hair->mShadowIntensity, 0.0f, 50.0f);
+		ImGui::SliderFloat("Diffuse intensity", &hair->mDiffuseIntensity, 0.0f, 5.0f);
+		ImGui::SliderFloat("Specular intensity", &hair->mSpecularIntensity, 0.0f, 5.0f);
 	}
 
 	if (ImGui::CollapsingHeader("Simulation", ImGuiTreeNodeFlags_DefaultOpen))

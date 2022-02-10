@@ -63,6 +63,7 @@ void Strand::Draw(ShaderProgram* program)
 	program->uniforms.triangleFace[0] = mTriangleFace[0];
 	program->uniforms.triangleFace[1] = mTriangleFace[1];
 	program->uniforms.numHairVertices = glm::min((int)vertices.size(), 64);
+	program->uniforms.length = mLength;
 	for (int i = 0; i < program->uniforms.numHairVertices; i++)
 	{
 		program->uniforms.vertexData[i] = vertices[i]->position;

@@ -6,6 +6,7 @@
 #include "Camera.h"
 #include "Hair.h"
 #include "Model.h"
+#include <string>
 
 class Simulation;
 class Texture;
@@ -25,6 +26,7 @@ public:
 	void TogglePause();
 	void ResetSimulation();
 	bool IsPaused();
+	void SetHairMap(std::string filename);
 	bool useShadows;
 	bool useSuperSampling;
 
@@ -49,6 +51,7 @@ private:
 
 	Hair* mHair;
 	Simulation* mSimulation;
+	std::string mHairMap;
 
 	std::vector<ShaderProgram*> mPrograms;
 	ShaderProgram* mMeshProgram;

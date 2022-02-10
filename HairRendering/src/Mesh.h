@@ -76,15 +76,10 @@ struct Triangle
 
 	float Area()
 	{
-		//return glm::length(glm::cross(vertex3.position - vertex1.position, vertex2.position - vertex1.position)) / 2.0f;
-		float ab = glm::distance(vertex1.position, vertex2.position);
-		float bc = glm::distance(vertex2.position, vertex3.position);
-		float ca = glm::distance(vertex3.position, vertex1.position);
-
-		return (ab + bc + ca) / 3.0f;
+		return glm::length(glm::cross(vertex3.position - vertex1.position, vertex2.position - vertex1.position)) / 2.0f;
 	}
 
-	void randomPoint(Vertex& v)
+	void RandomPoint(Vertex& v)
 	{
 		float t = sqrt(rand() / (float)RAND_MAX);
 		glm::vec3 randomPoint;
@@ -97,7 +92,7 @@ struct Triangle
 	}
 
 	//Triangle-ray intersection
-	/*bool IsIntersecting(glm::vec3& intersection, glm::vec3 position, glm::vec3 randomDir)
+	bool IsIntersecting(glm::vec3& intersection, glm::vec3 position, glm::vec3 randomDir)
 	{
 		glm::vec3 edge1 = vertex2.position - vertex1.position;
 		glm::vec3 edge2 = vertex3.position - vertex1.position;
@@ -133,7 +128,7 @@ struct Triangle
 
 		intersection = point;
 		return true;
-	}*/
+	}
 
 	//https://wikipedia.org/wiki/M%C3%B6ller%E2%80%93Trumbore_intersection_algorithm
 	bool Intersects(Vector3 rayVector, Vector3 rayOrigin)

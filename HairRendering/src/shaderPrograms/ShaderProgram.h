@@ -34,6 +34,7 @@ struct Uniforms
 	float occlusionLayerSize = 0.0005f;
 	float specularIntensity;
 	float diffuseIntensity;
+	float length;
 };
 
 class ShaderProgram

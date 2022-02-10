@@ -1,13 +1,14 @@
 #include "Camera.h"
 #include <gtx/transform.hpp>
 
-Camera::Camera(float zoom,  glm::mat4 projection)
+Camera::Camera(float zoom,  glm::mat4 projection, float angleX, float angleY)
 {
-	mZoom = 5.0f;
-	mAngleX = 0.0f;
-	mAngleY = 0.0f;
+	mZoom = zoom;
+	mAngleX = angleX;
+	mAngleY = angleY;
 
-	mView = glm::lookAt(glm::vec3(0.0f, 0.0f, mZoom), glm::vec3(0.0f), glm::vec3(0.0f, 1.0f, 0.0f));
+	/*mView = glm::lookAt(glm::vec3(0.0f, 0.0f, mZoom), glm::vec3(0.0f), glm::vec3(0.0f, 1.0f, 0.0f));*/
+	mView = glm::translate(glm::vec3(0.0f, 0.0f, -mZoom)) * glm::rotate(mAngleY, glm::vec3(1.0f, 0.0f, 0.0f)) * glm::rotate(mAngleX, glm::vec3(0.0f, 1.0f, 0.0f));
 	mProjection = projection;
 }
 

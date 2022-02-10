@@ -4,7 +4,7 @@
 class Camera
 {
 public:
-	Camera(float zoom = 5.0f, glm::mat4 projection = glm::mat4(0.0f));
+	Camera(float zoom = 5.0f, glm::mat4 projection = glm::mat4(0.0f), float angleX = 0.0f, float angleY = 0.0f);
 	glm::mat4 GetView();
 	glm::mat4 GetProjection();
 	void UpdateViewMatrix();

@@ -12,25 +12,13 @@
 #include "Texture.h"
 #include "Framebuffer.h"
 
-#define _CRTDBG_MAP_ALLOC
-#include <stdlib.h>
-#include <crtdbg.h>
-
-#ifdef _DEBUG
-#define DBG_NEW new ( _NORMAL_BLOCK , __FILE__ , __LINE__ )
-// Replace _NORMAL_BLOCK with _CLIENT_BLOCK if you want the
-// allocations to be of _CLIENT_BLOCK type
-#else
-#define DBG_NEW new
-#endif
-
 Application::Application(int width, int height)
 {
 	mPrevTime = glfwGetTime();
 	mCurrentTime = glfwGetTime();
 	mWidth = width;
 	mHeight = height;
-	mHairDensity = 100;
+	mHairDensity = 150;
 	mFirstMouse = true;
 	mLastX = width / 2.0;
 	mLastY = width / 2.f;
@@ -39,6 +27,7 @@ Application::Application(int width, int height)
 	mIsSpaceDown = false;
 	useShadows = true;
 	useSuperSampling = true;
+	mHairMap = "hairmap.png";
 
 	Initialise();
 }
@@ -102,6 +91,11 @@ bool Application::IsPaused()
 	return mIsPaused;
 }
 
+void Application::SetHairMap(std::string filename)
+{
+	mHairMap = filename;
+}
+
 
 void Application::Initialise()
 {
@@ -163,28 +157,28 @@ void Application::Initialise()
 	glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
 
 	//Initialise imgui
-	mGui = DBG_NEW GuiWindow(mWindow);
+	mGui = new GuiWindow(mWindow);
 	mGui->SetApplication(this);
 
 	//Camera
-	mCamera = DBG_NEW Camera(5.0f, glm::perspective(0.8f, (float)mWidth / mHeight, 0.1f, 100.0f));
+	mCamera = new Camera(5.0f, glm::perspective(0.8f, (float)mWidth / mHeight, 0.1f, 100.0f));
 
 	//Shaders
 	mPrograms = {
-		mMeshProgram = DBG_NEW MeshShaderProgram(),
-		mHairProgram = DBG_NEW HairShaderProgram(),
-		mHairOpacityProgram = DBG_NEW HairOpacityShaderProgram(),
-		mWhiteHairProgram = DBG_NEW HairShaderProgram("src/shaders/hair.vert", "src/shaders/white.frag"),
-		mWhiteMeshProgram = DBG_NEW MeshShaderProgram("src/shaders/mesh.vert", "src/shaders/white.frag"),
+		mMeshProgram = new MeshShaderProgram(),
+		mHairProgram = new HairShaderProgram(),
+		mHairOpacityProgram = new HairOpacityShaderProgram(),
+		mWhiteHairProgram = new HairShaderProgram("src/shaders/hair.vert", "src/shaders/white.frag"),
+		mWhiteMeshProgram = new MeshShaderProgram("src/shaders/mesh.vert", "src/shaders/white.frag"),
 	};
 
 	//Textures
 	mTextures = {
-		mNoiseTexture = DBG_NEW Texture(),
-		mHairDepthTexture = DBG_NEW Texture(),
-		mMeshDepthTexture = DBG_NEW Texture(),
-		mOpacityMapTexture = DBG_NEW Texture(),
-		mFinalTexture = DBG_NEW Texture(),
+		mNoiseTexture = new Texture(),
+		mHairDepthTexture = new Texture(),
+		mMeshDepthTexture = new Texture(),
+		mOpacityMapTexture = new Texture(),
+		mFinalTexture = new Texture(),
 	};
 
 	int shadowMapSize = 2048;
@@ -196,10 +190,10 @@ void Application::Initialise()
 
 	//Framebuffers
 	mFramebuffers = {
-		mHairShadowFramebuffer = DBG_NEW Framebuffer(),
-		mMeshShadowFramebuffer = DBG_NEW Framebuffer(),
-		mOpacityMapFramebuffer = DBG_NEW Framebuffer(),
-		mFinalFramebuffer = DBG_NEW Framebuffer(),
+		mHairShadowFramebuffer = new Framebuffer(),
+		mMeshShadowFramebuffer = new Framebuffer(),
+		mOpacityMapFramebuffer = new Framebuffer(),
+		mFinalFramebuffer = new Framebuffer(),
 	};
 
 	for (auto& fb : mFramebuffers)
@@ -236,31 +230,15 @@ void Application::InitSimulation()
 	}
 
 	//Head model
-	mHead = DBG_NEW Model("../models/Head3.obj");
+	mHead = new Model("../models/Head3.obj");
 	//mHead = model->GetFirstMesh();
 
 	//Collision model
-	mCollider = DBG_NEW Model("../models/Collider.obj", 1.1f);
-	//mCollider = collisionModel->GetFirstMesh();
-	/*cube->triangles = { Triangle(Vertex(glm::vec3(-5.0f, -0.7f, -5.0f), glm::vec2(0.875f, 0.5f), glm::vec3(0.0f, 1.0f, 0.0f)), Vertex(glm::vec3(5.0f, -0.3f, 5.0f), glm::vec2(0.625, 0.75), glm::vec3(0.0f, 1.0f, 0.0f)), Vertex(glm::vec3(5.0f, -0.3f, -5.0f), glm::vec2(0.625, 0.5f), glm::vec3(0.0f, 1.0f, 0.0f))),
-	Triangle(Vertex(glm::vec3(5.0f, -0.3f, 5.0f), glm::vec2(0.625f, 0.75f), glm::vec3(0.0f, 0.0f, 1.0f)), Vertex(glm::vec3(-5.0f, -0.7f, 5.0f), glm::vec2(0.375, 1.0), glm::vec3(0.0f, 0.0f, 1.0f)), Vertex(glm::vec3(-5.0f, -0.3f, -5.0f), glm::vec2(0.375, 0.75f), glm::vec3(0.0f, 0.0f, 1.0f))),
-	Triangle(Vertex(glm::vec3(-5.0f, -0.3f, 5.0f), glm::vec2(0.625f, 0.5f), glm::vec3(-1.0f, 0.0f, 0.0f)), Vertex(glm::vec3(-5.0f, -0.7f, -5.0f), glm::vec2(0.375, 0.25), glm::vec3(-1.0f, 0.0f, 0.0f)), Vertex(glm::vec3(-5.0f, -0.7f, 5.0f), glm::vec2(0.375, 0.0f), glm::vec3(-1.0f, 0.0f, 0.0f))),
-	Triangle(Vertex(glm::vec3(5.0f, -0.7f, -5.0f), glm::vec2(0.375f, 0.5f), glm::vec3(0.0f, -1.0f, 0.0f)), Vertex(glm::vec3(-5.0f, -0.7f, 5.0f), glm::vec2(0.125, 0.75), glm::vec3(0.0f, -1.0f, 0.0f)), Vertex(glm::vec3(-5.0f, -0.7f, -5.0f), glm::vec2(0.125, 0.5f), glm::vec3(0.0f, -1.0f, 0.0f))),
-	Triangle(Vertex(glm::vec3(5.0f, -0.3f, -5.0f), glm::vec2(0.625f, 0.5f), glm::vec3(1.0f, 0.0f, 0.0f)), Vertex(glm::vec3(5.0f, -0.7f, 5.0f), glm::vec2(0.375, 0.75), glm::vec3(1.0f, 0.0f, 0.0f)), Vertex(glm::vec3(5.0f, -0.7f, -5.0f), glm::vec2(0.375, 0.5f), glm::vec3(1.0f, 0.0f, 0.0f))),
-	Triangle(Vertex(glm::vec3(-5.0f, -0.3f, -5.0f), glm::vec2(0.625f, 0.25f), glm::vec3(0.0f, 0.0f, -1.0f)), Vertex(glm::vec3(5.0f, -0.7f, -5.0f), glm::vec2(0.375, 0.5), glm::vec3(0.0f, 0.0f, -1.0f)), Vertex(glm::vec3(-5.0f, -0.7f, -5.0f), glm::vec2(0.375, 0.25f), glm::vec3(0.0f, 0.0f, -1.0f))),
-	Triangle(Vertex(glm::vec3(-5.0f, -0.3f, -5.0f), glm::vec2(0.875f, 0.5f), glm::vec3(0.0f, 1.0f, 0.0f)), Vertex(glm::vec3(-5.0f, -0.3f, 5.0f), glm::vec2(0.875, 0.75), glm::vec3(0.0f, 1.0f, 0.0f)), Vertex(glm::vec3(5.0f, -0.3f, 5.0f), glm::vec2(0.625, 0.75f), glm::vec3(0.0f, 1.0f, 0.0f))),
-	Triangle(Vertex(glm::vec3(5.0f, -0.3f, 5.0f), glm::vec2(0.625f, 0.75f), glm::vec3(0.0f, 0.0f, 1.0f)), Vertex(glm::vec3(-5.0f, -0.3f, 5.0f), glm::vec2(0.625, 1.0f), glm::vec3(0.0f, 0.0f, 1.0f)), Vertex(glm::vec3(-5.0f, -0.7f, 5.0f), glm::vec2(0.375, 1.0f), glm::vec3(0.0f, 0.0f, 1.0f))),
-	Triangle(Vertex(glm::vec3(-5.0f, -0.3f, 5.0f), glm::vec2(0.625f, 0.0f), glm::vec3(-1.0f, 0.0f, 0.0f)), Vertex(glm::vec3(-5.0f, -0.3f, -5.0f), glm::vec2(0.625, 0.25), glm::vec3(-1.0f, 0.0f, 0.0f)), Vertex(glm::vec3(-5.0f, -0.7f, -5.0f), glm::vec2(0.375, 0.25f), glm::vec3(-1.0f, 0.0f, 0.0f))),
-	Triangle(Vertex(glm::vec3(5.0f, -0.7f, -5.0f), glm::vec2(0.375f, 0.5f), glm::vec3(0.0f, -1.0f, 0.0f)), Vertex(glm::vec3(5.0f, -0.7f, 5.0f), glm::vec2(0.375, 0.75), glm::vec3(0.0f, -1.0f, 0.0f)), Vertex(glm::vec3(-5.0f, -0.7f, 5.0f), glm::vec2(0.125, 0.75f), glm::vec3(0.0f, -1.0f, 0.0f))),
-	Triangle(Vertex(glm::vec3(5.0f, -0.3f, -5.0f), glm::vec2(0.625f, 0.5f), glm::vec3(1.0f, 0.0f, 0.0f)), Vertex(glm::vec3(5.0f, -0.3f, 5.0f), glm::vec2(0.625, 0.75), glm::vec3(1.0f, 0.0f, 0.0f)), Vertex(glm::vec3(5.0f, -0.7f, 5.0f), glm::vec2(0.375, 0.75f), glm::vec3(1.0f, 0.0f, 0.0f))),
-	Triangle(Vertex(glm::vec3(-5.0f, -0.3f, -5.0f), glm::vec2(0.625f, 0.25f), glm::vec3(0.0f, 0.0f, -1.0f)), Vertex(glm::vec3(5.0f, -0.3f, -5.0f), glm::vec2(0.625, 0.5), glm::vec3(0.0f, 0.0f, -1.0f)), Vertex(glm::vec3(5.0f, -0.7f, -5.0f), glm::vec2(0.375, 0.5f), glm::vec3(0.0f, 0.0f, -1.0f))) };*/
-	mSimulation = DBG_NEW Simulation(mCollider->GetFirstMesh());
+	mCollider = new Model("../models/Collider.obj", 1.1f);
+	
+	mSimulation = new Simulation(mCollider->GetFirstMesh());
 
-	//Scalp model
-	Model* scalp = DBG_NEW Model("../models/ScalpLow.obj");
-	//mHair = new Hair(scalp->GetFirstMesh(), mHairDensity, mSimulation, mHair);
-	mHair = DBG_NEW Hair(mHead->GetFirstMesh(), mHairDensity, "../images/hairmap.png", mSimulation);
-	delete scalp;
+	mHair = new Hair(mHead->GetFirstMesh(), mHairDensity, ("../images/" + mHairMap).c_str(), mSimulation);
 }
 
 
@@ -351,6 +329,7 @@ void Application::Draw()
 	mOpacityMapTexture->Unbind(GL_TEXTURE2);
 	mMeshDepthTexture->Unbind(GL_TEXTURE3);
 	mFinalTexture->Unbind(GL_TEXTURE4);
+	mHair->GetHairMap()->Unbind(GL_TEXTURE5);
 }
 
 void Application::Update()
@@ -462,21 +441,43 @@ void Application::MouseCallback(GLFWwindow* window, double xPos, double yPos)
 
 	if (glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_MIDDLE) == GLFW_PRESS)
 	{
-		glm::mat4 view = mCamera->GetView();
-		glm::vec2 delta = glm::vec2(xPos, yPos) - mCamera->GetPreviousRotation();
-		if (fabs(delta.x) > fabs(delta.y))
-		{
-			//Rotate up
-			glm::vec3 up = glm::normalize(glm::vec3(view[2][1], view[2][2], view[2][3]));
-			float angle = delta.x * 0.001f;
-			mSimulation->UpdateRotation(mHair, angle, glm::vec3(0.0f, 1.0f, 0.0f));
-		}
-		else
-		{
-			//Rotate right
-			float angle = delta.y * 0.001f;
-			mSimulation->UpdateRotation(mHair, angle, glm::vec3(1.0f, 0.0f, 0.0f));
-		}
+		//glm::mat4 view = mCamera->GetView();
+		//glm::vec2 delta = glm::vec2(xPos, yPos) - mCamera->GetPreviousRotation();
+		//if (fabs(delta.x) > fabs(delta.y))
+		//{
+		//	//Rotate up
+		//	glm::vec3 up = glm::normalize(glm::vec3(view[2][1], view[2][2], view[2][3]));
+		//	float angle = delta.x * 0.001f;
+		//	mSimulation->UpdateRotation(mHair, angle, glm::vec3(0.0f, 1.0f, 0.0f));
+		//}
+		//else
+		//{
+		//	//Rotate right
+		//	float angle = delta.y * 0.001f;
+		//	mSimulation->UpdateRotation(mHair, angle, glm::vec3(1.0f, 0.0f, 0.0f));
+		//}
+
+		/*double x, y;
+		glfwGetCursorPos(window, &x, &y);
+		glm::vec3 p0 = glm::vec3(mCamera->GetPreviousRotation().x / (float)mWidth, 1.0f - mCamera->GetPreviousRotation().y / (float)mHeight, 0.0f);
+		glm::vec3 p1 = glm::vec3(x / (float)mWidth, 1.0f - y / (float)mHeight, 0.0f);
+
+		p0 = 2.0f * p0 - 1.0f;
+		p1 = 2.0f * p1 - 1.0f;
+
+		float angle = 5.0f * glm::length(p1 - p0);
+		glm::mat4 object = glm::inverse(mCamera->GetProjection() * mCamera->GetView() * mSimulation->GetTransform());
+		p0 = glm::vec3(glm::normalize(object * glm::vec4(p0, 0.0f)));
+		p1 = glm::vec3(glm::normalize(object * glm::vec4(p1, 0.0f)));
+
+		glm::vec3 axis = glm::cross(p0, p1);
+		mSimulation->UpdateRotation(mHair, angle, axis);
+		mCamera->SetPreviousRotation(glm::vec2(x, y));*/
+	}
+
+	if (mIsPaused)
+	{
+		Update();
 	}
 }
 
@@ -487,10 +488,10 @@ void Application::MouseButtonCallback(GLFWwindow* window, int button, int action
 		return;
 	}
 
-	if (action == GLFW_RELEASE)
+	/*if (action == GLFW_RELEASE)
 	{
 		mSimulation->SetHeadMoving(false);
-	}
+	}*/
 
 	if (action == GLFW_PRESS)
 	{
@@ -528,6 +529,11 @@ void Application::MouseScrollCallback(GLFWwindow* window, double xOffset, double
 
 	mCamera->SetZoom(yOffset / 100.0f);
 	mCamera->UpdateViewMatrix();
+
+	if (mIsPaused)
+	{
+		Update();
+	}
 }
 
 void Application::DrawMesh(ShaderProgram* program, glm::mat4 model, glm::mat4 view, glm::mat4 projection)
@@ -564,8 +570,8 @@ void Application::DrawHair(ShaderProgram* program, glm::mat4 model, glm::mat4 vi
 	program->uniforms.lightPosition = mLightPosition;
 	program->uniforms.shadowIntensity = mHair->GetShadowIntensity();
 	program->uniforms.useShadows = useShadows;
-	program->uniforms.specularIntensity = 0.5f;
-	program->uniforms.diffuseIntensity = 1.0f;
+	program->uniforms.specularIntensity = mHair->GetSpecularIntensity();
+	program->uniforms.diffuseIntensity = mHair->GetDiffuseIntensity();
 	program->SetGlobalUniforms();
 	mHair->Draw(program);
 }
