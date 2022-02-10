@@ -62,12 +62,7 @@ private:
 
 	float mHairDensity;
 
-	std::vector<Texture*> mTextures;
 	Texture* mNoiseTexture;
-	Texture* mHairDepthTexture;
-	Texture* mMeshDepthTexture;
-	Texture* mOpacityMapTexture;
-	Texture* mFinalTexture;
 
 	std::vector<Framebuffer*> mFramebuffers;
 	Framebuffer* mHairShadowFramebuffer;

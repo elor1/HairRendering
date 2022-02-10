@@ -8,7 +8,7 @@
 #define GRAVITY -9.8f
 #define MASS 1.0f
 #define DAMPENING 0.99f
-#define TIMESTEP 0.01f
+#define TIMESTEP 0.02f
 #define GRID_WIDTH 0.1f
 
 #define WIND false
@@ -124,7 +124,7 @@ void Simulation::CalculateExternalForces(Hair* hair)
 			HairVertex* vertex = guide->vertices[i];
 
 			glm::vec3 force = glm::vec3(0.0f);
-			force += glm::vec3(0.0f, GRAVITY, 0.0f);
+			force += glm::vec3(glm::inverse(mTransform) * glm::vec4(0.0f, GRAVITY, 0.0f, 0.0f));
 
 			if (mHeadMoving)
 			{
@@ -132,9 +132,9 @@ void Simulation::CalculateExternalForces(Hair* hair)
 				glm::vec3 acceleration = (glm::vec3(vertex->prevPosition - glm::vec3(current)) - vertex->velocity * TIMESTEP) / (TIMESTEP * TIMESTEP);
 				force += acceleration * vertex->mass * 0.1f;
 			}
-
+			
 			//Wind
-			force += glm::normalize(windDirection) * windStrength * glm::vec3(((rand() % 100) / 100.0f), ((rand() % 100) / 100.0f), ((rand() % 100) / 100.0f));
+			force += glm::vec3(glm::inverse(mTransform) * glm::vec4(glm::normalize(windDirection) * windStrength * glm::vec3(((rand() % 100) / 100.0f), ((rand() % 100) / 100.0f), ((rand() % 100) / 100.0f)), 0.0f));
 			//if (windStrength != glm::vec3(0.0f))
 			//{
 			//	if (mTime > 2.0f)

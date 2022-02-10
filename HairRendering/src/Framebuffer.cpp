@@ -1,5 +1,19 @@
 #include "Framebuffer.h"
 #include <iostream>
+#include "Texture.h"
+
+Framebuffer::~Framebuffer()
+{
+	if (mColourTexture)
+	{
+		delete mColourTexture;
+	}
+
+	if (mDepthTexture)
+	{
+		delete mDepthTexture;
+	}
+}
 
 void Framebuffer::Create()
 {
@@ -68,4 +82,38 @@ void Framebuffer::ResizeDepthBuffer(int width, int height)
 	glDeleteRenderbuffers(1, &mDepthBufferID);
 	GenerateDepthBuffer(width, height);
 	Unbind();
+}
+
+void Framebuffer::GenerateTexture(int width, int height, GLint magFilter, GLint minFilter)
+{
+	if (mColourTexture)
+	{
+		delete mColourTexture;
+	}
+
+	mColourTexture = new Texture();
+	mColourTexture->Create(width, height, magFilter, minFilter);
+	AttachTexture(mColourTexture->GetID());
+}
+
+void Framebuffer::GenerateDepthTexture(int width, int height, GLint magFilter, GLint minFilter)
+{
+	if (mDepthTexture)
+	{
+		delete mDepthTexture;
+	}
+
+	mDepthTexture = new Texture();
+	mDepthTexture->CreateDepthTexture(width, height, magFilter, minFilter);
+	AttachDepthTexture(mDepthTexture->GetID());
+}
+
+Texture* Framebuffer::GetColourTexture()
+{
+	return mColourTexture;
+}
+
+Texture* Framebuffer::GetDepthTexture()
+{
+	return mDepthTexture;
 }
