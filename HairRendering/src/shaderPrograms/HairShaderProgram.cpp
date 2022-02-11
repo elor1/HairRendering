@@ -20,6 +20,7 @@ void HairShaderProgram::SetGlobalUniforms()
 	glUniform1i(GetUniformLocation("hairShadowMap"), uniforms.hairShadowMap);
 	glUniform1i(GetUniformLocation("meshShadowMap"), uniforms.meshShadowMap);
 	glUniform1i(GetUniformLocation("opacityMap"), uniforms.opacityMap);
+	glUniform1i(GetUniformLocation("depthPeelMap"), uniforms.depthPeelMap);
 	glUniform1i(GetUniformLocation("useShadows"), uniforms.useShadows);
 	glUniform1f(GetUniformLocation("shadowIntensity"), uniforms.shadowIntensity);
 }

@@ -236,5 +236,7 @@
       <Filter>Resource Files</Filter>
     </None>
     <None Include="src\shaders\hairRender.vert" />
+    <None Include="src\shaders\hairDepthPeel.frag" />
+    <None Include="src\shaders\meshDepthPeel.frag" />
   </ItemGroup>
 </Project>

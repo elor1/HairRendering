@@ -1,100 +1,110 @@
 #version 440
 
-in vec4 position_g;
-in vec3 tangent_g;
-
-out vec3 fragColour;
-
-uniform vec3 colour;
-uniform mat4 view;
-uniform vec3 lightPosition;
+//---Opacity---//
 uniform sampler2D hairShadowMap;
 uniform sampler2DShadow meshShadowMap;
 uniform sampler2D opacityMap;
-uniform mat4 dirToLight;
 uniform float shadowIntensity;
 uniform bool useShadows;
-uniform float specularIntensity;
-uniform float diffuseIntensity;
-
-const vec4 FILL_LIGHT_POSITION = vec4(-2.0f, 1.0f, 1.0f, 1.0f);
-const float SHININESS = 50.0f;
-const float FILL_LIGHT_INTENSITY = 0.6f;
-const float OPACITY_LAYER_SIZE = 0.0005f;
 
 float currentDepth;
+
+const float LAYER_SIZE = 0.0005f;
 
 //Sample opacity maps layers at the given texcoord to get occlusion from other strands
 float SampleOcclusion(vec2 coord)
 {
-	vec4 opacityValues = texture(opacityMap, coord);
-	float occlusion = 0.0f;
-	float layerSize = OPACITY_LAYER_SIZE;
+	vec4 values = texture(opacityMap, coord);
+	float occlusion = 0;
+	float layerSize = LAYER_SIZE;
 	float layerStart = texelFetch(hairShadowMap, ivec2(coord * textureSize(hairShadowMap, 0)), 0).r;
+
 	for (int i = 0; i < 4; i++)
 	{
 		float t = clamp((currentDepth - layerStart) / layerSize, 0.0f, 1.0f);
-		occlusion += mix(0.0f, opacityValues[i], t);
-
+		occlusion += mix(0.0f, values[i], t);
 		layerStart += layerSize;
 		layerSize *= 2.0f;
 	}
-
 	return occlusion;
 }
 
 //Calculate transmittance of the light to a point based on opacity map
-float CalculateTransmittance(vec4 vec)
+float CalculateTransmittance(vec4 point)
 {
-	vec4 shadowCoord = (vec / vec.w + 1.0f) / 2.0f;
-	vec2 coord = shadowCoord.xy;
+	vec4 shadowCoord = (point / point.w + 1.0f) / 2.0f;
 	currentDepth = shadowCoord.z - 0.0001f;
 
 	vec2 size = textureSize(hairShadowMap, 0);
 	vec2 texelSize = vec2(1.0f) / size;
 
 	//Interpolate 4 samples of opacity map
-	vec2 f = fract(coord * size);
-	float s1 = SampleOcclusion(coord + texelSize * vec2(0.0f, 0.0f));
-	float s2 = SampleOcclusion(coord + texelSize * vec2(0.0f, 1.0f));
-	float s3 = SampleOcclusion(coord + texelSize * vec2(1.0f, 0.0f));
-	float s4 = SampleOcclusion(coord + texelSize * vec2(1.0f, 1.0f));
+	vec2 f = fract(shadowCoord.xy * size);
+	float s1 = SampleOcclusion(shadowCoord.xy + texelSize * ivec2(0, 0));
+	float s2 = SampleOcclusion(shadowCoord.xy + texelSize * ivec2(0, 1));
+	float s3 = SampleOcclusion(shadowCoord.xy + texelSize * ivec2(1, 0));
+	float s4 = SampleOcclusion(shadowCoord.xy + texelSize * ivec2(1, 1));
 	float occlusion = mix(mix(s1, s2, f.y), mix(s3, s4, f.y), f.x);
 
-	float transmittance = exp(-shadowIntensity * occlusion);
-
-	return mix(1.0f, transmittance, useShadows);
+	return mix(1.0f, exp(-shadowIntensity * occlusion), useShadows);
 }
 
-float GetMeshVisibility(vec4 pos)
+float GetMeshVisibility(vec4 point)
 {
-	vec4 shadowCoord = (pos / pos.w + 1.0f) / 2.0f;
-	shadowCoord.z -= 0.0003f;
-	float meshVisibility = texture(meshShadowMap, shadowCoord.xyz);
+	vec4 shadowCoord = (point / point.w + 1.0f) / 2.0f;
+	shadowCoord -= 0.0003f;
+
+	return mix(1.0f, texture(meshShadowMap, shadowCoord.xyz), useShadows);
+}
+
+//---Hair lighting---//
+uniform vec3 colour;
+uniform mat4 view;
+uniform mat4 dirToLight;
+uniform vec3 lightPosition;
+uniform float specularIntensity;
+uniform float diffuseIntensity;
+
+const float SHININESS = 50.0f;
+const float OPACITY = 0.75f;
+const float FILL_LIGHT_INTENSITY = 0.6f;
+const vec4 FILL_LIGHT_POSITION = vec4(-2.0f, 1.0f, 1.0f, 1.0f);
+
+vec3 GetColour(vec4 pos, vec3 tangent, vec4 lightPos)
+{
+	vec4 lightDir = normalize(view * lightPos - pos);
 	
-	return mix(1.0f, meshVisibility, useShadows);
+	float diffuse = sqrt(1.0f - abs(dot(normalize(tangent), lightDir.xyz)));
+	float specular = pow(sqrt(1.0f - abs(dot(normalize(tangent), normalize(normalize(-pos.xyz) + lightDir.xyz)))), SHININESS);
+
+	return colour * (diffuseIntensity * diffuse + specularIntensity * specular); 
 }
 
-vec3 GetColour(vec4 lightPos)
+vec4 Lighting(vec4 pos, vec3 tangent)
 {
-	vec4 lightDirection = normalize(view * lightPos - position_g);
+	vec4 lightSpacePos = dirToLight * pos;
 
-	float diffuse = sqrt(1.0f - abs(dot(normalize(tangent_g), lightDirection.xyz)));
-	float specular = pow(sqrt(1.0f - abs(dot(normalize(tangent_g), normalize(normalize(-position_g.xyz) + lightDirection.xyz)))), SHININESS);
+	vec4 colour;
+	colour.w = OPACITY;
 
-	return colour * (diffuseIntensity * diffuse + specularIntensity * specular);
+	//Key light
+	colour.xyz = GetColour(pos, tangent, view * vec4(lightPosition, 1.0f));
+	colour.xyz *= CalculateTransmittance(lightSpacePos);
+	colour.xyz *= GetMeshVisibility(lightSpacePos);
+
+	//Fill light
+	colour.xyz += FILL_LIGHT_INTENSITY * GetColour(pos, tangent, view * FILL_LIGHT_POSITION);
+
+	return colour;
 }
+
+//---Main---//
+in vec4 position_g;
+in vec3 tangent_g;
+
+out vec4 fragColour;
 
 void main()
 {
-	vec4 lightSpacePos = dirToLight * position_g;
-
-	//Key light
-	fragColour = GetColour(view * vec4(lightPosition, 1.0f));
-	fragColour *= CalculateTransmittance(lightSpacePos);
-	fragColour *= GetMeshVisibility(lightSpacePos);
-
-	//Fill light
-	fragColour += GetColour(view * FILL_LIGHT_POSITION) * FILL_LIGHT_INTENSITY;
-
+	fragColour = Lighting(position_g, tangent_g);
 }

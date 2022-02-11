@@ -82,13 +82,7 @@ vec3 GetColour(vec4 pos, vec4 normal, vec4 lightPos)
 
 vec4 Lighting(vec4 pos, vec4 normal, vec2 texCoord)
 {
-	float alpha = texture(hairMap, texCoord).a;
-	float hair = 0.0f;
-	if (alpha > 0.05f)
-	{
-		hair = 1.0f;
-	}
-	meshColour = mix(MESH_COLOUR, hairColour, 0.0f);
+	meshColour = mix(MESH_COLOUR, hairColour, texture(hairMap, texCoord).r);
 
 	vec4 lightSpacePos = dirToLight * view * pos;
 	vec4 colour;
@@ -108,6 +102,24 @@ vec4 Lighting(vec4 pos, vec4 normal, vec2 texCoord)
 	return colour;
 }
 
+//---Depth peel---//
+uniform sampler2D depthPeelMap;
+
+const vec4 BACKGROUND_COLOUR = vec4 (0.0f, 0.0f, 0.0f, 1.0f);
+
+void DepthPeel(inout vec4 colour, vec4 point)
+{
+	vec4 clip = (point / point.w + 1.0f) / 2.0f;
+	
+	float currentDepth = gl_FragCoord.z - 1e-4;
+	float previousDepth = texelFetch(depthPeelMap, ivec2(clip.xy * textureSize(depthPeelMap, 0)), 0).r;
+
+	float remove = step(currentDepth, previousDepth);
+
+	colour = mix(colour, BACKGROUND_COLOUR, remove);
+	gl_FragDepth = mix(gl_FragCoord.z, 1.0f, remove);
+}
+
 //---Main---//
 in vec4 position_v;
 in vec2 texCoord_v;
@@ -120,4 +132,5 @@ out vec4 fragColour;
 void main()
 {
 	fragColour = Lighting(position_v, normal_v, texCoord_v);
+	DepthPeel(fragColour, projection * view * position_v);
 }

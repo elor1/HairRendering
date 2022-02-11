@@ -242,6 +242,7 @@ xcopy /y /d "$(SolutionDir)lib\assimp\assimp-vc140-mt.dll" "$(OutDir)"</Command>
     <ClInclude Include="src\Texture.h" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="src\shaders\hairDepthPeel.frag" />
     <None Include="src\shaders\hairOpacity.frag" />
     <None Include="src\shaders\hairRender.vert" />
     <None Include="src\shaders\mesh.frag" />
@@ -251,6 +252,7 @@ xcopy /y /d "$(SolutionDir)lib\assimp\assimp-vc140-mt.dll" "$(OutDir)"</Command>
     <None Include="src\shaders\hair.tcs" />
     <None Include="src\shaders\hair.tes" />
     <None Include="src\shaders\hair.vert" />
+    <None Include="src\shaders\meshDepthPeel.frag" />
     <None Include="src\shaders\quad.frag" />
     <None Include="src\shaders\quad.vert" />
     <None Include="src\shaders\white.frag" />

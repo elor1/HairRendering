@@ -28,6 +28,7 @@ struct Uniforms
 	int hairShadowMap;
 	int meshShadowMap;
 	int opacityMap;
+	int depthPeelMap;
 	int hairMap;
 	bool useShadows;
 	float shadowIntensity;

@@ -101,6 +101,7 @@ void GuiWindow::Update()
 	{
 		ImGui::Checkbox("Shadows", &mApp->useShadows);
 		ImGui::Checkbox("Supersampling", &mApp->useSuperSampling);
+		ImGui::Checkbox("Transparency", &mApp->useTransparency);
 	}
 
 	ImGui::End();

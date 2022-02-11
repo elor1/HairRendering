@@ -57,61 +57,68 @@ float GetMeshVisibility(vec4 point)
 	return mix(1.0f, texture(meshShadowMap, shadowCoord.xyz), useShadows);
 }
 
-//---Mesh lighting---//
-uniform vec3 hairColour;
-uniform vec3 lightPosition;
+//---Hair lighting---//
+uniform vec3 colour;
 uniform mat4 view;
 uniform mat4 dirToLight;
-uniform sampler2D hairMap;
+uniform vec3 lightPosition;
+uniform float specularIntensity;
+uniform float diffuseIntensity;
 
-vec3 meshColour;
-
-const float DIFFUSE_INTENSITY = 0.6f;
-const vec3 MESH_COLOUR = vec3(0.87f, 0.83f, 0.93f);
-const float AMBIENT_INTENSITY = 0.2f;
-const float FILL_LIGHT_INTENSITY = 0.4f;
+const float SHININESS = 50.0f;
+const float OPACITY = 0.75f;
+const float FILL_LIGHT_INTENSITY = 0.6f;
 const vec4 FILL_LIGHT_POSITION = vec4(-2.0f, 1.0f, 1.0f, 1.0f);
 
-vec3 GetColour(vec4 pos, vec4 normal, vec4 lightPos)
+vec3 GetColour(vec4 pos, vec3 tangent, vec4 lightPos)
 {
-	vec4 lightDir = lightPos - pos;
+	vec4 lightDir = normalize(view * lightPos - pos);
+	
+	float diffuse = sqrt(1.0f - abs(dot(normalize(tangent), lightDir.xyz)));
+	float specular = pow(sqrt(1.0f - abs(dot(normalize(tangent), normalize(normalize(-pos.xyz) + lightDir.xyz)))), SHININESS);
 
-	float diffuse =  max(0.0f, dot(normalize(lightDir), normalize(normal)));
-	return diffuse * DIFFUSE_INTENSITY * meshColour;
+	return colour * (diffuseIntensity * diffuse + specularIntensity * specular); 
 }
 
-vec4 Lighting(vec4 pos, vec4 normal, vec2 texCoord)
+vec4 Lighting(vec4 pos, vec3 tangent)
 {
-	float alpha = texture(hairMap, texCoord).a;
-	float hair = 0.0f;
-	if (alpha > 0.05f)
-	{
-		hair = 1.0f;
-	}
-	meshColour = mix(MESH_COLOUR, hairColour, 0.0f);
+	vec4 lightSpacePos = dirToLight * pos;
 
-	vec4 lightSpacePos = dirToLight * view * pos;
 	vec4 colour;
-	colour.w = 1.0f;
+	colour.w = OPACITY;
 
 	//Key light
-	colour.xyz = GetColour(pos, normal, vec4(lightPosition, 1.0f));
+	colour.xyz = GetColour(pos, tangent, view * vec4(lightPosition, 1.0f));
 	colour.xyz *= CalculateTransmittance(lightSpacePos);
 	colour.xyz *= GetMeshVisibility(lightSpacePos);
 
 	//Fill light
-	colour.xyz += FILL_LIGHT_INTENSITY * GetColour(pos, normal, FILL_LIGHT_POSITION);
-
-	//Ambient light
-	colour.xyz += AMBIENT_INTENSITY * meshColour;
+	colour.xyz += FILL_LIGHT_INTENSITY * GetColour(pos, tangent, view * FILL_LIGHT_POSITION);
 
 	return colour;
 }
 
+//---Depth peel---//
+uniform sampler2D depthPeelMap;
+
+const vec4 BACKGROUND_COLOUR = vec4 (0.0f, 0.0f, 0.0f, 1.0f);
+
+void DepthPeel(inout vec4 colour, vec4 point)
+{
+	vec4 clip = (point / point.w + 1.0f) / 2.0f;
+	
+	float currentDepth = gl_FragCoord.z - 1e-4;
+	float previousDepth = texelFetch(depthPeelMap, ivec2(clip.xy * textureSize(depthPeelMap, 0)), 0).r;
+
+	float remove = step(currentDepth, previousDepth);
+
+	colour = mix(colour, BACKGROUND_COLOUR, remove);
+	gl_FragDepth = mix(gl_FragCoord.z, 1.0f, remove);
+}
+
 //---Main---//
-in vec4 position_v;
-in vec2 texCoord_v;
-in vec4 normal_v;
+in vec4 position_g;
+in vec3 tangent_g;
 
 uniform mat4 projection;
 
@@ -119,5 +126,6 @@ out vec4 fragColour;
 
 void main()
 {
-	fragColour = Lighting(position_v, normal_v, texCoord_v);
+	fragColour = Lighting(position_g, tangent_g);
+	DepthPeel(fragColour, projection * position_g);
 }

@@ -29,6 +29,7 @@ public:
 	void SetHairMap(std::string filename);
 	bool useShadows;
 	bool useSuperSampling;
+	bool useTransparency;
 
 private:
 	void Initialise();
@@ -59,6 +60,8 @@ private:
 	ShaderProgram* mHairOpacityProgram;
 	ShaderProgram* mWhiteHairProgram;
 	ShaderProgram* mWhiteMeshProgram;
+	ShaderProgram* mHairDepthPeelProgram;
+	ShaderProgram* mMeshDepthPeelProgram;
 
 	float mHairDensity;
 
@@ -69,6 +72,8 @@ private:
 	Framebuffer* mMeshShadowFramebuffer;
 	Framebuffer* mOpacityMapFramebuffer;
 	Framebuffer* mFinalFramebuffer;
+	Framebuffer* mDepthPeelFramebuffer;
+	Framebuffer* mDepthPeelFramebuffer1;
 
 	Camera* mCamera;
 	bool mFirstMouse;
