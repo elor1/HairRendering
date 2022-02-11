@@ -36,6 +36,8 @@ struct Uniforms
 	float specularIntensity;
 	float diffuseIntensity;
 	float length;
+	float opacity;
+	float maxColourChange;
 };
 
 class ShaderProgram

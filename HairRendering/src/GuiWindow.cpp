@@ -45,26 +45,6 @@ void GuiWindow::Update()
 	std::string stats = std::to_string(numGuideHairs) + " simulated guide hairs \n" + std::to_string(numGuideHairs * numGroupHairs) + " total hairs \n";
 	ImGui::Text(stats.c_str());
 
-	if (ImGui::CollapsingHeader("Hair", ImGuiTreeNodeFlags_DefaultOpen))
-	{
-		const char* hairMaps[] = { "hairmap.png", "hairmap2.png" };
-		int currentHairMap = 0;
-		if (ImGui::Combo("Hair map", &currentHairMap, hairMaps, IM_ARRAYSIZE(hairMaps)))
-		{
-			mApp->SetHairMap(hairMaps[currentHairMap]);
-			mApp->ResetSimulation();
-		}
-		ImGui::SliderInt("Strands per guide hair", &hair->mNumGroupHairs, 0, 64);
-		ImGui::SliderInt("Vertices per strand", &hair->mNumSplineVertices, 0, 50);
-		ImGui::SliderFloat("Hair radius", &hair->mHairRadius, 0.0f, 0.1f);
-		ImGui::ColorEdit3("Hair colour", &hair->mColour.x);
-		ImGui::SliderFloat("Noise amplitude", &hair->mNoiseAmplitude, 0.0f, 1.0f);
-		ImGui::SliderFloat("Noise frquency", &hair->mNoiseFrequency, 0.0f, 1.0f);
-		ImGui::SliderFloat("Shadow intensity", &hair->mShadowIntensity, 0.0f, 50.0f);
-		ImGui::SliderFloat("Diffuse intensity", &hair->mDiffuseIntensity, 0.0f, 5.0f);
-		ImGui::SliderFloat("Specular intensity", &hair->mSpecularIntensity, 0.0f, 5.0f);
-	}
-
 	if (ImGui::CollapsingHeader("Simulation", ImGuiTreeNodeFlags_DefaultOpen))
 	{
 		ImGui::InputFloat3("Wind direction", &hair->mSimulation->windDirection.x);
@@ -90,18 +70,36 @@ void GuiWindow::Update()
 		{
 			hair->mSimulation->ResetPosition();
 		}
-		
+
 		if (ImGui::Button("Reset simulation"))
 		{
 			mApp->ResetSimulation();
 		}
 	}
 
-	if (ImGui::CollapsingHeader("Rendering", ImGuiTreeNodeFlags_DefaultOpen))
+	if (ImGui::CollapsingHeader("Hair", ImGuiTreeNodeFlags_DefaultOpen))
 	{
+		const char* hairMaps[] = { "hairmap.png", "hairmap2.png" };
+		int currentHairMap = 0;
+		if (ImGui::Combo("Hair map", &currentHairMap, hairMaps, IM_ARRAYSIZE(hairMaps)))
+		{
+			mApp->SetHairMap(hairMaps[currentHairMap]);
+			mApp->ResetSimulation();
+		}
 		ImGui::Checkbox("Shadows", &mApp->useShadows);
 		ImGui::Checkbox("Supersampling", &mApp->useSuperSampling);
 		ImGui::Checkbox("Transparency", &mApp->useTransparency);
+		ImGui::SliderInt("Strands per guide hair", &hair->mNumGroupHairs, 0, 64);
+		ImGui::SliderInt("Vertices per strand", &hair->mNumSplineVertices, 0, 50);
+		ImGui::SliderFloat("Hair radius", &hair->mHairRadius, 0.0f, 0.1f);
+		ImGui::ColorEdit3("Hair colour", &hair->mColour.x);
+		ImGui::SliderFloat("Noise amplitude", &hair->mNoiseAmplitude, 0.0f, 1.0f);
+		ImGui::SliderFloat("Noise frquency", &hair->mNoiseFrequency, 0.0f, 1.0f);
+		ImGui::SliderFloat("Shadow intensity", &hair->mShadowIntensity, 0.0f, 50.0f);
+		ImGui::SliderFloat("Diffuse intensity", &hair->mDiffuseIntensity, 0.0f, 5.0f);
+		ImGui::SliderFloat("Specular intensity", &hair->mSpecularIntensity, 0.0f, 5.0f);
+		ImGui::SliderFloat("Opacity", &hair->mOpacity, 0.0f, 1.0f);
+		ImGui::SliderFloat("Colour variation", &hair->mColourChange, 0.0f, 5.0f);
 	}
 
 	ImGui::End();

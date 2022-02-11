@@ -4,10 +4,11 @@ layout(isolines) in;
 
 out vec3 tangent_te;
 out float tessx_te;
+out float colourChange_te;
 
-out vec3 pos;
+/*out vec3 pos;
 out vec3 tangent;
-out float tessx;
+out float tessx;*/
 
 const int MAX_VERTICES = 64; //Max number of hair vertices
 const int NOISE_LAYERS = 3;
@@ -79,11 +80,12 @@ void main()
 
     tangent_te = (view * model * vec4(nextPosition - previousPosition, 0.0f)).xyz;
     tessx_te = gl_TessCoord.x;
+    colourChange_te = texture(noiseTexture, triangleFace[0].xy * gl_TessCoord.yy).r;
 
     gl_Position = view * model * vec4(position, 1.0f);
 
-    //Feedback
+    /*Feedback
     pos = (model * vec4(position, 1.0f)).xyz;
     tangent = (model * vec4(nextPosition - previousPosition, 0.0f)).xyz;
-    tessx = tessx_te;
+    tessx = tessx_te;*/
 }

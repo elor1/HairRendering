@@ -191,6 +191,7 @@ void Hair::SetAttributes(glm::vec3 colour, int numGroupHairs, float groupSpread,
 	mShadowIntensity = 15.0f;
 	mDiffuseIntensity = 1.0f;
 	mSpecularIntensity = 0.5f;
+	mColourChange = 0.8f;
 }
 
 std::vector<Strand*> Hair::GetGuideHairs()
@@ -241,4 +242,14 @@ float Hair::GetDiffuseIntensity()
 float Hair::GetSpecularIntensity()
 {
 	return mSpecularIntensity;
+}
+
+float Hair::GetOpacity()
+{
+	return mOpacity;
+}
+
+float Hair::GetColourChange()
+{
+	return mColourChange;
 }

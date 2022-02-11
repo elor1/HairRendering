@@ -30,6 +30,7 @@ void ShaderProgram::SetGlobalUniforms()
 	glUniform1i(GetUniformLocation("hairShadowMap"), uniforms.hairShadowMap);
 	glUniform1i(GetUniformLocation("meshShadowMap"), uniforms.meshShadowMap);
 	glUniform1i(GetUniformLocation("opacityMap"), uniforms.opacityMap);
+	glUniform1i(GetUniformLocation("depthPeelMap"), uniforms.depthPeelMap);
 	glUniform1i(GetUniformLocation("useShadows"), uniforms.useShadows);
 	glUniform1f(GetUniformLocation("shadowIntensity"), uniforms.shadowIntensity);
 	glUniform1f(GetUniformLocation("layerSize"), uniforms.occlusionLayerSize);
@@ -48,6 +49,8 @@ void ShaderProgram::SetObjectUniforms()
 	glUniform3fv(GetUniformLocation("colour"), 1, glm::value_ptr(uniforms.colour));
 	glUniform1f(GetUniformLocation("specularIntensity"), uniforms.specularIntensity);
 	glUniform1f(GetUniformLocation("diffuseIntensity"), uniforms.diffuseIntensity);
+	glUniform1f(GetUniformLocation("opacity"), uniforms.opacity);
+	glUniform1f(GetUniformLocation("maxColourChange"), uniforms.maxColourChange);
 }
 
 void ShaderProgram::SetDrawUniforms()

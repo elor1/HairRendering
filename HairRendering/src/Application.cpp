@@ -629,6 +629,8 @@ void Application::DrawHair(ShaderProgram* program, glm::mat4 model, glm::mat4 vi
 	program->uniforms.useShadows = useShadows;
 	program->uniforms.specularIntensity = mHair->GetSpecularIntensity();
 	program->uniforms.diffuseIntensity = mHair->GetDiffuseIntensity();
+	program->uniforms.opacity = mHair->GetOpacity();
+	program->uniforms.maxColourChange = mHair->GetColourChange();
 	program->SetGlobalUniforms();
 	mHair->Draw(program);
 }

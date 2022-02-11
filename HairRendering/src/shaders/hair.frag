@@ -64,36 +64,38 @@ uniform mat4 dirToLight;
 uniform vec3 lightPosition;
 uniform float specularIntensity;
 uniform float diffuseIntensity;
+uniform float opacity;
+uniform float maxColourChange;
 
 const float SHININESS = 50.0f;
-const float OPACITY = 0.75f;
 const float FILL_LIGHT_INTENSITY = 0.6f;
 const vec4 FILL_LIGHT_POSITION = vec4(-2.0f, 1.0f, 1.0f, 1.0f);
 
-vec3 GetColour(vec4 pos, vec3 tangent, vec4 lightPos)
+vec3 GetColour(vec4 pos, vec3 tangent, vec4 lightPos, float colourChange)
 {
-	vec4 lightDir = normalize(view * lightPos - pos);
+	vec4 lightDir = normalize(lightPos - pos);
 	
 	float diffuse = sqrt(1.0f - abs(dot(normalize(tangent), lightDir.xyz)));
 	float specular = pow(sqrt(1.0f - abs(dot(normalize(tangent), normalize(normalize(-pos.xyz) + lightDir.xyz)))), SHININESS);
+	vec3 colourScale = vec3(1.0f + maxColourChange * (2.0f * colourChange - 1.0f));
 
-	return colour * (diffuseIntensity * diffuse + specularIntensity * specular); 
+	return colour * colourScale * (diffuseIntensity * diffuse + specularIntensity * specular); 
 }
 
-vec4 Lighting(vec4 pos, vec3 tangent)
+vec4 Lighting(vec4 pos, vec3 tangent, float colourChange)
 {
 	vec4 lightSpacePos = dirToLight * pos;
 
 	vec4 colour;
-	colour.w = OPACITY;
+	colour.w = opacity;
 
 	//Key light
-	colour.xyz = GetColour(pos, tangent, view * vec4(lightPosition, 1.0f));
+	colour.xyz = GetColour(pos, tangent, view * vec4(lightPosition, 1.0f), colourChange);
 	colour.xyz *= CalculateTransmittance(lightSpacePos);
 	colour.xyz *= GetMeshVisibility(lightSpacePos);
 
 	//Fill light
-	colour.xyz += FILL_LIGHT_INTENSITY * GetColour(pos, tangent, view * FILL_LIGHT_POSITION);
+	colour.xyz += FILL_LIGHT_INTENSITY * GetColour(pos, tangent, view * FILL_LIGHT_POSITION, colourChange);
 
 	return colour;
 }
@@ -101,10 +103,11 @@ vec4 Lighting(vec4 pos, vec3 tangent)
 //---Main---//
 in vec4 position_g;
 in vec3 tangent_g;
+in float colourChange_g;
 
 out vec4 fragColour;
 
 void main()
 {
-	fragColour = Lighting(position_g, tangent_g);
+	fragColour = Lighting(position_g, tangent_g, colourChange_g);
 }
