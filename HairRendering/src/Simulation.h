@@ -85,6 +85,7 @@ public:
 	float windStrength;
 	float friction;
 	float stiffness;
+	float dampening;
 
 	void ResetPosition();
 

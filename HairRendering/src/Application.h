@@ -27,9 +27,12 @@ public:
 	void ResetSimulation();
 	bool IsPaused();
 	void SetHairMap(std::string filename);
+	void SetModel(std::string filename);
 	bool useShadows;
 	bool useSuperSampling;
 	bool useTransparency;
+	float hairDensity;
+	float maxLength;
 
 private:
 	void Initialise();
@@ -52,7 +55,10 @@ private:
 
 	Hair* mHair;
 	Simulation* mSimulation;
-	std::string mHairMap;
+
+	std::string mHairMapName;
+	std::string mModelName;
+	std::string mColliderName;
 
 	std::vector<ShaderProgram*> mPrograms;
 	ShaderProgram* mMeshProgram;
@@ -63,15 +69,13 @@ private:
 	ShaderProgram* mHairDepthPeelProgram;
 	ShaderProgram* mMeshDepthPeelProgram;
 
-	float mHairDensity;
-
 	Texture* mNoiseTexture;
 
 	std::vector<Framebuffer*> mFramebuffers;
 	Framebuffer* mHairShadowFramebuffer;
 	Framebuffer* mMeshShadowFramebuffer;
 	Framebuffer* mOpacityMapFramebuffer;
-	Framebuffer* mFinalFramebuffer;
+	Framebuffer* mSsFramebuffer;
 	Framebuffer* mDepthPeelFramebuffer;
 	Framebuffer* mDepthPeelFramebuffer1;
 

@@ -6,12 +6,8 @@
 #include <iostream>
 
 #define GRAVITY -9.8f
-#define MASS 1.0f
-#define DAMPENING 0.99f
 #define TIMESTEP 0.02f
 #define GRID_WIDTH 0.1f
-
-#define WIND false
 #define COLLISIONS true
 
 Simulation::Simulation(Mesh* mesh)
@@ -28,7 +24,8 @@ Simulation::Simulation(Mesh* mesh)
 	windDirection = glm::vec3(1.0f, 0.0f, 0.0f);
 	windStrength = 0.0f;
 	friction = 0.05f;
-	stiffness = 0.01f;
+	stiffness = 0.0f;
+	dampening = 0.95f;
 }
 
 void Simulation::Update(float time)
@@ -100,11 +97,16 @@ void Simulation::Move(Hair* hair)
 			vertex->prevPosition = glm::vec3(mTransform * glm::vec4(vertex->startPosition, 1.0f));
 		}
 	}*/
+	
+	mHeadMoving = true;
+	UpdateHair(hair);
 	if (shake || nod)
 	{
-		mHeadMoving = true;
-		UpdateHair(hair);
 		mTransform = glm::rotate((float)sin(mTime), glm::vec3(nod, shake, 0));
+	}
+	else
+	{
+		mTransform = glm::rotate(0.0f, glm::vec3(0, 1, 0));
 	}
 
 	/*if (nod)
@@ -126,7 +128,7 @@ void Simulation::CalculateExternalForces(Hair* hair)
 			glm::vec3 force = glm::vec3(0.0f);
 			force += glm::vec3(glm::inverse(mTransform) * glm::vec4(0.0f, GRAVITY, 0.0f, 0.0f));
 
-			if (mHeadMoving)
+			if (true)
 			{
 				glm::vec4 current = mTransform * glm::vec4(vertex->startPosition, 1.0f);
 				glm::vec3 acceleration = (glm::vec3(vertex->prevPosition - glm::vec3(current)) - vertex->velocity * TIMESTEP) / (TIMESTEP * TIMESTEP);
@@ -364,7 +366,7 @@ void Simulation::ParticleSimulation(Hair* hair)
 		{
 			HairVertex* previous = guide->vertices[i - 1];
 			HairVertex* current = guide->vertices[i];
-			previous->velocity = ((previous->tempPosition - previous->position) / TIMESTEP) + DAMPENING * (current->correction / TIMESTEP);
+			previous->velocity = ((previous->tempPosition - previous->position) / TIMESTEP) + dampening * (current->correction / TIMESTEP);
 			previous->position = previous->tempPosition;
 		}
 

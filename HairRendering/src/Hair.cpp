@@ -34,7 +34,7 @@ Hair::Hair(Mesh* mesh, float hairDensity, Simulation* simulation, Hair* oldHair)
 	mSimulation = simulation;
 }
 
-Hair::Hair(Mesh* mesh, float hairDensity, const char* hairMap, Simulation* simulation, Hair* oldHair)
+Hair::Hair(Mesh* mesh, float hairDensity, const char* hairMap, double maxLength, Simulation* simulation, Hair* oldHair)
 {
 	if (hairMap == "")
 	{
@@ -115,7 +115,7 @@ Hair::Hair(Mesh* mesh, float hairDensity, const char* hairMap, Simulation* simul
 				continue;
 			}
 
-			mGuideHairs.push_back(new Strand(20, mMaxLength * alphaVal, randomPoint.position, randomPoint.normal));
+			mGuideHairs.push_back(new Strand(20, maxLength * alphaVal, randomPoint.position, randomPoint.normal));
 		}
 	}
 

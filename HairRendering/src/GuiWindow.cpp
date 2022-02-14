@@ -52,8 +52,9 @@ void GuiWindow::Update()
 		ImGui::Checkbox("Shake", &hair->mSimulation->shake);
 		ImGui::Checkbox("Nod", &hair->mSimulation->nod);
 		ImGui::SliderFloat("Stiffness", &hair->mSimulation->stiffness, 0.0f, 1.0f);
-		ImGui::Checkbox("Friction", &hair->mSimulation->useFriction);
-		ImGui::SliderFloat("Friction amount", &hair->mSimulation->friction, 0.0f, 0.5f);
+		ImGui::SliderFloat("Dampening", &hair->mSimulation->dampening, 0.0f, 1.0f);
+		/*ImGui::Checkbox("Friction", &hair->mSimulation->useFriction);
+		ImGui::SliderFloat("Friction amount", &hair->mSimulation->friction, 0.0f, 0.5f);*/
 
 		std::string pauseLabel = "Pause";
 		if (mApp->IsPaused())
@@ -66,10 +67,10 @@ void GuiWindow::Update()
 			mApp->TogglePause();
 		}
 
-		if (ImGui::Button("Reset position"))
+		/*if (ImGui::Button("Reset position"))
 		{
 			hair->mSimulation->ResetPosition();
-		}
+		}*/
 
 		if (ImGui::Button("Reset simulation"))
 		{
@@ -79,7 +80,15 @@ void GuiWindow::Update()
 
 	if (ImGui::CollapsingHeader("Hair", ImGuiTreeNodeFlags_DefaultOpen))
 	{
-		const char* hairMaps[] = { "hairmap.png", "hairmap2.png" };
+		const char* models[] = { "head.obj", "bear.obj" };
+		int currentModel = 0;
+		if (ImGui::Combo("Model", &currentModel, models, IM_ARRAYSIZE(models)))
+		{
+			mApp->SetModel(models[currentModel]);
+			mApp->ResetSimulation();
+		}
+
+		const char* hairMaps[] = { "hairmap.png", "hairmap2.png", "beard2.png", "sideburnsHairmap.png", "black.png"};
 		int currentHairMap = 0;
 		if (ImGui::Combo("Hair map", &currentHairMap, hairMaps, IM_ARRAYSIZE(hairMaps)))
 		{
@@ -89,8 +98,16 @@ void GuiWindow::Update()
 		ImGui::Checkbox("Shadows", &mApp->useShadows);
 		ImGui::Checkbox("Supersampling", &mApp->useSuperSampling);
 		ImGui::Checkbox("Transparency", &mApp->useTransparency);
+		if (ImGui::SliderFloat("Density", &mApp->hairDensity, 0.0f, 1000.0f))
+		{
+			mApp->ResetSimulation();
+		}
 		ImGui::SliderInt("Strands per guide hair", &hair->mNumGroupHairs, 0, 64);
 		ImGui::SliderInt("Vertices per strand", &hair->mNumSplineVertices, 0, 50);
+		if (ImGui::SliderFloat("Max length", &mApp->maxLength, 0.01, 2))
+		{
+			mApp->ResetSimulation();
+		}
 		ImGui::SliderFloat("Hair radius", &hair->mHairRadius, 0.0f, 0.1f);
 		ImGui::ColorEdit3("Hair colour", &hair->mColour.x);
 		ImGui::SliderFloat("Noise amplitude", &hair->mNoiseAmplitude, 0.0f, 1.0f);

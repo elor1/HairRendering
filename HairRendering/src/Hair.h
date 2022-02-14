@@ -14,7 +14,7 @@ public:
 	friend class GuiWindow;
 	Hair(int numGuides, Simulation* simulation);
 	Hair(Mesh* mesh, float hairDensity, Simulation* simulation, Hair* oldHair = nullptr);
-	Hair(Mesh* mesh, float hairDensity, const char* hairMap, Simulation* simulation, Hair* oldHair = nullptr);
+	Hair(Mesh* mesh, float hairDensity, const char* hairMap, double maxLength, Simulation* simulation, Hair* oldHair = nullptr);
 	~Hair();
 
 	void Update(float time);
@@ -53,7 +53,6 @@ private:
 	float mShadowIntensity;
 	float mDiffuseIntensity;
 	float mSpecularIntensity;
-	float mMaxLength = 0.45f;
 	float mOpacity = 0.75f;
 	float mColourChange;
 };

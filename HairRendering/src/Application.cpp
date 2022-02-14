@@ -18,7 +18,7 @@ Application::Application(int width, int height)
 	mCurrentTime = glfwGetTime();
 	mWidth = width;
 	mHeight = height;
-	mHairDensity = 150;
+	hairDensity = 150;
 	mFirstMouse = true;
 	mLastX = width / 2.0;
 	mLastY = width / 2.f;
@@ -28,7 +28,10 @@ Application::Application(int width, int height)
 	useShadows = true;
 	useSuperSampling = true;
 	useTransparency = true;
-	mHairMap = "hairmap.png";
+	mHairMapName = "hairmap.png";
+	mModelName = "head.obj";
+	mColliderName = "headCollider.obj";
+	maxLength = 0.45;
 
 	Initialise();
 }
@@ -90,7 +93,28 @@ bool Application::IsPaused()
 
 void Application::SetHairMap(std::string filename)
 {
-	mHairMap = filename;
+	mHairMapName = filename;
+}
+
+void Application::SetModel(std::string filename)
+{
+	mModelName = filename;
+
+	std::string collider = "";
+	for (int i = 0; i < collider.length() - 5; i++)
+	{
+		collider += mModelName[i];
+	}
+	collider += "Collider.obj";
+
+	if (mModelName == "head.obj")
+	{
+		SetHairMap("hairmap.png");
+	}
+	else
+	{
+		SetHairMap("black.png");
+	}
 }
 
 
@@ -182,7 +206,7 @@ void Application::Initialise()
 		mHairShadowFramebuffer = new Framebuffer(),
 		mMeshShadowFramebuffer = new Framebuffer(),
 		mOpacityMapFramebuffer = new Framebuffer(),
-		mFinalFramebuffer = new Framebuffer(),
+		mSsFramebuffer = new Framebuffer(),
 		mDepthPeelFramebuffer = new Framebuffer(),
 		mDepthPeelFramebuffer1 = new Framebuffer(),
 	};
@@ -196,8 +220,8 @@ void Application::Initialise()
 	mMeshShadowFramebuffer->GenerateDepthTexture(shadowMapSize, shadowMapSize, GL_LINEAR, GL_LINEAR);
 	mOpacityMapFramebuffer->GenerateTexture(shadowMapSize, shadowMapSize, GL_NEAREST, GL_NEAREST);
 	mOpacityMapFramebuffer->GenerateDepthBuffer(shadowMapSize, shadowMapSize);
-	mFinalFramebuffer->GenerateTexture(size.x, size.y, GL_LINEAR, GL_LINEAR);
-	mFinalFramebuffer->GenerateDepthBuffer(size.x, size.y);
+	mSsFramebuffer->GenerateTexture(size.x, size.y, GL_LINEAR, GL_LINEAR);
+	mSsFramebuffer->GenerateDepthBuffer(size.x, size.y);
 	mDepthPeelFramebuffer->GenerateTexture(size.x, size.y, GL_LINEAR, GL_LINEAR);
 	mDepthPeelFramebuffer->GenerateDepthTexture(size.x, size.y, GL_NEAREST, GL_NEAREST);
 	mDepthPeelFramebuffer1->GenerateTexture(size.x, size.y, GL_LINEAR, GL_LINEAR);
@@ -224,15 +248,15 @@ void Application::InitSimulation()
 	}
 
 	//Head model
-	mHead = new Model("../models/Head3.obj");
+	mHead = new Model("../models/" + mModelName);
 	//mHead = model->GetFirstMesh();
 
 	//Collision model
-	mCollider = new Model("../models/Collider.obj", 1.1f);
+	mCollider = new Model("../models/" + mColliderName, 1.1f);
 	
 	mSimulation = new Simulation(mCollider->GetFirstMesh());
 
-	mHair = new Hair(mHead->GetFirstMesh(), mHairDensity, ("../images/" + mHairMap).c_str(), mSimulation);
+	mHair = new Hair(mHead->GetFirstMesh(), hairDensity, ("../images/" + mHairMapName).c_str(), (double)maxLength, mSimulation);
 }
 
 
@@ -281,7 +305,7 @@ void Application::Draw()
 	mHairShadowFramebuffer->GetDepthTexture()->Bind(GL_TEXTURE1);
 	mOpacityMapFramebuffer->GetColourTexture()->Bind(GL_TEXTURE2);
 	mMeshShadowFramebuffer->GetDepthTexture()->Bind(GL_TEXTURE3);
-	mFinalFramebuffer->GetColourTexture()->Bind(GL_TEXTURE4);
+	mSsFramebuffer->GetColourTexture()->Bind(GL_TEXTURE4);
 	mHair->GetHairMap()->Bind(GL_TEXTURE5);
 	mDepthPeelFramebuffer->GetDepthTexture()->Bind(GL_TEXTURE6);
 	mDepthPeelFramebuffer->GetColourTexture()->Bind(GL_TEXTURE7);
@@ -351,8 +375,8 @@ void Application::Draw()
 	{
 		if (useSuperSampling)
 		{
-			mFinalFramebuffer->Bind();
-			glViewport(0, 0, mFinalFramebuffer->GetColourTexture()->GetWidth(), mFinalFramebuffer->GetColourTexture()->GetHeight());
+			mSsFramebuffer->Bind();
+			glViewport(0, 0, mSsFramebuffer->GetColourTexture()->GetWidth(), mSsFramebuffer->GetColourTexture()->GetHeight());
 		}
 		else
 		{
@@ -369,10 +393,10 @@ void Application::Draw()
 		if (useSuperSampling)
 		{
 			//Render texture
-			mFinalFramebuffer->Unbind();
+			mSsFramebuffer->Unbind();
 			glViewport(0, 0, mWidth, mHeight);
 			glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-			mFinalFramebuffer->GetColourTexture()->RenderFullScreen();
+			mSsFramebuffer->GetColourTexture()->RenderFullScreen();
 		}
 	}
 	
@@ -381,7 +405,7 @@ void Application::Draw()
 	mHairShadowFramebuffer->GetDepthTexture()->Unbind(GL_TEXTURE1);
 	mOpacityMapFramebuffer->GetColourTexture()->Unbind(GL_TEXTURE2);
 	mMeshShadowFramebuffer->GetDepthTexture()->Unbind(GL_TEXTURE3);
-	mFinalFramebuffer->GetColourTexture()->Unbind(GL_TEXTURE4);
+	mSsFramebuffer->GetColourTexture()->Unbind(GL_TEXTURE4);
 	mHair->GetHairMap()->Unbind(GL_TEXTURE5);
 	mDepthPeelFramebuffer->GetDepthTexture()->Unbind(GL_TEXTURE6);
 	mDepthPeelFramebuffer->GetColourTexture()->Unbind(GL_TEXTURE7);
@@ -559,7 +583,7 @@ void Application::MouseButtonCallback(GLFWwindow* window, int button, int action
 			mSimulation->SetHeadMoving(true);
 		}
 
-		if (button = GLFW_MOUSE_BUTTON_RIGHT)
+		if (button == GLFW_MOUSE_BUTTON_RIGHT)
 		{
 			double x, y;
 			glfwGetCursorPos(window, &x, &y);
