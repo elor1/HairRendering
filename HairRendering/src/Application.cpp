@@ -28,7 +28,7 @@ Application::Application(int width, int height)
 	useShadows = true;
 	useSuperSampling = true;
 	useTransparency = true;
-	mHairMapName = "hairmap.png";
+	mHairMapName = "hair.png";
 	mModelName = "head.obj";
 	mColliderName = "headCollider.obj";
 	maxLength = 0.45;
@@ -109,7 +109,7 @@ void Application::SetModel(std::string filename)
 
 	if (mModelName == "head.obj")
 	{
-		SetHairMap("hairmap.png");
+		SetHairMap("hair.png");
 	}
 	else
 	{
@@ -249,7 +249,6 @@ void Application::InitSimulation()
 
 	//Head model
 	mHead = new Model("../models/" + mModelName);
-	//mHead = model->GetFirstMesh();
 
 	//Collision model
 	mCollider = new Model("../models/" + mColliderName, 1.1f);

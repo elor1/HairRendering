@@ -83,6 +83,7 @@ std::vector<Vertex> Mesh::GetVertices()
 	return mVertices;
 }
 
+
 bool Mesh::Contains(glm::vec3 &normal, glm::vec3 position)
 {
 	//Ellipsoid collisions

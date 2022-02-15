@@ -35,7 +35,7 @@ void GuiWindow::Update()
 	Hair* hair = mApp->GetHair();
 
 	//Update stats
-	ImGui::Text("Stats:");
+	//ImGui::Text("Stats:");
 
 	double fps = (1.0 / mApp->GetDeltaTime());
 	ImGui::Text((std::to_string(fps) + " FPS").c_str());
@@ -88,7 +88,7 @@ void GuiWindow::Update()
 			mApp->ResetSimulation();
 		}
 
-		const char* hairMaps[] = { "hairmap.png", "hairmap2.png", "beard2.png", "sideburnsHairmap.png", "black.png"};
+		const char* hairMaps[] = { "hair.png", "hair2.png", "beard.png", "sideburns.png", "black.png"};
 		int currentHairMap = 0;
 		if (ImGui::Combo("Hair map", &currentHairMap, hairMaps, IM_ARRAYSIZE(hairMaps)))
 		{
@@ -109,9 +109,10 @@ void GuiWindow::Update()
 			mApp->ResetSimulation();
 		}
 		ImGui::SliderFloat("Hair radius", &hair->mHairRadius, 0.0f, 0.1f);
+		ImGui::SliderFloat("Group spread", &hair->mGroupSpread, 0.0f, 1.0f);
 		ImGui::ColorEdit3("Hair colour", &hair->mColour.x);
 		ImGui::SliderFloat("Noise amplitude", &hair->mNoiseAmplitude, 0.0f, 1.0f);
-		ImGui::SliderFloat("Noise frquency", &hair->mNoiseFrequency, 0.0f, 1.0f);
+		ImGui::SliderFloat("Noise frequency", &hair->mNoiseFrequency, 0.0f, 1.0f);
 		ImGui::SliderFloat("Shadow intensity", &hair->mShadowIntensity, 0.0f, 50.0f);
 		ImGui::SliderFloat("Diffuse intensity", &hair->mDiffuseIntensity, 0.0f, 5.0f);
 		ImGui::SliderFloat("Specular intensity", &hair->mSpecularIntensity, 0.0f, 5.0f);

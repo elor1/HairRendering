@@ -179,7 +179,7 @@ void Hair::SetAttributes(Hair* oldHair)
 	}
 }
 
-void Hair::SetAttributes(glm::vec3 colour, int numGroupHairs, float groupSpread, float hairRadius, float noiseAmplitude, float noiseFrequency, int numSplineVertices)
+void Hair::SetAttributes(glm::vec3 colour, int numGroupHairs, float groupSpread, float hairRadius, float noiseAmplitude, float noiseFrequency, int numSplineVertices, float shadowIntensity, float diffuseIntensity, float specularIntensity, float opacity, float colourChange)
 {
 	mColour = colour;
 	mNumGroupHairs = numGroupHairs;
@@ -188,10 +188,11 @@ void Hair::SetAttributes(glm::vec3 colour, int numGroupHairs, float groupSpread,
 	mNoiseAmplitude = noiseAmplitude;
 	mNoiseFrequency = noiseFrequency;
 	mNumSplineVertices = numSplineVertices;
-	mShadowIntensity = 15.0f;
-	mDiffuseIntensity = 1.0f;
-	mSpecularIntensity = 0.5f;
-	mColourChange = 0.8f;
+	mShadowIntensity = shadowIntensity;
+	mDiffuseIntensity = diffuseIntensity;
+	mSpecularIntensity = specularIntensity;
+	mOpacity = opacity;
+	mColourChange = colourChange;
 }
 
 std::vector<Strand*> Hair::GetGuideHairs()

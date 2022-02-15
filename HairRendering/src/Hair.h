@@ -21,7 +21,7 @@ public:
 	void Draw(ShaderProgram* program);
 
 	void SetAttributes(Hair* oldHair);
-	void SetAttributes(glm::vec3 colour = glm::vec3(0.25f, 0.17f, 0.15f), int numGroupHairs = 64, float groupSpread = 0.3f, float hairRadius = 0.003f, float noiseAmplitude = 0.3f, float noiseFrequency =  0.2f, int numSplineVertices = 20);
+	void SetAttributes(glm::vec3 colour = glm::vec3(0.25f, 0.17f, 0.15f), int numGroupHairs = 64, float groupSpread = 0.3f, float hairRadius = 0.003f, float noiseAmplitude = 0.3f, float noiseFrequency =  0.2f, int numSplineVertices = 20, float shadowIntensity = 20.0f, float diffuseIntensity = 1.0f, float specularIntensity = 0.5f, float opacity = 0.25, float colourChange = 1.5f);
 
 	std::vector<Strand*> GetGuideHairs();
 	int GetNumGroupHairs();
