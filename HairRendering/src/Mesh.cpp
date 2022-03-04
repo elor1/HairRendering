@@ -2,7 +2,6 @@
 #include <glew.h>
 #include <glm.hpp>
 #include <gtc/random.hpp>
-#include "MeshOctree.h"
 
 Mesh::Mesh(std::vector<Vertex> vertices, std::vector<unsigned int> indices, float scale)
 {

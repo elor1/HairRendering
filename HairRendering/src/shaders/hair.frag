@@ -58,6 +58,8 @@ float GetMeshVisibility(vec4 point)
 }
 
 //---Hair lighting---//
+in float tessx_g;
+
 uniform vec3 colour;
 uniform mat4 view;
 uniform mat4 dirToLight;
@@ -70,6 +72,9 @@ uniform float maxColourChange;
 const float SHININESS = 50.0f;
 const float FILL_LIGHT_INTENSITY = 0.6f;
 const vec4 FILL_LIGHT_POSITION = vec4(-2.0f, 1.0f, 1.0f, 1.0f);
+const float MIN_COLOUR = 0.5f;
+const float MIN_COLOUR_END = 0.0f;
+const float MAX_COLOUR_START = 0.3f;
 
 vec3 GetColour(vec4 pos, vec3 tangent, vec4 lightPos, float colourChange)
 {
@@ -77,7 +82,10 @@ vec3 GetColour(vec4 pos, vec3 tangent, vec4 lightPos, float colourChange)
 	
 	float diffuse = sqrt(1.0f - abs(dot(normalize(tangent), lightDir.xyz)));
 	float specular = pow(sqrt(1.0f - abs(dot(normalize(tangent), normalize(normalize(-pos.xyz) + lightDir.xyz)))), SHININESS);
+
+	//Colour variation and gradient
 	vec3 colourScale = vec3(1.0f + maxColourChange * (2.0f * colourChange - 1.0f));
+	colourScale *= mix(MIN_COLOUR, 1.0f, smoothstep(MIN_COLOUR_END, MAX_COLOUR_START, tessx_g));
 
 	return colour * colourScale * (diffuseIntensity * diffuse + specularIntensity * specular); 
 }

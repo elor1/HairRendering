@@ -1,7 +1,6 @@
 #pragma once
 #include <vector>
 #include <glm.hpp>
-#include "Integrator.h"
 #include "Mesh.h"
 #include <map>
 #include <stdexcept>

@@ -42,9 +42,6 @@
     <ClCompile Include="src\Hair.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\Integrator.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="src\Mesh.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -61,9 +58,6 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="src\Quad.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="src\MeshOctree.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="src\shaderPrograms\HairShaderProgram.cpp">
@@ -128,9 +122,6 @@
     <ClInclude Include="src\Hair.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\Integrator.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="src\Mesh.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -147,9 +138,6 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="src\Quad.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="src\MeshOctree.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="src\shaderPrograms\HairShaderProgram.h">
@@ -235,10 +223,7 @@
     <None Include="src\shaders\white.frag">
       <Filter>Resource Files</Filter>
     </None>
-    <None Include="src\shaders\hairRender.vert" />
     <None Include="src\shaders\hairDepthPeel.frag" />
     <None Include="src\shaders\meshDepthPeel.frag" />
-    <None Include="src\shaders\feedback.geom" />
-    <None Include="src\shaders\feedback.tes" />
   </ItemGroup>
 </Project>

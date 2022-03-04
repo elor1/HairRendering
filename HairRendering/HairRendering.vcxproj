@@ -192,9 +192,7 @@ xcopy /y /d "$(SolutionDir)lib\assimp\assimp-vc140-mt.dll" "$(OutDir)"</Command>
     <ClCompile Include="src\Framebuffer.cpp" />
     <ClCompile Include="src\GuiWindow.cpp" />
     <ClCompile Include="src\Hair.cpp" />
-    <ClCompile Include="src\Integrator.cpp" />
     <ClCompile Include="src\Mesh.cpp" />
-    <ClCompile Include="src\MeshOctree.cpp" />
     <ClCompile Include="src\Model.cpp" />
     <ClCompile Include="src\Quad.cpp" />
     <ClCompile Include="src\shaderPrograms\FeedbackShaderProgram.cpp" />
@@ -225,9 +223,7 @@ xcopy /y /d "$(SolutionDir)lib\assimp\assimp-vc140-mt.dll" "$(OutDir)"</Command>
     <ClInclude Include="src\Framebuffer.h" />
     <ClInclude Include="src\GuiWindow.h" />
     <ClInclude Include="src\Hair.h" />
-    <ClInclude Include="src\Integrator.h" />
     <ClInclude Include="src\Mesh.h" />
-    <ClInclude Include="src\MeshOctree.h" />
     <ClInclude Include="src\Model.h" />
     <ClInclude Include="src\Quad.h" />
     <ClInclude Include="src\shaderPrograms\FeedbackShaderProgram.h" />
@@ -242,11 +238,8 @@ xcopy /y /d "$(SolutionDir)lib\assimp\assimp-vc140-mt.dll" "$(OutDir)"</Command>
     <ClInclude Include="src\Texture.h" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="src\shaders\feedback.geom" />
-    <None Include="src\shaders\feedback.tes" />
     <None Include="src\shaders\hairDepthPeel.frag" />
     <None Include="src\shaders\hairOpacity.frag" />
-    <None Include="src\shaders\hairRender.vert" />
     <None Include="src\shaders\mesh.frag" />
     <None Include="src\shaders\mesh.vert" />
     <None Include="src\shaders\hair.frag" />
