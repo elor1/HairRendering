@@ -443,21 +443,6 @@ void Application::Update()
 	glfwPollEvents();
 }
 
-void Application::SetPatchHair(int numHairs)
-{
-	mHair->SetNumGroupHairs(numHairs);
-}
-
-void Application::SetNumSplineVertices(int numVertices)
-{
-	mHair->SetNumSplineVertices(numVertices);
-}
-
-void Application::SetHairColour(glm::vec3 colour)
-{
-	mHair->SetColour(colour / 2550.0f);
-}
-
 void Application::ProcessInput()
 {
 	if (glfwGetKey(mWindow, GLFW_KEY_ESCAPE) == GLFW_PRESS)
@@ -518,42 +503,6 @@ void Application::MouseCallback(GLFWwindow* window, double xPos, double yPos)
 		mCamera->SetPrevMousePosition(glm::vec2(xPos, yPos));
 	}
 
-	if (glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_MIDDLE) == GLFW_PRESS)
-	{
-		//glm::mat4 view = mCamera->GetView();
-		//glm::vec2 delta = glm::vec2(xPos, yPos) - mCamera->GetPreviousRotation();
-		//if (fabs(delta.x) > fabs(delta.y))
-		//{
-		//	//Rotate up
-		//	glm::vec3 up = glm::normalize(glm::vec3(view[2][1], view[2][2], view[2][3]));
-		//	float angle = delta.x * 0.001f;
-		//	mSimulation->UpdateRotation(mHair, angle, glm::vec3(0.0f, 1.0f, 0.0f));
-		//}
-		//else
-		//{
-		//	//Rotate right
-		//	float angle = delta.y * 0.001f;
-		//	mSimulation->UpdateRotation(mHair, angle, glm::vec3(1.0f, 0.0f, 0.0f));
-		//}
-
-		/*double x, y;
-		glfwGetCursorPos(window, &x, &y);
-		glm::vec3 p0 = glm::vec3(mCamera->GetPreviousRotation().x / (float)mWidth, 1.0f - mCamera->GetPreviousRotation().y / (float)mHeight, 0.0f);
-		glm::vec3 p1 = glm::vec3(x / (float)mWidth, 1.0f - y / (float)mHeight, 0.0f);
-
-		p0 = 2.0f * p0 - 1.0f;
-		p1 = 2.0f * p1 - 1.0f;
-
-		float angle = 5.0f * glm::length(p1 - p0);
-		glm::mat4 object = glm::inverse(mCamera->GetProjection() * mCamera->GetView() * mSimulation->GetTransform());
-		p0 = glm::vec3(glm::normalize(object * glm::vec4(p0, 0.0f)));
-		p1 = glm::vec3(glm::normalize(object * glm::vec4(p1, 0.0f)));
-
-		glm::vec3 axis = glm::cross(p0, p1);
-		mSimulation->UpdateRotation(mHair, angle, axis);
-		mCamera->SetPreviousRotation(glm::vec2(x, y));*/
-	}
-
 	if (mIsPaused)
 	{
 		Update();
@@ -566,11 +515,6 @@ void Application::MouseButtonCallback(GLFWwindow* window, int button, int action
 	{
 		return;
 	}
-
-	/*if (action == GLFW_RELEASE)
-	{
-		mSimulation->SetHeadMoving(false);
-	}*/
 
 	if (action == GLFW_PRESS)
 	{

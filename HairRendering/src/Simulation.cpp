@@ -89,15 +89,7 @@ void Simulation::ResetPosition()
 }
 
 void Simulation::Move(Hair* hair)
-{
-	/*for (auto& guide : hair->GetGuideHairs())
-	{
-		for (auto& vertex : guide->vertices)
-		{
-			vertex->prevPosition = glm::vec3(mTransform * glm::vec4(vertex->startPosition, 1.0f));
-		}
-	}*/
-	
+{	
 	mHeadMoving = true;
 	UpdateHair(hair);
 	if (shake || nod)
@@ -108,12 +100,6 @@ void Simulation::Move(Hair* hair)
 	{
 		mTransform = glm::rotate(0.0f, glm::vec3(0, 1, 0));
 	}
-
-	/*if (nod)
-	{
-		mTransform = glm::rotate((float)sin(mTime), glm::vec3(1, 0, 0));
-	}*/
-	//mTransform = glm::translate(glm::mat4(1.0f), glm::vec3(sin(mTime), 0.0f, cos(mTime)));
 }
 
 void Simulation::CalculateExternalForces(Hair* hair)
@@ -137,13 +123,7 @@ void Simulation::CalculateExternalForces(Hair* hair)
 			
 			//Wind
 			force += glm::vec3(glm::inverse(mTransform) * glm::vec4(glm::normalize(windDirection) * windStrength * glm::vec3(((rand() % 100) / 100.0f), ((rand() % 100) / 100.0f), ((rand() % 100) / 100.0f)), 0.0f));
-			//if (windStrength != glm::vec3(0.0f))
-			//{
-			//	if (mTime > 2.0f)
-			//	{
-			//		force += windStrength * glm::vec3(((rand() % 100) / 100.0f), ((rand() % 100) / 100.0f), ((rand() % 100) / 100.0f)) /*glm::vec3(6.0f + 20.0f * ((rand() % 100) / 100.0f) - 10.0f, 0.0f, 0.0f)*/;
-			//	}
-			//}
+			
 
 			if (COLLISIONS)
 			{
@@ -152,8 +132,6 @@ void Simulation::CalculateExternalForces(Hair* hair)
 				if (mMesh->Contains(normal, vertex->position))
 				{
 					force = 5.0f * normal;
-					/*force = glm::vec3(0.0f, 0.0f, 0.0f);
-					vertex->simulate = false;*/
 				}
 			}
 
@@ -337,11 +315,6 @@ void Simulation::ParticleSimulation(Hair* hair)
 			HairVertex* vertex = guide->vertices[i];
 			HairVertex* previous = guide->vertices[i - 1];
 
-			if (!vertex->simulate)
-			{
-				goto skip;
-			}
-
 			vertex->velocity += TIMESTEP * (vertex->forces * (1.0f / vertex->mass)) * 0.5f;
 			glm::vec3 stiffPosition = previous->segmentLength * previous->pointVec;
 			vertex->tempPosition += glm::mix((vertex->velocity * TIMESTEP), stiffPosition, stiffness);
@@ -372,8 +345,6 @@ void Simulation::ParticleSimulation(Hair* hair)
 
 		
 		last->position = last->tempPosition;
-		
-	skip:;
 	}
 }
 

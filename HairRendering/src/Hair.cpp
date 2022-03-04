@@ -52,43 +52,6 @@ Hair::Hair(Mesh* mesh, float hairDensity, const char* hairMap, double maxLength,
 	mHairMap = new Texture();
 	mHairMap->Create(hairMap, GL_LINEAR, GL_LINEAR);
 
-	//std::default_random_engine generator;
-	//std::uniform_real_distribution<float> distribution(-0.03f, 0.03f);
-	//for (auto& vertex : mesh->GetVertices())
-	//{
-	//	glm::vec3 random = glm::vec3(distribution(generator), distribution(generator), distribution(generator));
-	//	glm::vec2 texCoord = vertex.texCoords + glm::vec2(random.x, random.y);
-
-	//	//Get uv colour
-	//	int x = vertex.texCoords.x * width;
-	//	int y = ( vertex.texCoords.y) * height;
-
-	//	/*if (x < 0 || x > width || y < 0 || y > width)
-	//	{
-	//		continue;
-	//	}*/
-
-	//	unsigned char* pixel = image + y * width * channels + x * channels;
-	//	unsigned char alpha = pixel[3];
-
-	//	//If pixel alpha is 0, do not place hair
-	//	if ((int)alpha == 0)
-	//	{
-	//		continue;
-	//	}
-
-	//	//Get length from alpha value
-	//	double length = (double)(alpha / 255) * mMaxLength;
-	//	if (length < 0.01)
-	//	{
-	//		continue;
-	//	}
-	//	glm::vec3 position = vertex.position + random;
-	//	glm::vec3 normal = vertex.normal + random;
-
-	//	mGuideHairs.push_back(DBG_NEW Strand(20, length, position, normal));
-	//}
-
 	for (auto& triangle : mesh->triangles)
 	{
 		int numHairs = (int)(hairDensity * triangle.Area() + rand() / (float)RAND_MAX);

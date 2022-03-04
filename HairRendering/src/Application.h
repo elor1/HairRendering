@@ -39,9 +39,6 @@ private:
 	void InitSimulation();
 	void Draw();
 	void Update();
-	void SetPatchHair(int numHairs);
-	void SetNumSplineVertices(int numVertices);
-	void SetHairColour(glm::vec3 colour);
 	void ProcessInput();
 	static void FrameBufferCallback(GLFWwindow* window, int width, int height);
 	void MouseCallback(GLFWwindow* window, double xPos, double yPos);

@@ -24,13 +24,6 @@ Mesh::Mesh(std::vector<Vertex> vertices, std::vector<unsigned int> indices, floa
 
 void Mesh::SetupMesh()
 {
-	/*for (unsigned int i = 0; i < mVertices.size() / 3; i++)
-	{
-		unsigned int index = i * 3;
-		Triangle triangle(mVertices[index], mVertices[index + 1], mVertices[index + 2]);
-		triangles.push_back(triangle);
-	}*/
-
 	//Create triangles
 	for (int i = 0; i * 3 < mIndices.size(); i++)
 	{
@@ -94,21 +87,11 @@ bool Mesh::Contains(glm::vec3 &normal, glm::vec3 position)
 		return false;
 	}
 
-	Vector3 direction = Vector3(0.0f, 1.0f, 0.0f);
-	Vector3 pos = Vector3(position.x, position.y, position.z);
 	int numIntersections = 0;
 
 	for (auto& triangle : triangles)
 	{
-		//glm::vec3 intersectionPoint = glm::vec3(0.0f);
-		//if (triangle.IsIntersecting(intersectionPoint, position, glm::normalize(position)))
-		//{
-		//	//normal = (triangle.vertex1.normal + triangle.vertex2.normal + triangle.vertex3.normal) / 3.0f;
-		//	normal = (triangle.vertex1.normal + triangle.vertex2.normal + triangle.vertex3.normal) / 3.0f;
-		//	numIntersections++;
-		//}
-
-		if (triangle.Intersects(direction, pos))
+		if (triangle.Intersects(glm::vec3(0.0f, 1.0f, 0.0f), position))
 		{
 			normal = (triangle.vertex1.normal + triangle.vertex2.normal + triangle.vertex3.normal) / 3.0f;
 			numIntersections++;
