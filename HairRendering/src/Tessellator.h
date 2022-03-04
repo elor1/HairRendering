@@ -8,17 +8,17 @@ public:
 	Tesselator();
 	virtual ~Tesselator();
 
-	void Initialise(int numLines);
+	void Initialise(int numTriangles);
 	void Begin();
 	void End();
 	void Draw();
 
 private:
 	ShaderProgram* mProgram;
-	int mNumLines;
+	int mNumTriangles;
 	GLuint mQuery;
 	GLuint mVAO;
 	GLuint mVBO;
 
-	void SetNumLines(int numLines);
+	void SetNumTriangles(int numTriangles);
 };

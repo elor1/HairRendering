@@ -88,7 +88,7 @@ void GuiWindow::Update()
 			mApp->ResetSimulation();
 		}
 
-		const char* hairMaps[] = { "hair.png", "hair2.png", "beard.png", "sideburns.png", "black.png"};
+		const char* hairMaps[] = { "hair.png", "hair2.png", "beard.png", "hairBeard.png", "sideburns.png", "black.png"};
 		int currentHairMap = 0;
 		if (ImGui::Combo("Hair map", &currentHairMap, hairMaps, IM_ARRAYSIZE(hairMaps)))
 		{
@@ -96,8 +96,11 @@ void GuiWindow::Update()
 			mApp->ResetSimulation();
 		}
 		ImGui::Checkbox("Shadows", &mApp->useShadows);
-		ImGui::Checkbox("Supersampling", &mApp->useSuperSampling);
 		ImGui::Checkbox("Transparency", &mApp->useTransparency);
+		if (!mApp->useTransparency)
+		{
+			ImGui::Checkbox("Supersampling", &mApp->useSuperSampling);
+		}
 		if (ImGui::SliderFloat("Density", &mApp->hairDensity, 0.0f, 1000.0f))
 		{
 			mApp->ResetSimulation();

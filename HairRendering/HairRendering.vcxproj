@@ -242,6 +242,8 @@ xcopy /y /d "$(SolutionDir)lib\assimp\assimp-vc140-mt.dll" "$(OutDir)"</Command>
     <ClInclude Include="src\Texture.h" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="src\shaders\feedback.geom" />
+    <None Include="src\shaders\feedback.tes" />
     <None Include="src\shaders\hairDepthPeel.frag" />
     <None Include="src\shaders\hairOpacity.frag" />
     <None Include="src\shaders\hairRender.vert" />

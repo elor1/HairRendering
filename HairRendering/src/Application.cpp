@@ -270,7 +270,7 @@ void Application::Draw()
 	}
 	else
 	{
-		width = mWidth;
+		/*width = mWidth;
 		height = mHeight;
 
 		Texture* texture = mDepthPeelFramebuffer->GetColourTexture();
@@ -280,7 +280,7 @@ void Application::Draw()
 			mDepthPeelFramebuffer->GetDepthTexture()->Resize(width, height);
 			mDepthPeelFramebuffer1->GetColourTexture()->Resize(width, height);
 			mDepthPeelFramebuffer1->ResizeDepthBuffer(width, height);
-		}
+		}*/
 	}
 
 	//Update hair
