@@ -20,6 +20,7 @@ Strand::Strand(int numSegments, double length, glm::vec3 position, glm::vec3 dir
 	mTriangleFace[0] = glm::normalize(glm::vec3(-direction.y, direction.x, 0.0f));
 	mTriangleFace[1] = glm::cross(direction, mTriangleFace[0]);
 
+	//Create segments
 	double step = (double)length / numSegments;
 	for (int i = 0; i < numSegments; i++)
 	{

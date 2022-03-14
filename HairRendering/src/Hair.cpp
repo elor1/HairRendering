@@ -41,6 +41,8 @@ Hair::Hair(Mesh* mesh, float hairDensity, const char* hairMap, double maxLength,
 		Hair(mesh, hairDensity, simulation, oldHair);
 		return;
 	}
+
+	//Get hair map data
 	int width, height, channels;
 	unsigned char* image = SOIL_load_image(hairMap, &width, &height, &channels, SOIL_LOAD_RGBA);
 	
@@ -52,6 +54,7 @@ Hair::Hair(Mesh* mesh, float hairDensity, const char* hairMap, double maxLength,
 	mHairMap = new Texture();
 	mHairMap->Create(hairMap, GL_LINEAR, GL_LINEAR);
 
+	//Place hairs at random points in triangles
 	for (auto& triangle : mesh->triangles)
 	{
 		int numHairs = (int)(hairDensity * triangle.Area() + rand() / (float)RAND_MAX);
@@ -69,6 +72,7 @@ Hair::Hair(Mesh* mesh, float hairDensity, const char* hairMap, double maxLength,
 				continue;
 			}
 
+			//Use hair map's alpha value to scale hair length
 			unsigned char* pixel = image + y * width * channels + x * channels;
 			unsigned char alpha = pixel[3];
 			double alphaVal = (double)alpha / 255;

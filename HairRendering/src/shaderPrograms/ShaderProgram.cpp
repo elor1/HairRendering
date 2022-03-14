@@ -73,6 +73,7 @@ void ShaderProgram::Unbind()
 
 GLuint ShaderProgram::Load()
 {
+	//Create shaders
 	std::vector<GLuint> shaders;
 	shaders.push_back(CreateShader(GL_VERTEX_SHADER, mVertex));
 	shaders.push_back(CreateShader(GL_FRAGMENT_SHADER, mFragment));
@@ -86,8 +87,10 @@ GLuint ShaderProgram::Load()
 		shaders.push_back(CreateShader(GL_TESS_EVALUATION_SHADER, mTessEval));
 	}
 
+	//Create program
 	GLuint programID = CreateProgram(shaders);
 
+	//Clean up
 	for (auto& shader : shaders)
 	{
 		glDeleteShader(shader);
