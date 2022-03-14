@@ -13,6 +13,7 @@ Mesh::Mesh(std::vector<Vertex> vertices, std::vector<unsigned int> indices, floa
 
 	mScale = scale;
 
+	//Get mesh bounds
 	for (auto& vertex : vertices)
 	{
 		mMin = glm::min(mMin, vertex.position /** mScale*/);
@@ -82,11 +83,13 @@ bool Mesh::Contains(glm::vec3 &normal, glm::vec3 position)
 	/*normal = glm::normalize(position / glm::pow(mMax, glm::vec3(2.0f)));
 	return glm::dot(glm::pow(position / mMax, glm::vec3(2.0f)), glm::vec3(1.0f)) < 1;*/
 
+	//Ignore points outside bounding box
 	if (glm::any(glm::lessThan(position, mMin)) || glm::any(glm::greaterThan(position, mMax)))
 	{
 		return false;
 	}
 
+	//Check for collisions
 	int numIntersections = 0;
 
 	for (auto& triangle : triangles)

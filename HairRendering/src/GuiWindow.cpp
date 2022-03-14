@@ -53,8 +53,6 @@ void GuiWindow::Update()
 		ImGui::Checkbox("Nod", &hair->mSimulation->nod);
 		ImGui::SliderFloat("Stiffness", &hair->mSimulation->stiffness, 0.0f, 1.0f);
 		ImGui::SliderFloat("Dampening", &hair->mSimulation->dampening, 0.0f, 1.0f);
-		/*ImGui::Checkbox("Friction", &hair->mSimulation->useFriction);
-		ImGui::SliderFloat("Friction amount", &hair->mSimulation->friction, 0.0f, 0.5f);*/
 
 		std::string pauseLabel = "Pause";
 		if (mApp->IsPaused())
