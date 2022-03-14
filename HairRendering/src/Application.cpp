@@ -94,29 +94,91 @@ bool Application::IsPaused()
 void Application::SetHairMap(std::string filename)
 {
 	mHairMapName = filename;
+
+	UpdateSettings();
 }
 
 void Application::SetModel(std::string filename)
 {
 	mModelName = filename;
 
+	//Get collider name
 	std::string collider = "";
-	for (int i = 0; i < collider.length() - 5; i++)
+	for (int i = 0; i < mModelName.length() - 4; i++)
 	{
 		collider += mModelName[i];
 	}
 	collider += "Collider.obj";
+	mColliderName = collider;
 
+	//Set hair map
 	if (mModelName == "head.obj")
 	{
 		SetHairMap("hair.png");
+	}
+	else if (mModelName == "plane.obj")
+	{
+		SetHairMap("grass.png");
 	}
 	else
 	{
 		SetHairMap("black.png");
 	}
+
+	UpdateSettings();
 }
 
+void Application::SetPreset(std::string preset)
+{
+	if (preset == "Hair")
+	{
+		SetModel("head.obj");
+		SetHairMap("hair.png");
+
+		maxLength = 0.45f;
+	}
+	else if (preset == "Mohawk")
+	{
+		SetModel("head.obj");
+		SetHairMap("hair2.png");
+
+		maxLength = 0.45f;
+	}
+	else if (preset == "Beard")
+	{
+		SetModel("head.obj");
+		SetHairMap("beard.png");
+
+		maxLength = 0.18f;
+	}
+	else if (preset == "Grass")
+	{
+		SetModel("plane.obj");
+		SetHairMap("grass.png");
+
+		maxLength = 0.45f;
+	}
+
+	UpdateSettings();
+}
+
+
+void Application::UpdateSettings()
+{
+	if (mModelName == "head.obj")
+	{
+		hairDensity = 250.0f;
+	}
+	else if (mModelName == "plane.obj")
+	{
+		hairDensity = 40.0f;
+	}
+	
+	if (mHairMapName == "beard.png")
+	{
+		hairDensity = 850.0f;
+	}
+}
 
 void Application::Initialise()
 {
@@ -256,6 +318,14 @@ void Application::InitSimulation()
 	mSimulation = new Simulation(mCollider->GetFirstMesh());
 
 	mHair = new Hair(mHead->GetFirstMesh(), hairDensity, ("../images/" + mHairMapName).c_str(), (double)maxLength, mSimulation);
+
+	//Some default settings
+	if (mModelName == "plane.obj")
+	{
+		mSimulation->stiffness = 0.5f;
+		mSimulation->windStrength = 35.0f;
+		mHair->SetColour(glm::vec3(0.09f, 0.43f, 0.13f));
+	}
 }
 
 
@@ -293,6 +363,7 @@ void Application::Draw()
 	
 	mGui->NewFrame();
 
+	//Light
 	glm::mat4 model = mSimulation->GetTransform();
 	mLightPosition = glm::vec3(2.0f, 2.0f, 2.0f);
 	glm::mat4 lightProjection = glm::perspective(1.3f, 1.0f, 1.0f, 100.0f);
@@ -324,7 +395,7 @@ void Application::Draw()
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 		DrawMesh(mWhiteMeshProgram, model, lightView, lightProjection);
 
-		//Opacity map - Enable additive blending
+		//Opacity map - Additive blending
 		glDisable(GL_DEPTH_TEST);
 		glEnable(GL_BLEND);
 		glBlendFunc(GL_ONE, GL_ONE);
@@ -445,11 +516,13 @@ void Application::Update()
 
 void Application::ProcessInput()
 {
+	//Escape to exit
 	if (glfwGetKey(mWindow, GLFW_KEY_ESCAPE) == GLFW_PRESS)
 	{
 		glfwSetWindowShouldClose(mWindow, true);
 	}
 
+	//Space to toggle pause
 	if (glfwGetKey(mWindow, GLFW_KEY_SPACE) == GLFW_PRESS)
 	{
 		if (!mIsSpaceDown)
@@ -473,11 +546,13 @@ void Application::FrameBufferCallback(GLFWwindow* window, int width, int height)
 
 void Application::MouseCallback(GLFWwindow* window, double xPos, double yPos)
 {
+	//Ignore mouse if over GUI
 	if (ImGui::GetIO().WantCaptureMouse)
 	{
 		return;
 	}
 
+	//Left mouse to move hair
 	if (glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_LEFT) == GLFW_PRESS)
 	{
 		glm::mat4 view = mCamera->GetView();
@@ -493,6 +568,7 @@ void Application::MouseCallback(GLFWwindow* window, double xPos, double yPos)
 		mCamera->SetPreviousPosition(glm::vec2(xPos, yPos));
 	}
 
+	//Right mouse to rotate camera
 	if (glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_RIGHT) == GLFW_PRESS)
 	{
 		float x = 10 * (xPos - mCamera->GetPrevMousePosition().x) / (float)mWidth;

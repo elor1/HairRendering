@@ -28,6 +28,7 @@ public:
 	bool IsPaused();
 	void SetHairMap(std::string filename);
 	void SetModel(std::string filename);
+	void SetPreset(std::string preset);
 	bool useShadows;
 	bool useSuperSampling;
 	bool useTransparency;
@@ -35,6 +36,7 @@ public:
 	float maxLength;
 
 private:
+	void UpdateSettings();
 	void Initialise();
 	void InitSimulation();
 	void Draw();

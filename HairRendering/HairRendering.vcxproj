@@ -203,7 +203,6 @@ xcopy /y /d "$(SolutionDir)lib\assimp\assimp-vc140-mt.dll" "$(OutDir)"</Command>
     <ClCompile Include="src\shaderPrograms\ShaderProgram.cpp" />
     <ClCompile Include="src\Shape.cpp" />
     <ClCompile Include="src\Simulation.cpp" />
-    <ClCompile Include="src\Tessellator.cpp" />
     <ClCompile Include="src\Texture.cpp" />
   </ItemGroup>
   <ItemGroup>
@@ -233,7 +232,6 @@ xcopy /y /d "$(SolutionDir)lib\assimp\assimp-vc140-mt.dll" "$(OutDir)"</Command>
     <ClInclude Include="src\shaderPrograms\ShaderProgram.h" />
     <ClInclude Include="src\Shape.h" />
     <ClInclude Include="src\Simulation.h" />
-    <ClInclude Include="src\Tessellator.h" />
     <ClInclude Include="src\Texture.h" />
   </ItemGroup>
   <ItemGroup>

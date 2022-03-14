@@ -80,7 +80,15 @@ void GuiWindow::Update()
 
 	if (ImGui::CollapsingHeader("Hair", ImGuiTreeNodeFlags_DefaultOpen))
 	{
-		const char* models[] = { "head.obj", "bear.obj" };
+		const char* presets[] = { "Hair", "Mohawk", "Beard", "Grass"};
+		int currentPreset = 0;
+		if (ImGui::Combo("Preset", &currentPreset, presets, IM_ARRAYSIZE(presets)))
+		{
+			mApp->SetPreset(presets[currentPreset]);
+			mApp->ResetSimulation();
+		}
+
+		const char* models[] = { "head.obj", "plane.obj", "bear.obj" };
 		int currentModel = 0;
 		if (ImGui::Combo("Model", &currentModel, models, IM_ARRAYSIZE(models)))
 		{
@@ -88,7 +96,7 @@ void GuiWindow::Update()
 			mApp->ResetSimulation();
 		}
 
-		const char* hairMaps[] = { "hair.png", "hair2.png", "beard.png", "hairBeard.png", "sideburns.png", "black.png"};
+		const char* hairMaps[] = { "hair.png", "hair2.png", "beard.png", "hairBeard.png", "sideburns.png", "grass.png", "black.png"};
 		int currentHairMap = 0;
 		if (ImGui::Combo("Hair map", &currentHairMap, hairMaps, IM_ARRAYSIZE(hairMaps)))
 		{
@@ -119,7 +127,10 @@ void GuiWindow::Update()
 		ImGui::SliderFloat("Shadow intensity", &hair->mShadowIntensity, 0.0f, 50.0f);
 		ImGui::SliderFloat("Diffuse intensity", &hair->mDiffuseIntensity, 0.0f, 5.0f);
 		ImGui::SliderFloat("Specular intensity", &hair->mSpecularIntensity, 0.0f, 5.0f);
-		ImGui::SliderFloat("Opacity", &hair->mOpacity, 0.0f, 1.0f);
+		if (mApp->useTransparency)
+		{
+			ImGui::SliderFloat("Opacity", &hair->mOpacity, 0.0f, 1.0f);
+		}
 		ImGui::SliderFloat("Colour variation", &hair->mColourChange, 0.0f, 5.0f);
 	}
 
