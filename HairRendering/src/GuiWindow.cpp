@@ -33,6 +33,7 @@ void GuiWindow::Update()
 	ImGui::Begin("Settings");
 	ImGui::PushItemWidth(ImGui::GetWindowWidth() * 0.6f);
 	Hair* hair = mApp->GetHair();
+	Light* light = mApp->GetLight();
 
 	//Update stats
 	//ImGui::Text("Stats:");
@@ -45,8 +46,19 @@ void GuiWindow::Update()
 	std::string stats = std::to_string(numGuideHairs) + " simulated guide hairs \n" + std::to_string(numGuideHairs * numGroupHairs) + " total hairs \n";
 	ImGui::Text(stats.c_str());
 
-	ImGui::SliderFloat3("Light position", &mApp->lightPosition.x, -10, 10);
-	ImGui::Checkbox("Orbit light", &mApp->orbitLight);
+	if (ImGui::CollapsingHeader("Light", ImGuiTreeNodeFlags_DefaultOpen))
+	{
+		ImGui::SliderFloat3("Light position", &mApp->lightPosition.x, -10, 10);
+		if (ImGui::Checkbox("Orbit light", &mApp->orbitLight))
+		{
+			if (mApp->orbitLight)
+			{
+				mApp->lightPosition.y = 0.0f;
+			}
+		}
+		ImGui::ColorEdit3("Light colour", &light->mColour.x);
+		ImGui::Checkbox("Shadows", &mApp->useShadows);
+	}
 
 	if (ImGui::CollapsingHeader("Simulation", ImGuiTreeNodeFlags_DefaultOpen))
 	{
@@ -89,7 +101,7 @@ void GuiWindow::Update()
 			mApp->ResetSimulation();
 		}
 
-		const char* models[] = { "head.obj", "plane.obj", "bear.obj" };
+		const char* models[] = { "head.obj", "plane.obj"/*, "bear.obj" */};
 		int currentModel = 0;
 		if (ImGui::Combo("Model", &currentModel, models, IM_ARRAYSIZE(models)))
 		{
@@ -104,7 +116,7 @@ void GuiWindow::Update()
 			mApp->SetHairMap(hairMaps[currentHairMap]);
 			mApp->ResetSimulation();
 		}
-		ImGui::Checkbox("Shadows", &mApp->useShadows);
+		
 		ImGui::Checkbox("Transparency", &mApp->useTransparency);
 		if (!mApp->useTransparency)
 		{

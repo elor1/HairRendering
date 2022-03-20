@@ -24,6 +24,7 @@ public:
 	//Gui
 	double GetDeltaTime();
 	Hair* GetHair();
+	Light* GetLight();
 	void TogglePause();
 	void ResetSimulation();
 	bool IsPaused();

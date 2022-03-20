@@ -64,6 +64,7 @@ uniform vec3 colour;
 uniform mat4 view;
 uniform mat4 dirToLight;
 uniform vec3 lightPosition;
+uniform vec3 lightColour;
 uniform float specularIntensity;
 uniform float diffuseIntensity;
 uniform float opacity;
@@ -87,7 +88,7 @@ vec3 GetColour(vec4 pos, vec3 tangent, vec4 lightPos, float colourChange)
 	vec3 colourScale = vec3(1.0f + maxColourChange * (2.0f * colourChange - 1.0f));
 	colourScale *= mix(MIN_COLOUR, 1.0f, smoothstep(MIN_COLOUR_END, MAX_COLOUR_START, tessx_g));
 
-	return colour * colourScale * (diffuseIntensity * diffuse + specularIntensity * specular); 
+	return colour * colourScale * (diffuseIntensity * diffuse + specularIntensity * specular) * lightColour; 
 }
 
 vec4 Lighting(vec4 pos, vec3 tangent, float colourChange)

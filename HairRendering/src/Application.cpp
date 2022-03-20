@@ -80,6 +80,11 @@ Hair* Application::GetHair()
 	return mHair;
 }
 
+Light* Application::GetLight()
+{
+	return mLight;
+}
+
 void Application::TogglePause()
 {
 	mIsPaused = !mIsPaused;
@@ -267,7 +272,7 @@ void Application::Initialise()
 	mNoiseTexture->Create("../images/Noise.jpg", GL_LINEAR, GL_LINEAR);
 
 	//Framebuffers
-	int shadowMapSize = 2048;
+	int shadowMapSize = 4096;
 	glm::vec2 size = glm::vec2(2 * mWidth, 2 * mHeight);
 	mFramebuffers = {
 		mHairShadowFramebuffer = new Framebuffer(),
@@ -331,6 +336,10 @@ void Application::InitSimulation()
 		mSimulation->windStrength = 35.0f;
 		mHair->SetColour(glm::vec3(0.09f, 0.43f, 0.13f));
 	}
+	else if (mHairMapName == "beard.png")
+	{
+		mSimulation->stiffness = 0.3f;
+	}
 }
 
 
@@ -367,7 +376,7 @@ void Application::Draw()
 
 		if (orbitLight)
 		{
-			lightPosition = glm::vec3(cos(mLightRotate) * 10.0f, 0.0f, sin(mLightRotate) * 10.0f);
+			lightPosition = glm::vec3(cos(mLightRotate) * 10.0f, lightPosition.y, sin(mLightRotate) * 10.0f);
 			mLightRotate += 0.7f * mDeltaTime;
 		}
 	}
@@ -663,6 +672,7 @@ void Application::DrawMesh(ShaderProgram* program, glm::mat4 model, glm::mat4 vi
 	program->uniforms.view = view;
 	program->uniforms.model = model;
 	program->uniforms.lightPosition = lightPosition;
+	program->uniforms.lightColour = mLight->GetColour();
 	program->uniforms.dirToLight = mDirToLight;
 	program->uniforms.shadowIntensity = mHair->GetShadowIntensity();
 	program->uniforms.useShadows = useShadows;
@@ -685,6 +695,7 @@ void Application::DrawHair(ShaderProgram* program, glm::mat4 model, glm::mat4 vi
 	program->uniforms.model = model;
 	program->uniforms.dirToLight = mDirToLight;
 	program->uniforms.lightPosition = lightPosition;
+	program->uniforms.lightColour = mLight->GetColour();
 	program->uniforms.shadowIntensity = mHair->GetShadowIntensity();
 	program->uniforms.useShadows = useShadows;
 	program->uniforms.specularIntensity = mHair->GetSpecularIntensity();

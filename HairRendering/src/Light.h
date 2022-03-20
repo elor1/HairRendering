@@ -5,6 +5,7 @@
 class Light : public Model
 {
 public:
+	friend class GuiWindow;
 	Light(glm::vec3 position, glm::vec3 colour);
 
 	void SetPosition(glm::vec3 pos);

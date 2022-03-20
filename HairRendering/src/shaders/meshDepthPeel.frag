@@ -60,6 +60,7 @@ float GetMeshVisibility(vec4 point)
 //---Mesh lighting---//
 uniform vec3 hairColour;
 uniform vec3 lightPosition;
+uniform vec3 lightColour;
 uniform mat4 view;
 uniform mat4 dirToLight;
 uniform sampler2D hairMap;
@@ -77,7 +78,7 @@ vec3 GetColour(vec4 pos, vec4 normal, vec4 lightPos)
 	vec4 lightDir = lightPos - pos;
 
 	float diffuse =  max(0.0f, dot(normalize(lightDir), normalize(normal)));
-	return diffuse * DIFFUSE_INTENSITY * meshColour;
+	return lightColour * diffuse * DIFFUSE_INTENSITY * meshColour;
 }
 
 vec4 Lighting(vec4 pos, vec4 normal, vec2 texCoord)

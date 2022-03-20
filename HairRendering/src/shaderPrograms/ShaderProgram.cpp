@@ -26,6 +26,7 @@ void ShaderProgram::SetGlobalUniforms()
 	glUniformMatrix4fv(GetUniformLocation("projection"), 1, GL_FALSE, glm::value_ptr(uniforms.projection));
 	glUniformMatrix4fv(GetUniformLocation("dirToLight"), 1, GL_FALSE, glm::value_ptr(uniforms.dirToLight));
 	glUniform3fv(GetUniformLocation("lightPosition"), 1, glm::value_ptr(uniforms.lightPosition));
+	glUniform3fv(GetUniformLocation("lightColour"), 1, glm::value_ptr(uniforms.lightColour));
 	glUniform1i(GetUniformLocation("noiseTexture"), uniforms.noiseTexture);
 	glUniform1i(GetUniformLocation("hairShadowMap"), uniforms.hairShadowMap);
 	glUniform1i(GetUniformLocation("meshShadowMap"), uniforms.meshShadowMap);

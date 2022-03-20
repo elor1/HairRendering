@@ -23,6 +23,7 @@ struct Uniforms
 	glm::vec3 triangleFace[2];
 	glm::vec3 colour;
 	glm::vec3 lightPosition;
+	glm::vec3 lightColour;
 	glm::mat4 dirToLight;
 	int noiseTexture;
 	int hairShadowMap;
