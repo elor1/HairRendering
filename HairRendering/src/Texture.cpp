@@ -18,9 +18,10 @@ Texture::~Texture()
 
 void Texture::Create(const char* filename, GLint magFilter, GLint minFilter)
 {
+	std::string path = DIRECTORY_PATH + filename;
 	int width;
 	int height;
-	unsigned char* image = SOIL_load_image(filename, &width, &height, NULL, SOIL_LOAD_RGBA);
+	unsigned char* image = SOIL_load_image(path.c_str(), &width, &height, NULL, SOIL_LOAD_RGBA);
 
 	if (image == NULL)
 	{
@@ -77,7 +78,7 @@ void Texture::RenderFullScreen()
 
 	if (!mProgram)
 	{
-		mProgram = new ShaderProgram("src/shaders/quad.vert", "src/shaders/quad.frag");
+		mProgram = new ShaderProgram("quad.vert", "quad.frag");
 	}
 
 	mProgram->Bind();

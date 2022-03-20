@@ -240,7 +240,6 @@ xcopy /y /d "$(SolutionDir)lib\assimp\assimp-vc140-mt.dll" "$(OutDir)"</Command>
     <None Include="src\shaders\hairDepthPeel.frag" />
     <None Include="src\shaders\hairOpacity.frag" />
     <None Include="src\shaders\light.frag" />
-    <None Include="src\shaders\light.vert" />
     <None Include="src\shaders\mesh.frag" />
     <None Include="src\shaders\mesh.vert" />
     <None Include="src\shaders\hair.frag" />

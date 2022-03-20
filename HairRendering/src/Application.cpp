@@ -260,16 +260,16 @@ void Application::Initialise()
 		mMeshProgram = new MeshShaderProgram(),
 		mHairProgram = new HairShaderProgram(),
 		mHairOpacityProgram = new HairOpacityShaderProgram(),
-		mWhiteHairProgram = new HairShaderProgram("src/shaders/hair.vert", "src/shaders/white.frag"),
-		mWhiteMeshProgram = new MeshShaderProgram("src/shaders/mesh.vert", "src/shaders/white.frag"),
-		mHairDepthPeelProgram = new HairShaderProgram("src/shaders/hair.vert", "src/shaders/hairDepthPeel.frag"),
-		mMeshDepthPeelProgram = new MeshShaderProgram("src/shaders/mesh.vert", "src/shaders/meshDepthPeel.frag"),
-		mLightShaderProgram = new ShaderProgram("src/shaders/mesh.vert", "src/shaders/light.frag"),
+		mWhiteHairProgram = new HairShaderProgram("hair.vert", "white.frag"),
+		mWhiteMeshProgram = new MeshShaderProgram("mesh.vert", "white.frag"),
+		mHairDepthPeelProgram = new HairShaderProgram("hair.vert", "hairDepthPeel.frag"),
+		mMeshDepthPeelProgram = new MeshShaderProgram("mesh.vert", "meshDepthPeel.frag"),
+		mLightShaderProgram = new ShaderProgram("mesh.vert", "light.frag"),
 	};
 
 	//Textures
 	mNoiseTexture = new Texture();
-	mNoiseTexture->Create("../images/Noise.jpg", GL_LINEAR, GL_LINEAR);
+	mNoiseTexture->Create("Noise.jpg", GL_LINEAR, GL_LINEAR);
 
 	//Framebuffers
 	int shadowMapSize = 4096;
@@ -320,14 +320,14 @@ void Application::InitSimulation()
 	}
 
 	//Head model
-	mHead = new Model("../models/" + mModelName);
+	mHead = new Model(mModelName);
 
 	//Collision model
-	mCollider = new Model("../models/" + mColliderName, 1.1f);
+	mCollider = new Model(mColliderName, 1.1f);
 	
 	mSimulation = new Simulation(mCollider->GetFirstMesh());
 
-	mHair = new Hair(mHead->GetFirstMesh(), hairDensity, ("../images/" + mHairMapName).c_str(), (double)maxLength, mSimulation);
+	mHair = new Hair(mHead->GetFirstMesh(), hairDensity, ("../../../images/" + mHairMapName).c_str(), (double)maxLength, mSimulation);
 
 	//Some default settings
 	if (mModelName == "plane.obj")

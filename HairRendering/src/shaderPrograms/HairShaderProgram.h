@@ -4,6 +4,6 @@
 class HairShaderProgram : public ShaderProgram
 {
 public:
-	HairShaderProgram(const char* vertex = "src/shaders/hair.vert", const char* fragment = "src/shaders/hair.frag", const char* geometry = "src/shaders/hair.geom", const char* tessControl = "src/shaders/hair.tcs", const char* tessEval = "src/shaders/hair.tes");
+	HairShaderProgram(const char* vertex = "hair.vert", const char* fragment = "hair.frag", const char* geometry = "hair.geom", const char* tessControl = "hair.tcs", const char* tessEval = "hair.tes");
 	virtual void SetGlobalUniforms() override;
 };

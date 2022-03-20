@@ -25,4 +25,6 @@ private:
 	Mesh* ProcessMesh(aiMesh* mesh, const aiScene* scene);
 
 	float mScale;
+
+	const std::string DIRECTORY_PATH = "../../../models/";
 };

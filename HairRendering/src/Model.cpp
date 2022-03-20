@@ -3,7 +3,9 @@
 Model::Model(std::string filename, float scale)
 {
 	mScale = scale;
-	LoadModel(filename);
+
+	std::string path = DIRECTORY_PATH + filename;
+	LoadModel(path);
 }
 
 Model::~Model()

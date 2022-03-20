@@ -58,7 +58,7 @@ public:
 
 protected:
 	GLint GetUniformLocation(const GLchar* name);
-	GLuint CreateShader(GLenum type, const char* path);
+	GLuint CreateShader(GLenum type, const char* filename);
 
 	GLuint mID;
 	const char* mVertex;
@@ -72,4 +72,6 @@ private:
 	GLuint CreateProgram(std::vector<GLuint>& shaders);
 
 	std::map<std::string, int> mUniformLocations;
+
+	const std::string DIRECTORY_PATH = "../../../HairRendering/src/shaders/";
 };

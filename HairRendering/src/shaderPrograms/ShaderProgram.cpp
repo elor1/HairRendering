@@ -100,11 +100,12 @@ GLuint ShaderProgram::Load()
 	return programID;
 }
 
-GLuint ShaderProgram::CreateShader(GLenum type, const char* path)
+GLuint ShaderProgram::CreateShader(GLenum type, const char* filename)
 {
 	GLuint shaderID = glCreateShader(type);
 
 	//Read from file
+	std::string path = DIRECTORY_PATH + filename;
 	std::ifstream file(path);
 	std::string out;
 

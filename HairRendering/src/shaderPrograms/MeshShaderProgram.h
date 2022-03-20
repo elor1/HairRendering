@@ -4,7 +4,7 @@
 class MeshShaderProgram : public ShaderProgram
 {
 public:
-	MeshShaderProgram(const char* vertex = "src/shaders/mesh.vert", const char* fragment = "src/shaders/mesh.frag");
+	MeshShaderProgram(const char* vertex = "mesh.vert", const char* fragment = "mesh.frag");
 
 	virtual void SetGlobalUniforms() override;
 	virtual void SetObjectUniforms() override;

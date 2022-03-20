@@ -30,4 +30,6 @@ private:
 	GLint mInternalFormat;
 	GLenum mFormat;
 	GLenum mType;
+
+	const std::string DIRECTORY_PATH = "../../../images/";
 };
