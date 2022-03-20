@@ -442,14 +442,14 @@ void Application::Draw()
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 		DrawHair(mHairProgram, model, mCamera->GetView(), mCamera->GetProjection());
 		DrawMesh(mMeshProgram, model, mCamera->GetView(), mCamera->GetProjection());
-		DrawLight(model, mCamera->GetView(), mCamera->GetProjection());
+		DrawLight(mCamera->GetView(), mCamera->GetProjection());
 
 		//2nd layer
 		mDepthPeelFramebuffer1->Bind();
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 		DrawHair(mHairDepthPeelProgram, model, mCamera->GetView(), mCamera->GetProjection());
 		DrawMesh(mMeshDepthPeelProgram, model, mCamera->GetView(), mCamera->GetProjection());
-		DrawLight(model, mCamera->GetView(), mCamera->GetProjection());
+		DrawLight(mCamera->GetView(), mCamera->GetProjection());
 
 		//3rd layer
 		mDepthPeelFramebuffer1->Unbind();
@@ -485,7 +485,7 @@ void Application::Draw()
 		DrawMesh(mMeshProgram, model, mCamera->GetView(), mCamera->GetProjection());
 
 		//Render light
-		DrawLight(model, mCamera->GetView(), mCamera->GetProjection());
+		DrawLight(mCamera->GetView(), mCamera->GetProjection());
 
 		if (useSuperSampling)
 		{
@@ -706,12 +706,12 @@ void Application::DrawHair(ShaderProgram* program, glm::mat4 model, glm::mat4 vi
 	mHair->Draw(program);
 }
 
-void Application::DrawLight(glm::mat4 model, glm::mat4 view, glm::mat4 projection)
+void Application::DrawLight(glm::mat4 view, glm::mat4 projection)
 {
 	mLightShaderProgram->Bind();
 	mLightShaderProgram->uniforms.projection = projection;
 	mLightShaderProgram->uniforms.view = view;
-	mLightShaderProgram->uniforms.model = model;
+	mLightShaderProgram->uniforms.model = glm::mat4(1.0f);
 	mLightShaderProgram->uniforms.colour = mLight->GetColour();
 	mLightShaderProgram->SetGlobalUniforms();
 	mLightShaderProgram->SetObjectUniforms();

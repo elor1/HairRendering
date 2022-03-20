@@ -52,7 +52,7 @@ private:
 	void MouseScrollCallback(GLFWwindow* window, double xOffset, double yOffset);
 	void DrawMesh(ShaderProgram* program, glm::mat4 model, glm::mat4 view, glm::mat4 projection);
 	void DrawHair(ShaderProgram* program, glm::mat4 model, glm::mat4 view, glm::mat4 projection);
-	void DrawLight(glm::mat4 model, glm::mat4 view, glm::mat4 projection);
+	void DrawLight(glm::mat4 view, glm::mat4 projection);
 	
 	Model* mHead;
 	Model* mCollider;
