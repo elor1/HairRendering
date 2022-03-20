@@ -76,6 +76,12 @@ std::vector<Vertex> Mesh::GetVertices()
 	return mVertices;
 }
 
+void Mesh::SetVertices(std::vector<Vertex> vertices)
+{
+	mVertices = vertices;
+	SetupMesh();
+}
+
 
 bool Mesh::Contains(glm::vec3 &normal, glm::vec3 position)
 {

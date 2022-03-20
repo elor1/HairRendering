@@ -7,6 +7,7 @@
 #include "Hair.h"
 #include "Model.h"
 #include <string>
+#include "Light.h"
 
 class Simulation;
 class Texture;
@@ -34,6 +35,8 @@ public:
 	bool useTransparency;
 	float hairDensity;
 	float maxLength;
+	glm::vec3 lightPosition;
+	bool orbitLight;
 
 private:
 	void UpdateSettings();
@@ -48,6 +51,7 @@ private:
 	void MouseScrollCallback(GLFWwindow* window, double xOffset, double yOffset);
 	void DrawMesh(ShaderProgram* program, glm::mat4 model, glm::mat4 view, glm::mat4 projection);
 	void DrawHair(ShaderProgram* program, glm::mat4 model, glm::mat4 view, glm::mat4 projection);
+	void DrawLight(glm::mat4 model, glm::mat4 view, glm::mat4 projection);
 	
 	Model* mHead;
 	Model* mCollider;
@@ -67,6 +71,7 @@ private:
 	ShaderProgram* mWhiteMeshProgram;
 	ShaderProgram* mHairDepthPeelProgram;
 	ShaderProgram* mMeshDepthPeelProgram;
+	ShaderProgram* mLightShaderProgram;
 
 	Texture* mNoiseTexture;
 
@@ -87,7 +92,6 @@ private:
 	int mWidth;
 	int mHeight;
 
-	glm::vec3 mLightPosition;
 	glm::mat4 mDirToLight;
 
 	double mPrevTime;
@@ -99,4 +103,7 @@ private:
 	bool mIsSpaceDown;
 
 	GuiWindow* mGui;
+
+	Light* mLight;
+	float mLightRotate;
 };

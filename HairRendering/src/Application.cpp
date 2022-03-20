@@ -32,6 +32,9 @@ Application::Application(int width, int height)
 	mModelName = "head.obj";
 	mColliderName = "headCollider.obj";
 	maxLength = 0.45;
+	lightPosition = glm::vec3(2.0f, 2.0f, 2.0f);
+	mLightRotate = 0.0f;
+	orbitLight = false;
 
 	Initialise();
 }
@@ -54,6 +57,7 @@ Application::~Application()
 	delete mSimulation;
 	delete mHair;
 	delete mCamera;
+	delete mLight;
 	delete mNoiseTexture;
 }
 
@@ -245,7 +249,7 @@ void Application::Initialise()
 
 	//Camera
 	mCamera = new Camera(5.0f, glm::perspective(0.8f, (float)mWidth / mHeight, 0.1f, 100.0f));
-
+	mLight = new Light(lightPosition, glm::vec3(1.0f, 1.0f, 1.0f));
 	//Shaders
 	mPrograms = {
 		mMeshProgram = new MeshShaderProgram(),
@@ -255,6 +259,7 @@ void Application::Initialise()
 		mWhiteMeshProgram = new MeshShaderProgram("src/shaders/mesh.vert", "src/shaders/white.frag"),
 		mHairDepthPeelProgram = new HairShaderProgram("src/shaders/hair.vert", "src/shaders/hairDepthPeel.frag"),
 		mMeshDepthPeelProgram = new MeshShaderProgram("src/shaders/mesh.vert", "src/shaders/meshDepthPeel.frag"),
+		mLightShaderProgram = new ShaderProgram("src/shaders/mesh.vert", "src/shaders/light.frag"),
 	};
 
 	//Textures
@@ -359,15 +364,23 @@ void Application::Draw()
 		float time = mFrame++ / 60.0f;
 		mSimulation->Update(time);
 		mHair->Update(time);
+
+		if (orbitLight)
+		{
+			lightPosition = glm::vec3(cos(mLightRotate) * 10.0f, 0.0f, sin(mLightRotate) * 10.0f);
+			mLightRotate += 0.7f * mDeltaTime;
+		}
 	}
 	
 	mGui->NewFrame();
 
 	//Light
 	glm::mat4 model = mSimulation->GetTransform();
-	mLightPosition = glm::vec3(2.0f, 2.0f, 2.0f);
+	
+	mLight->SetPosition(lightPosition);
+
 	glm::mat4 lightProjection = glm::perspective(1.3f, 1.0f, 1.0f, 100.0f);
-	glm::mat4 lightView = glm::lookAt(mLightPosition, glm::vec3(0.0f), glm::vec3(0.0f, 1.0f, 0.0f));
+	glm::mat4 lightView = glm::lookAt(lightPosition, glm::vec3(0.0f), glm::vec3(0.0f, 1.0f, 0.0f));
 	mDirToLight = lightProjection * lightView * glm::inverse(mCamera->GetView());
 
 	//Bind textures
@@ -420,12 +433,14 @@ void Application::Draw()
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 		DrawHair(mHairProgram, model, mCamera->GetView(), mCamera->GetProjection());
 		DrawMesh(mMeshProgram, model, mCamera->GetView(), mCamera->GetProjection());
+		DrawLight(model, mCamera->GetView(), mCamera->GetProjection());
 
 		//2nd layer
 		mDepthPeelFramebuffer1->Bind();
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 		DrawHair(mHairDepthPeelProgram, model, mCamera->GetView(), mCamera->GetProjection());
 		DrawMesh(mMeshDepthPeelProgram, model, mCamera->GetView(), mCamera->GetProjection());
+		DrawLight(model, mCamera->GetView(), mCamera->GetProjection());
 
 		//3rd layer
 		mDepthPeelFramebuffer1->Unbind();
@@ -460,6 +475,9 @@ void Application::Draw()
 		//Render mesh
 		DrawMesh(mMeshProgram, model, mCamera->GetView(), mCamera->GetProjection());
 
+		//Render light
+		DrawLight(model, mCamera->GetView(), mCamera->GetProjection());
+
 		if (useSuperSampling)
 		{
 			//Render texture
@@ -469,7 +487,6 @@ void Application::Draw()
 			mSsFramebuffer->GetColourTexture()->RenderFullScreen();
 		}
 	}
-	
 
 	mNoiseTexture->Unbind(GL_TEXTURE0);
 	mHairShadowFramebuffer->GetDepthTexture()->Unbind(GL_TEXTURE1);
@@ -645,7 +662,7 @@ void Application::DrawMesh(ShaderProgram* program, glm::mat4 model, glm::mat4 vi
 	program->uniforms.projection = projection;
 	program->uniforms.view = view;
 	program->uniforms.model = model;
-	program->uniforms.lightPosition = mLightPosition;
+	program->uniforms.lightPosition = lightPosition;
 	program->uniforms.dirToLight = mDirToLight;
 	program->uniforms.shadowIntensity = mHair->GetShadowIntensity();
 	program->uniforms.useShadows = useShadows;
@@ -667,7 +684,7 @@ void Application::DrawHair(ShaderProgram* program, glm::mat4 model, glm::mat4 vi
 	program->uniforms.view = view;
 	program->uniforms.model = model;
 	program->uniforms.dirToLight = mDirToLight;
-	program->uniforms.lightPosition = mLightPosition;
+	program->uniforms.lightPosition = lightPosition;
 	program->uniforms.shadowIntensity = mHair->GetShadowIntensity();
 	program->uniforms.useShadows = useShadows;
 	program->uniforms.specularIntensity = mHair->GetSpecularIntensity();
@@ -676,4 +693,16 @@ void Application::DrawHair(ShaderProgram* program, glm::mat4 model, glm::mat4 vi
 	program->uniforms.maxColourChange = mHair->GetColourChange();
 	program->SetGlobalUniforms();
 	mHair->Draw(program);
+}
+
+void Application::DrawLight(glm::mat4 model, glm::mat4 view, glm::mat4 projection)
+{
+	mLightShaderProgram->Bind();
+	mLightShaderProgram->uniforms.projection = projection;
+	mLightShaderProgram->uniforms.view = view;
+	mLightShaderProgram->uniforms.model = model;
+	mLightShaderProgram->uniforms.colour = mLight->GetColour();
+	mLightShaderProgram->SetGlobalUniforms();
+	mLightShaderProgram->SetObjectUniforms();
+	mLight->Draw();
 }

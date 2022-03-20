@@ -4,6 +4,7 @@
 #include "gtx/transform.hpp"
 #include "gtx/extended_min_max.hpp"
 #include <iostream>
+#include <random>
 
 #define GRAVITY -9.8f
 #define TIMESTEP 0.02f
@@ -12,7 +13,7 @@
 
 Simulation::Simulation(Mesh* mesh)
 {
-	mTime = 0;
+	mTime = 0.0f;
 	mMesh = mesh;
 	mTransform = glm::mat4(1.0f);
 	mHeadMoving = false;
@@ -109,8 +110,12 @@ void Simulation::CalculateExternalForces(Hair* hair)
 			force += acceleration * vertex->mass * 0.1f;
 			
 			//Wind
-			force += glm::vec3(glm::inverse(mTransform) * glm::vec4(glm::normalize(windDirection) * windStrength * glm::vec3(((rand() % 100) / 100.0f), ((rand() % 100) / 100.0f), ((rand() % 100) / 100.0f)), 0.0f));
-	
+			if (windStrength > 0.0f)
+			{
+				force += glm::vec3(glm::inverse(mTransform) * glm::vec4(glm::normalize(windDirection) * windStrength * glm::vec3(((rand() % 100) / 100.0f), ((rand() % 100) / 100.0f), ((rand() % 100) / 100.0f)), 0.0f));
+			}
+			
+
 			if (COLLISIONS)
 			{
 				//Hair-head collisions

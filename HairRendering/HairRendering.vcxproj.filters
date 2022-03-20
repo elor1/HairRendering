@@ -96,6 +96,9 @@
     <ClCompile Include="src\shaderPrograms\FeedbackShaderProgram.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="src\Light.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\Application.h">
@@ -179,6 +182,9 @@
     <ClInclude Include="src\shaderPrograms\FeedbackShaderProgram.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="src\Light.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="src\shaders\hair.frag">
@@ -216,5 +222,7 @@
     </None>
     <None Include="src\shaders\hairDepthPeel.frag" />
     <None Include="src\shaders\meshDepthPeel.frag" />
+    <None Include="src\shaders\light.vert" />
+    <None Include="src\shaders\light.frag" />
   </ItemGroup>
 </Project>

@@ -45,6 +45,9 @@ void GuiWindow::Update()
 	std::string stats = std::to_string(numGuideHairs) + " simulated guide hairs \n" + std::to_string(numGuideHairs * numGroupHairs) + " total hairs \n";
 	ImGui::Text(stats.c_str());
 
+	ImGui::SliderFloat3("Light position", &mApp->lightPosition.x, -10, 10);
+	ImGui::Checkbox("Orbit light", &mApp->orbitLight);
+
 	if (ImGui::CollapsingHeader("Simulation", ImGuiTreeNodeFlags_DefaultOpen))
 	{
 		ImGui::InputFloat3("Wind direction", &hair->mSimulation->windDirection.x);

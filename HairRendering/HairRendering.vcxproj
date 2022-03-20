@@ -191,6 +191,7 @@ xcopy /y /d "$(SolutionDir)lib\assimp\assimp-vc140-mt.dll" "$(OutDir)"</Command>
     <ClCompile Include="src\Framebuffer.cpp" />
     <ClCompile Include="src\GuiWindow.cpp" />
     <ClCompile Include="src\Hair.cpp" />
+    <ClCompile Include="src\Light.cpp" />
     <ClCompile Include="src\Mesh.cpp" />
     <ClCompile Include="src\Model.cpp" />
     <ClCompile Include="src\Quad.cpp" />
@@ -221,6 +222,7 @@ xcopy /y /d "$(SolutionDir)lib\assimp\assimp-vc140-mt.dll" "$(OutDir)"</Command>
     <ClInclude Include="src\Framebuffer.h" />
     <ClInclude Include="src\GuiWindow.h" />
     <ClInclude Include="src\Hair.h" />
+    <ClInclude Include="src\Light.h" />
     <ClInclude Include="src\Mesh.h" />
     <ClInclude Include="src\Model.h" />
     <ClInclude Include="src\Quad.h" />
@@ -237,6 +239,8 @@ xcopy /y /d "$(SolutionDir)lib\assimp\assimp-vc140-mt.dll" "$(OutDir)"</Command>
   <ItemGroup>
     <None Include="src\shaders\hairDepthPeel.frag" />
     <None Include="src\shaders\hairOpacity.frag" />
+    <None Include="src\shaders\light.frag" />
+    <None Include="src\shaders\light.vert" />
     <None Include="src\shaders\mesh.frag" />
     <None Include="src\shaders\mesh.vert" />
     <None Include="src\shaders\hair.frag" />
