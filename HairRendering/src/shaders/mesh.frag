@@ -58,12 +58,12 @@ float GetMeshVisibility(vec4 point)
 }
 
 //---Mesh lighting---//
+uniform sampler2D hairMap;
 uniform vec3 hairColour;
 uniform vec3 lightPosition;
 uniform vec3 lightColour;
 uniform mat4 view;
 uniform mat4 dirToLight;
-uniform sampler2D hairMap;
 
 vec3 meshColour;
 
@@ -83,13 +83,7 @@ vec3 GetColour(vec4 pos, vec4 normal, vec4 lightPos)
 
 vec4 Lighting(vec4 pos, vec4 normal, vec2 texCoord)
 {
-	float alpha = texture(hairMap, texCoord).a;
-	float hair = 0.0f;
-	if (alpha > 0.05f)
-	{
-		hair = 1.0f;
-	}
-	meshColour = mix(MESH_COLOUR, hairColour, 0.0f);
+	meshColour = mix(MESH_COLOUR, hairColour, texture(hairMap, texCoord).r);
 
 	vec4 lightSpacePos = dirToLight * view * pos;
 	vec4 colour;

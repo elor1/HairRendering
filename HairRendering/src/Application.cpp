@@ -38,7 +38,7 @@ Application::Application(int width, int height)
 	hairDensity = 150;
 	maxLength = 0.45;
 
-	lightPosition = glm::vec3(2.0f, 2.0f, 2.0f);
+	lightPosition = glm::vec3(3.0f, 1.8f, 3.6f);
 	mLightRotate = 0.0f;
 	orbitLight = false;
 
