@@ -25,7 +25,7 @@ void Model::Draw()
 }
 
 
-Mesh* Model::GetFirstMesh()
+Mesh* Model::GetFirstMesh() const
 {
 	return mMeshes[0];
 }

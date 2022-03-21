@@ -71,12 +71,12 @@ void Mesh::Draw()
 	glBindVertexArray(0);
 }
 
-std::vector<Vertex> Mesh::GetVertices()
+std::vector<Vertex> Mesh::GetVertices() const
 {
 	return mVertices;
 }
 
-void Mesh::SetVertices(std::vector<Vertex> vertices)
+void Mesh::SetVertices(const std::vector<Vertex> vertices)
 {
 	mVertices = vertices;
 	SetupMesh();

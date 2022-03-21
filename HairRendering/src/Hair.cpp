@@ -43,8 +43,9 @@ Hair::Hair(Mesh* mesh, float hairDensity, const char* hairMap, double maxLength,
 	}
 
 	//Get hair map data
+	std::string path = std::string("../../../images/") + hairMap;
 	int width, height, channels;
-	unsigned char* image = SOIL_load_image(hairMap, &width, &height, &channels, SOIL_LOAD_RGBA);
+	unsigned char* image = SOIL_load_image(path.c_str(), &width, &height, &channels, SOIL_LOAD_RGBA);
 	
 	if (image == NULL || width == 0 || height == 0)
 	{
@@ -162,62 +163,72 @@ void Hair::SetAttributes(glm::vec3 colour, int numGroupHairs, float groupSpread,
 	mColourChange = colourChange;
 }
 
-std::vector<Strand*> Hair::GetGuideHairs()
+std::vector<Strand*> Hair::GetGuideHairs() const
 {
 	return mGuideHairs;
 }
 
-int Hair::GetNumGroupHairs()
+int Hair::GetNumGroupHairs() const
 {
 	return mNumGroupHairs;
 }
 
-void Hair::SetNumGroupHairs(int num)
+void Hair::SetNumGroupHairs(const int num)
 {
 	mNumGroupHairs = num;
 }
 
-void Hair::SetNumSplineVertices(int num)
+void Hair::SetNumSplineVertices(const int num)
 {
 	mNumSplineVertices = num;
 }
 
-void Hair::SetColour(glm::vec3 colour)
+void Hair::SetColour(const glm::vec3 colour)
 {
 	mColour = colour;
 }
 
-Texture* Hair::GetHairMap()
+void Hair::SetShadowIntensity(const float intensity)
+{
+	mShadowIntensity = intensity;
+}
+
+void Hair::SetGroupSpread(const float spread)
+{
+	mGroupSpread = spread;
+}
+
+Texture* Hair::GetHairMap() const
 {
 	return mHairMap;
 }
 
-glm::vec3 Hair::GetColour()
+glm::vec3 Hair::GetColour() const
 {
 	return mColour;
 }
 
-float Hair::GetShadowIntensity()
+float Hair::GetShadowIntensity() const
 {
 	return mShadowIntensity;
 }
 
-float Hair::GetDiffuseIntensity()
+float Hair::GetDiffuseIntensity() const
 {
 	return mDiffuseIntensity;
 }
 
-float Hair::GetSpecularIntensity()
+float Hair::GetSpecularIntensity() const
 {
 	return mSpecularIntensity;
 }
 
-float Hair::GetOpacity()
+float Hair::GetOpacity() const
 {
 	return mOpacity;
 }
 
-float Hair::GetColourChange()
+float Hair::GetColourChange() const
 {
 	return mColourChange;
 }

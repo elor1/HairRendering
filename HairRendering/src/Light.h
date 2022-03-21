@@ -8,8 +8,8 @@ public:
 	friend class GuiWindow;
 	Light(glm::vec3 position, glm::vec3 colour);
 
-	void SetPosition(glm::vec3 pos);
-	glm::vec3 GetColour();
+	void SetPosition(const glm::vec3 pos);
+	glm::vec3 GetColour() const;
 
 private:
 	glm::vec3 mPosition;

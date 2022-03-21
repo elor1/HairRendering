@@ -21,8 +21,8 @@ public:
 	void UpdateHair(Hair* hair);
 
 	std::vector<glm::vec3> mForces;
-	glm::mat4 GetTransform();
-	void SetHeadMoving(bool moving);
+	glm::mat4 GetTransform() const;
+	void SetHeadMoving(const bool moving);
 
 	//Gui
 	bool shake;

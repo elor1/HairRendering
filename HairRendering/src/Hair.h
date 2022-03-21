@@ -23,18 +23,20 @@ public:
 	void SetAttributes(Hair* oldHair);
 	void SetAttributes(glm::vec3 colour = glm::vec3(0.25f, 0.17f, 0.15f), int numGroupHairs = 64, float groupSpread = 0.3f, float hairRadius = 0.003f, float noiseAmplitude = 0.3f, float noiseFrequency =  0.2f, int numSplineVertices = 20, float shadowIntensity = 20.0f, float diffuseIntensity = 1.0f, float specularIntensity = 0.5f, float opacity = 0.25, float colourChange = 1.5f);
 
-	std::vector<Strand*> GetGuideHairs();
-	int GetNumGroupHairs();
-	void SetNumGroupHairs(int num);
-	void SetNumSplineVertices(int num);
-	void SetColour(glm::vec3 colour);
-	Texture* GetHairMap();
-	glm::vec3 GetColour();
-	float GetShadowIntensity();
-	float GetDiffuseIntensity();
-	float GetSpecularIntensity();
-	float GetOpacity();
-	float GetColourChange();
+	std::vector<Strand*> GetGuideHairs() const;
+	int GetNumGroupHairs() const;
+	void SetNumGroupHairs(const int num);
+	void SetNumSplineVertices(const int num);
+	void SetColour(const glm::vec3 colour);
+	void SetShadowIntensity(const float intensity);
+	void SetGroupSpread(const float spread);
+	Texture* GetHairMap() const;
+	glm::vec3 GetColour() const;
+	float GetShadowIntensity() const;
+	float GetDiffuseIntensity() const;
+	float GetSpecularIntensity() const;
+	float GetOpacity() const;
+	float GetColourChange() const;
 
 private:
 	std::vector<Strand*> mGuideHairs;

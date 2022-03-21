@@ -7,7 +7,7 @@ Light::Light(glm::vec3 position, glm::vec3 colour) : Model("../models/sphere.obj
 	mOriginalPos = GetFirstMesh()->GetVertices();
 }
 
-void Light::SetPosition(glm::vec3 pos)
+void Light::SetPosition(const glm::vec3 pos)
 {
 	std::vector<Vertex> newPos = mOriginalPos;
 	for (int i = 0; i < mOriginalPos.size(); i++)
@@ -18,7 +18,7 @@ void Light::SetPosition(glm::vec3 pos)
 	GetFirstMesh()->SetVertices(newPos);
 }
 
-glm::vec3 Light::GetColour()
+glm::vec3 Light::GetColour() const
 {
 	return mColour;
 }

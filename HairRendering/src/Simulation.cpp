@@ -4,7 +4,6 @@
 #include "gtx/transform.hpp"
 #include "gtx/extended_min_max.hpp"
 #include <iostream>
-#include <random>
 
 #define GRAVITY -9.8f
 #define TIMESTEP 0.02f
@@ -61,12 +60,12 @@ void Simulation::UpdateHair(Hair* hair)
 	}
 }
 
-glm::mat4 Simulation::GetTransform()
+glm::mat4 Simulation::GetTransform() const
 {
 	return mTransform;
 }
 
-void Simulation::SetHeadMoving(bool moving)
+void Simulation::SetHeadMoving(const bool moving)
 {
 	mHeadMoving = moving;
 }
@@ -110,11 +109,28 @@ void Simulation::CalculateExternalForces(Hair* hair)
 			force += acceleration * vertex->mass * 0.1f;
 			
 			//Wind
-			if (windStrength > 0.0f)
+			if (windStrength > 0.0f && glm::length(windDirection) > 0)
 			{
-				force += glm::vec3(glm::inverse(mTransform) * glm::vec4(glm::normalize(windDirection) * windStrength * glm::vec3(((rand() % 100) / 100.0f), ((rand() % 100) / 100.0f), ((rand() % 100) / 100.0f)), 0.0f));
+				//Higher wind strenth means more chance of each vertex being affected by wind
+				int chance = (rand() % 100) / 2;
+				if (chance <= windStrength)
+				{
+					//Main wind force
+					force += glm::vec3(glm::inverse(mTransform) * glm::vec4(glm::normalize(windDirection) * windStrength, 0.0f)) * 0.8f;
+
+					//Add randomness based on wind strength
+					float a = ((float)rand() / (RAND_MAX)) * 2 - 1;
+					float b = ((float)rand() / (RAND_MAX)) * 2 - 1;
+					float c = ((float)rand() / (RAND_MAX)) * 2 - 1;
+					glm::vec3 randomForce = glm::vec3(a, b, c) * windStrength * 0.2f;
+
+					//Ignore small random forces to reduce jittering
+					if (glm::length(randomForce) > 3.0f)
+					{
+						force += randomForce;
+					}
+				}
 			}
-			
 
 			if (COLLISIONS)
 			{

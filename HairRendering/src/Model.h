@@ -14,7 +14,7 @@ public:
 	~Model();
 
 	void Draw();
-	Mesh* GetFirstMesh();
+	Mesh* GetFirstMesh() const;
 
 private:
 	std::vector<Mesh*> mMeshes;

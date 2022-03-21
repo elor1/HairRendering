@@ -103,8 +103,8 @@ public:
 
 
 	void Draw();
-	std::vector<Vertex> GetVertices();
-	void SetVertices(std::vector<Vertex> vertices);
+	std::vector<Vertex> GetVertices() const;
+	void SetVertices(const std::vector<Vertex> vertices);
 	std::vector<Triangle> triangles;
 	bool Contains(glm::vec3 &normal, glm::vec3 position);
 

@@ -19,8 +19,8 @@ public:
 	void ResizeDepthBuffer(int width, int height);
 	void GenerateTexture(int width, int height, GLint magFilter, GLint minFilter);
 	void GenerateDepthTexture(int width, int height, GLint magFilter, GLint minFilter);
-	Texture* GetColourTexture();
-	Texture* GetDepthTexture();
+	Texture* GetColourTexture() const;
+	Texture* GetDepthTexture() const;
 
 private:
 	GLuint mID;

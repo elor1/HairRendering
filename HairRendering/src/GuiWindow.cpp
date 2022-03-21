@@ -127,7 +127,7 @@ void GuiWindow::Update()
 			mApp->ResetSimulation();
 		}
 		ImGui::SliderInt("Strands per guide hair", &hair->mNumGroupHairs, 0, 64);
-		ImGui::SliderInt("Vertices per strand", &hair->mNumSplineVertices, 0, 50);
+		ImGui::SliderInt("Vertices per strand", &hair->mNumSplineVertices, 2, 50);
 		if (ImGui::SliderFloat("Max length", &mApp->maxLength, 0.01, 2))
 		{
 			mApp->ResetSimulation();

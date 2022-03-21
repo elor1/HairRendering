@@ -108,12 +108,12 @@ void Framebuffer::GenerateDepthTexture(int width, int height, GLint magFilter, G
 	AttachDepthTexture(mDepthTexture->GetID());
 }
 
-Texture* Framebuffer::GetColourTexture()
+Texture* Framebuffer::GetColourTexture() const
 {
 	return mColourTexture;
 }
 
-Texture* Framebuffer::GetDepthTexture()
+Texture* Framebuffer::GetDepthTexture() const
 {
 	return mDepthTexture;
 }

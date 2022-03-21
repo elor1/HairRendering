@@ -5,20 +5,20 @@ class Camera
 {
 public:
 	Camera(float zoom = 5.0f, glm::mat4 projection = glm::mat4(0.0f), float angleX = 0.0f, float angleY = 0.0f);
-	glm::mat4 GetView();
-	glm::mat4 GetProjection();
+	glm::mat4 GetView() const;
+	glm::mat4 GetProjection() const;
 	void UpdateViewMatrix();
-	void SetAngles(float x = 0.0f, float y = 0.0f);
-	void SetPreviousPosition(glm::vec2 pos);
-	void SetPreviousRotation(glm::vec2 rotation);
-	void SetPrevMousePosition(glm::vec2 pos);
-	glm::vec2 GetPreviousPosition();
-	glm::vec2 GetPreviousRotation();
-	glm::vec2 GetPrevMousePosition();
-	float GetZoom();
-	float GetAngleX();
-	float GetAngleY();
-	void SetZoom(float offset);
+	void SetAngles(const float x = 0.0f, const float y = 0.0f);
+	void SetPreviousPosition(const glm::vec2 pos);
+	void SetPreviousRotation(const glm::vec2 rotation);
+	void SetPrevMousePosition(const glm::vec2 pos);
+	glm::vec2 GetPreviousPosition() const;
+	glm::vec2 GetPreviousRotation() const;
+	glm::vec2 GetPrevMousePosition() const;
+	float GetZoom() const;
+	float GetAngleX() const;
+	float GetAngleY() const;
+	void SetZoom(const float offset);
 
 private:
 	glm::mat4 mProjection;

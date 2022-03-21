@@ -89,17 +89,17 @@ void Texture::RenderFullScreen()
 	mProgram->Unbind();
 }
 
-GLuint Texture::GetID()
+GLuint Texture::GetID() const
 {
 	return mID;
 }
 
-GLuint Texture::GetWidth()
+GLuint Texture::GetWidth() const
 {
 	return mWidth;
 }
 
-GLuint Texture::GetHeight()
+GLuint Texture::GetHeight() const
 {
 	return mHeight;
 }

@@ -7,7 +7,7 @@ in vec4 position_g;
 
 out vec4 opacityMap;
 
-const float OPACITY_LAYER_SIZE = 0.0005f;
+const float LAYER_SIZE = 0.0005f;
 
 void main()
 {
@@ -18,15 +18,15 @@ void main()
 	float currentDepth = shadowCoord.z;
 
 	opacityMap = vec4(0.0f);
-	if (currentDepth < shadowDepth + OPACITY_LAYER_SIZE)
+	if (currentDepth < shadowDepth + LAYER_SIZE)
 	{
 		opacityMap.r = 0.01f;
 	}
-	else if (currentDepth < shadowDepth + 3.0f * OPACITY_LAYER_SIZE)
+	else if (currentDepth < shadowDepth + 3.0f * LAYER_SIZE)
 	{
 		opacityMap.g = 0.01f;
 	}
-	else if (currentDepth < shadowDepth + 7.0f * OPACITY_LAYER_SIZE)
+	else if (currentDepth < shadowDepth + 7.0f * LAYER_SIZE)
 	{
 		opacityMap.b = 0.01f;
 	}

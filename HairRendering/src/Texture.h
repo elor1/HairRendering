@@ -16,9 +16,9 @@ public:
 	void Bind(GLenum textureUnit);
 	void Unbind(GLenum textureUnit);
 	void RenderFullScreen();
-	GLuint GetID();
-	GLuint GetWidth();
-	GLuint GetHeight();
+	GLuint GetID() const;
+	GLuint GetWidth() const;
+	GLuint GetHeight() const;
 
 private:
 	void Create(unsigned char* image, GLint internalFormat, int width, int height, GLenum format, GLenum type, GLint magFilter, GLint minFilter);

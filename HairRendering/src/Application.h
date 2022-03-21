@@ -22,15 +22,15 @@ public:
 	void Run();
 
 	//Gui
-	double GetDeltaTime();
-	Hair* GetHair();
-	Light* GetLight();
+	double GetDeltaTime() const;
+	Hair* GetHair() const;
+	Light* GetLight() const;
 	void TogglePause();
 	void ResetSimulation();
-	bool IsPaused();
-	void SetHairMap(std::string filename);
-	void SetModel(std::string filename);
-	void SetPreset(std::string preset);
+	bool IsPaused() const;
+	void SetHairMap(const std::string filename);
+	void SetModel(const std::string filename);
+	void SetPreset(const std::string preset);
 	bool useShadows;
 	bool useSuperSampling;
 	bool useTransparency;

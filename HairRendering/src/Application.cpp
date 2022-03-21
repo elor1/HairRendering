@@ -16,22 +16,28 @@ Application::Application(int width, int height)
 {
 	mPrevTime = glfwGetTime();
 	mCurrentTime = glfwGetTime();
+	mFrame = 0;
+
 	mWidth = width;
 	mHeight = height;
-	hairDensity = 150;
+	
 	mFirstMouse = true;
 	mLastX = width / 2.0;
 	mLastY = width / 2.f;
-	mFrame = 0;
 	mIsPaused = false;
 	mIsSpaceDown = false;
+
 	useShadows = true;
 	useSuperSampling = true;
 	useTransparency = true;
+
 	mHairMapName = "hair.png";
 	mModelName = "head.obj";
 	mColliderName = "headCollider.obj";
+
+	hairDensity = 150;
 	maxLength = 0.45;
+
 	lightPosition = glm::vec3(2.0f, 2.0f, 2.0f);
 	mLightRotate = 0.0f;
 	orbitLight = false;
@@ -70,17 +76,17 @@ void Application::Run()
 	}
 }
 
-double Application::GetDeltaTime()
+double Application::GetDeltaTime() const
 {
 	return mDeltaTime;
 }
 
-Hair* Application::GetHair()
+Hair* Application::GetHair() const
 {
 	return mHair;
 }
 
-Light* Application::GetLight()
+Light* Application::GetLight() const
 {
 	return mLight;
 }
@@ -95,19 +101,19 @@ void Application::ResetSimulation()
 	InitSimulation();
 }
 
-bool Application::IsPaused()
+bool Application::IsPaused() const
 {
 	return mIsPaused;
 }
 
-void Application::SetHairMap(std::string filename)
+void Application::SetHairMap(const std::string filename)
 {
 	mHairMapName = filename;
 
 	UpdateSettings();
 }
 
-void Application::SetModel(std::string filename)
+void Application::SetModel(const std::string filename)
 {
 	mModelName = filename;
 
@@ -137,7 +143,7 @@ void Application::SetModel(std::string filename)
 	UpdateSettings();
 }
 
-void Application::SetPreset(std::string preset)
+void Application::SetPreset(const std::string preset)
 {
 	if (preset == "Hair")
 	{
@@ -199,7 +205,7 @@ void Application::Initialise()
 	}
 
 	//Create window
-	mWindow = glfwCreateWindow(mWidth, mHeight, "Hello World", NULL, NULL);
+	mWindow = glfwCreateWindow(mWidth, mHeight, "Hair Rendering", NULL, NULL);
 	if (!mWindow)
 	{
 		std::cout << "ERROR: Failed to create window" << std::endl;
@@ -327,7 +333,7 @@ void Application::InitSimulation()
 	
 	mSimulation = new Simulation(mCollider->GetFirstMesh());
 
-	mHair = new Hair(mHead->GetFirstMesh(), hairDensity, ("../../../images/" + mHairMapName).c_str(), (double)maxLength, mSimulation);
+	mHair = new Hair(mHead->GetFirstMesh(), hairDensity, mHairMapName.c_str(), (double)maxLength, mSimulation);
 
 	//Some default settings
 	if (mModelName == "plane.obj")
@@ -335,10 +341,16 @@ void Application::InitSimulation()
 		mSimulation->stiffness = 0.5f;
 		mSimulation->windStrength = 35.0f;
 		mHair->SetColour(glm::vec3(0.09f, 0.43f, 0.13f));
+		mHair->SetShadowIntensity(0.95f);
+		mHair->SetGroupSpread(0.75f);
 	}
 	else if (mHairMapName == "beard.png")
 	{
 		mSimulation->stiffness = 0.3f;
+	}
+	else if (mHairMapName == "hair2.png")
+	{
+		mSimulation->stiffness = 0.25f;
 	}
 }
 
@@ -385,9 +397,7 @@ void Application::Draw()
 
 	//Light
 	glm::mat4 model = mSimulation->GetTransform();
-	
 	mLight->SetPosition(lightPosition);
-
 	glm::mat4 lightProjection = glm::perspective(1.3f, 1.0f, 1.0f, 100.0f);
 	glm::mat4 lightView = glm::lookAt(lightPosition, glm::vec3(0.0f), glm::vec3(0.0f, 1.0f, 0.0f));
 	mDirToLight = lightProjection * lightView * glm::inverse(mCamera->GetView());
