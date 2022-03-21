@@ -195,7 +195,6 @@ xcopy /y /d "$(SolutionDir)lib\assimp\assimp-vc140-mt.dll" "$(OutDir)"</Command>
     <ClCompile Include="src\Mesh.cpp" />
     <ClCompile Include="src\Model.cpp" />
     <ClCompile Include="src\Quad.cpp" />
-    <ClCompile Include="src\shaderPrograms\FeedbackShaderProgram.cpp" />
     <ClCompile Include="src\shaderPrograms\HairOpacityShaderProgram.cpp" />
     <ClCompile Include="src\shaderPrograms\HairShaderProgram.cpp" />
     <ClCompile Include="src\shaderPrograms\MeshShaderProgram.cpp" />
@@ -226,7 +225,6 @@ xcopy /y /d "$(SolutionDir)lib\assimp\assimp-vc140-mt.dll" "$(OutDir)"</Command>
     <ClInclude Include="src\Mesh.h" />
     <ClInclude Include="src\Model.h" />
     <ClInclude Include="src\Quad.h" />
-    <ClInclude Include="src\shaderPrograms\FeedbackShaderProgram.h" />
     <ClInclude Include="src\shaderPrograms\HairOpacityShaderProgram.h" />
     <ClInclude Include="src\shaderPrograms\HairShaderProgram.h" />
     <ClInclude Include="src\shaderPrograms\MeshShaderProgram.h" />
